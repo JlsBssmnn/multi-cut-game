@@ -1,0 +1,15 @@
+.node {
+  background-color: black;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.edge {
+  padding: 0px;
+  margin: 0px;
+  height: 4px;
+  background-color: black;
+  line-height: 1px;
+  position: absolute;
+  transform-origin: 0 50%;
+}

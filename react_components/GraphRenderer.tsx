@@ -104,14 +104,8 @@ export default function GraphRenderer({
         const nodes = [...info.nodes];
         const edges = [...info.edges];
 
-        nodes[draggedNode].x = Math.max(
-          Math.min(pointerX - nodeSize / 2, width - nodeSize),
-          0
-        );
-        nodes[draggedNode].y = Math.max(
-          Math.min(pointerY - nodeSize / 2, height - nodeSize),
-          0
-        );
+        nodes[draggedNode].x = pointerX - nodeSize / 2;
+        nodes[draggedNode].y = pointerY - nodeSize / 2;
 
         return {
           nodes,
@@ -127,11 +121,10 @@ export default function GraphRenderer({
 
   return (
     <div
-      className={"noTouchAction"}
+      className={`noTouchAction ${styles.graph}`}
       style={{
         width,
         height,
-        position: "relative",
       }}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}

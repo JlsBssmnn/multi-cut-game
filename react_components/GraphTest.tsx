@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Graph } from "../types/graph";
-import GraphRenderer from "./GraphRenderer";
 import fullyConnected from "../graphs/fullyConnected";
+import randomGraph from "../graphs/random";
+import gridGraph from "../graphs/grid";
+
+// use no SSR for the graph renderer, because otherwise there is a
+// problem, where the styles are different for the server and client
+import dynamic from "next/dynamic";
+const GraphRenderer = dynamic(() => import("./GraphRenderer"), {
+  ssr: false,
+});
 
 export interface Bar {
   width: number;
@@ -9,10 +17,10 @@ export interface Bar {
 }
 
 export default function GraphTest() {
-  const [graph, setGraph] = useState<Graph>(fullyConnected(5));
+  const [graph, setGraph] = useState<Graph>(randomGraph(10, 0.3));
 
   function addNew() {
-    setGraph((graph) => fullyConnected(graph.nodes.length + 1));
+    setGraph((graph) => randomGraph(graph.nodes.length + 1));
   }
 
   return (
@@ -20,7 +28,7 @@ export default function GraphTest() {
       <button onClick={addNew}>Add new Element</button>
       <br />
       <div style={{ border: "solid 5px black", display: "inline-block" }}>
-        <GraphRenderer width={800} height={600} nodeSize={50} graph={graph} />
+        <GraphRenderer width={1100} height={800} nodeSize={30} graph={graph} />
       </div>
     </div>
   );

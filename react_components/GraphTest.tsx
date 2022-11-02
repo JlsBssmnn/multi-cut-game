@@ -7,7 +7,7 @@ import gridGraph from "../graphs/grid";
 // use no SSR for the graph renderer, because otherwise there is a
 // problem, where the styles are different for the server and client
 import dynamic from "next/dynamic";
-const GraphRenderer = dynamic(() => import("./GraphRenderer"), {
+const GraphRenderer = dynamic(() => import("./InteractiveGraph"), {
   ssr: false,
 });
 
@@ -17,7 +17,7 @@ export interface Bar {
 }
 
 export default function GraphTest() {
-  const [graph, setGraph] = useState<Graph>(randomGraph(10, 0.3));
+  const [graph, setGraph] = useState<Graph>(fullyConnected(6));
 
   function addNew() {
     setGraph((graph) => randomGraph(graph.nodes.length + 1));

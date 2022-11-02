@@ -18,3 +18,10 @@
   position: absolute;
   transform-origin: 0 50%;
 }
+
+.dragArea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}

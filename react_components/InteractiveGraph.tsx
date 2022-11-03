@@ -1,6 +1,7 @@
 import { PointerEvent, useEffect, useState } from "react";
 import styles from "../styles/Graph.module.scss";
 import { Graph as GraphType, PartiallyRenderedGraph } from "../types/graph";
+import { clusterOffset } from "../utils/calculations/geometry";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
 import renderEdges from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
@@ -32,24 +33,32 @@ interface DraggedNode {
   clusterNode?: number;
 }
 
+export interface InteractiveGraphProps {
+  width: number;
+  height: number;
+  nodeSize: number;
+  graph: GraphType;
+  removeNodeFromCluster: (nodeID: string) => void;
+  moveNodeToCluster: (nodeID: string, group: number) => void;
+  joinClusters: (group1: number, group2: number) => void;
+}
+
 /**
  * This component displays the given graph and enables interaction with it.
  * This mean that nodes can be dragged via the pointer and thus nodes can
  * be moved. If the move of a node denotes an action that changes the
  * clustering, this component will emit a signal to it's parent to inform
- * it of this change (TODO).
+ * it of this change.
  */
 export default function InteractiveGraph({
   width,
   height,
   nodeSize,
   graph,
-}: {
-  width: number;
-  height: number;
-  nodeSize: number;
-  graph: GraphType;
-}) {
+  removeNodeFromCluster,
+  moveNodeToCluster,
+  joinClusters,
+}: InteractiveGraphProps) {
   const [renderInfo, setRenderInfo] = useState<PartiallyRenderedGraph>(() => {
     const info = layoutGraph(graph, nodeSize);
     scaleGraph(info, width, height, nodeSize);
@@ -165,7 +174,75 @@ export default function InteractiveGraph({
   }
 
   function pointerUp() {
-    // setRecording(false);
+    if (draggedNode == null) return;
+
+    const { cluster, clusterNode } = draggedNode;
+
+    if (clusterNode === undefined) {
+      // a cluster was moved
+      const { x, y, size, id } = renderInfo.nodes[cluster];
+      for (let i = 0; i < renderInfo.nodes.length; i++) {
+        const {
+          x: otherX,
+          y: otherY,
+          size: otherSize,
+          id: otherID,
+        } = renderInfo.nodes[i];
+        if (
+          i !== cluster &&
+          Math.max(x, otherX) <= Math.min(x + size, otherX + otherSize) &&
+          Math.max(y, otherY) <= Math.min(y + size, otherY + otherSize)
+        ) {
+          joinClusters(parseInt(id), parseInt(otherID));
+          return;
+        }
+      }
+    } else {
+      // a node within a cluster was moved
+      const clusterSize = renderInfo.nodes[cluster].size;
+      const { x, y, id } =
+        renderInfo.nodes[cluster].subgraph!.nodes[clusterNode];
+
+      // the node is still inside the cluster
+      if (x >= 0 && y >= 0 && x <= clusterSize && y <= clusterSize) return;
+
+      // check for collision with clusters
+      const absoluteX = x + renderInfo.nodes[cluster].x;
+      const absoluteY = y + renderInfo.nodes[cluster].y;
+
+      for (let i = 0; i < renderInfo.nodes.length; i++) {
+        const {
+          x: clusterX,
+          y: clusterY,
+          size: clusterSize,
+          id: group,
+        } = renderInfo.nodes[i];
+        if (
+          clusterX <= absoluteX &&
+          clusterY <= absoluteY &&
+          absoluteX <= clusterX + clusterSize &&
+          absoluteY <= clusterY + clusterSize
+        ) {
+          moveNodeToCluster(id, parseInt(group));
+          return;
+        }
+      }
+
+      // node is already in a singleton, so reset it's position
+      if (renderInfo.nodes[cluster].subgraph!.nodes.length < 2) {
+        setRenderInfo((graph) => {
+          const newGraph = { ...graph };
+          const node = newGraph.nodes[cluster].subgraph!.nodes[clusterNode];
+          const offset = clusterOffset(1, nodeSize);
+          node.x = offset;
+          node.y = offset;
+
+          return newGraph;
+        });
+        return;
+      }
+      removeNodeFromCluster(id);
+    }
   }
 
   return (

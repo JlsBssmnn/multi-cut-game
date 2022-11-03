@@ -43,6 +43,7 @@ export interface RenderedGraph {
 }
 
 export type PartiallyRenderedNode = {
+  id: string;
   x: number;
   y: number;
   color: string;

@@ -94,6 +94,7 @@ export function layoutCluster(
     .tick(300);
 
   const nodes = simulation.nodes().map((obj) => ({
+    id: obj.id,
     x: obj.x ?? 0,
     y: obj.y ?? 0,
     color: "black",
@@ -141,6 +142,7 @@ export default function layoutGraph(
     .tick(300);
 
   const nodes: PartiallyRenderedNode[] = simulation.nodes().map((obj) => ({
+    id: String(obj.id),
     x: obj.x ?? 0,
     y: obj.y ?? 0,
     color: d3.schemeTableau10[obj.id % 10],

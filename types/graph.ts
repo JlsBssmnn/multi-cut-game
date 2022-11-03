@@ -1,3 +1,5 @@
+import PartiallyRenderedGraph from "../utils/graph_rendering/PartiallyRenderedGraph";
+
 export interface Node {
   id: string;
   group: number;
@@ -11,23 +13,6 @@ export interface Edge {
 
 export interface Graph {
   nodes: Node[];
-  edges: Edge[];
-}
-
-/**
- * This represents a partially rendered graph: The nodes are rendered (contain
- * actual coordinates that will be used to position the elements), but the edges
- * are just indices into the nodes and don't contain any position-properties.
- */
-export interface PartiallyRenderedGraph {
-  /**
-   * An array of positions for the nodes.
-   */
-  nodes: PartiallyRenderedNode[];
-
-  /**
-   * The indices of the source and target node that are connected by this edge
-   */
   edges: Edge[];
 }
 

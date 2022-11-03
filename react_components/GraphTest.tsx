@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Graph } from "../types/graph";
 import fullyConnected from "../graphs/fullyConnected";
-import randomGraph from "../graphs/random";
-import gridGraph from "../graphs/grid";
 
 // use no SSR for the graph renderer, because otherwise there is a
 // problem, where the styles are different for the server and client
@@ -20,7 +18,7 @@ export default function GraphTest() {
   const [graph, setGraph] = useState<Graph>(fullyConnected(6));
 
   function addNew() {
-    setGraph((graph) => randomGraph(graph.nodes.length + 1));
+    setGraph((graph) => fullyConnected(graph.nodes.length + 1));
   }
 
   function removeNodeFromCluster(nodeID: string) {
@@ -76,9 +74,11 @@ export default function GraphTest() {
           height={800}
           nodeSize={30}
           graph={graph}
-          removeNodeFromCluster={removeNodeFromCluster}
-          moveNodeToCluster={moveNodeToCluster}
-          joinClusters={joinClusters}
+          signalHandlers={{
+            removeNodeFromCluster,
+            moveNodeToCluster,
+            joinClusters,
+          }}
         />
       </div>
     </div>

@@ -1,13 +1,8 @@
 import * as d3 from "d3";
 import { SimulationLinkDatum, SimulationNodeDatum } from "d3";
-import {
-  Edge,
-  Graph,
-  Node,
-  PartiallyRenderedGraph,
-  PartiallyRenderedNode,
-} from "../../types/graph";
+import { Edge, Graph, Node, PartiallyRenderedNode } from "../../types/graph";
 import { clusterDiameter } from "../calculations/geometry";
+import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
 
 // d3 will take nodes and edges and attach additional information to them (like
 // position). These new types are defined here.
@@ -114,10 +109,7 @@ export function layoutCluster(
     };
   });
 
-  return {
-    nodes,
-    edges,
-  };
+  return new PartiallyRenderedGraph(nodes, edges);
 }
 
 export default function layoutGraph(
@@ -179,8 +171,5 @@ export default function layoutGraph(
     cluster.subgraph = renderedCluster;
   });
 
-  return {
-    nodes,
-    edges,
-  };
+  return new PartiallyRenderedGraph(nodes, edges);
 }

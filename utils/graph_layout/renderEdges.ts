@@ -1,8 +1,5 @@
-import {
-  PartiallyRenderedGraph,
-  RenderedGraph,
-  RenderedNode,
-} from "../../types/graph";
+import { RenderedGraph, RenderedNode } from "../../types/graph";
+import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
 
 /**
  * This function takes a partially rendered graph and renders the edges of that

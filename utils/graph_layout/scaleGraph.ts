@@ -1,5 +1,5 @@
-import { PartiallyRenderedGraph } from "../../types/graph";
 import { clusterOffset } from "../calculations/geometry";
+import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
 
 /**
  * This function takes a partially rendered graph and scales all the cluster nodes to

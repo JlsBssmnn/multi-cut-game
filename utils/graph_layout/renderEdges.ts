@@ -7,11 +7,12 @@ import PartialGraph from "../graph_rendering/PartialGraph";
  * are connected by an edge. The result of this function is a fully rendered graph.
  */
 export default function renderEdges(
-  graph: PartialGraph | PartialSubgraph
+  graph: PartialGraph | PartialSubgraph,
+  edgeThickness: number
 ): Graph {
   const nodes = graph.nodes.map((node) => {
     if ("subgraph" in node)
-      return { ...node, subgraph: renderEdges(node.subgraph) };
+      return { ...node, subgraph: renderEdges(node.subgraph, edgeThickness) };
     else return node as ClusterNode;
   });
 
@@ -42,6 +43,8 @@ export default function renderEdges(
       left: sourceX,
       top: sourceY,
       width: length,
+      height: computeEdgeThickness(edgeThickness, edge.value),
+      backgroundColor: edge.value < 0 ? "red" : "green",
       transform: `rotate(${angle}deg)`,
     };
   });
@@ -50,4 +53,12 @@ export default function renderEdges(
     nodes,
     edges,
   };
+}
+
+/**
+ * This function computes the thickness of a rendered edge in pixels
+ * depending on it's value by using the provided `edgeThickness` parameter.
+ */
+function computeEdgeThickness(edgeThickness: number, value: number): number {
+  return Math.sqrt(edgeThickness * Math.abs(value));
 }

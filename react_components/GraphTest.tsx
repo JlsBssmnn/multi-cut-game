@@ -79,6 +79,7 @@ export default function GraphTest() {
             moveNodeToCluster,
             joinClusters,
           }}
+          edgeThickness={6}
         />
       </div>
     </div>

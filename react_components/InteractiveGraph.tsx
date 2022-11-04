@@ -40,6 +40,7 @@ export interface InteractiveGraphProps {
   nodeSize: number;
   graph: GraphType;
   signalHandlers: SignalHandlers;
+  edgeThickness: number;
 }
 
 /**
@@ -55,6 +56,7 @@ export default function InteractiveGraph({
   nodeSize,
   graph,
   signalHandlers,
+  edgeThickness,
 }: InteractiveGraphProps) {
   const [renderInfo, setRenderInfo] = useState<PartialGraph>(() => {
     const info = layoutGraph(graph, nodeSize);
@@ -70,7 +72,7 @@ export default function InteractiveGraph({
 
   const [draggedNode, setDraggedNode] = useState<DraggedNode | null>(null);
 
-  const { nodes, edges } = renderGraph(renderInfo);
+  const { nodes, edges } = renderGraph(renderInfo, edgeThickness);
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();

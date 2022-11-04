@@ -1,7 +1,7 @@
 import { PointerEvent, useEffect, useState } from "react";
 import styles from "../styles/Graph.module.scss";
 import { Point } from "../types/geometry";
-import { LogicalGraph as GraphType } from "../types/graph";
+import { LogicalGraph } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
 import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
@@ -38,7 +38,7 @@ export interface InteractiveGraphProps {
   width: number;
   height: number;
   nodeSize: number;
-  graph: GraphType;
+  logicalGraph: LogicalGraph;
   signalHandlers: SignalHandlers;
   edgeThickness: number;
 }
@@ -54,25 +54,25 @@ export default function InteractiveGraph({
   width,
   height,
   nodeSize,
-  graph,
+  logicalGraph,
   signalHandlers,
   edgeThickness,
 }: InteractiveGraphProps) {
-  const [renderInfo, setRenderInfo] = useState<PartialGraph>(() => {
-    const info = layoutGraph(graph, nodeSize);
-    scaleGraph(info, width, height, nodeSize);
-    return info;
+  const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
+    const partialGraph = layoutGraph(logicalGraph, nodeSize);
+    scaleGraph(partialGraph, width, height, nodeSize);
+    return partialGraph;
   });
 
   useEffect(() => {
-    const info = layoutGraph(graph, nodeSize);
-    scaleGraph(info, width, height, nodeSize);
-    setRenderInfo(info);
-  }, [graph]);
+    const partialGraph = layoutGraph(logicalGraph, nodeSize);
+    scaleGraph(partialGraph, width, height, nodeSize);
+    setPartialGraph(partialGraph);
+  }, [logicalGraph]);
 
   const [draggedNode, setDraggedNode] = useState<DraggedNode | null>(null);
 
-  const { nodes, edges } = renderGraph(renderInfo, edgeThickness);
+  const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();
@@ -80,7 +80,7 @@ export default function InteractiveGraph({
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
     };
-    setDraggedNode(renderInfo.nodeAt(pointerPosition));
+    setDraggedNode(partialGraph.nodeAt(pointerPosition));
   }
 
   function pointerMove(event: PointerEvent) {
@@ -93,14 +93,16 @@ export default function InteractiveGraph({
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
       };
-      setRenderInfo((info) => info.moveNode(pointerPosition, draggedNode));
+      setPartialGraph((partialGraph) =>
+        partialGraph.moveNode(pointerPosition, draggedNode)
+      );
     }
   }
 
   function pointerUp() {
     if (draggedNode == null) return;
-    if (renderInfo.sendAction(draggedNode, signalHandlers) === "rerender") {
-      setRenderInfo((info) => copyObject(info));
+    if (partialGraph.sendAction(draggedNode, signalHandlers) === "rerender") {
+      setPartialGraph((info) => copyObject(info));
     }
   }
 
@@ -115,7 +117,7 @@ export default function InteractiveGraph({
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
     >
-      <GraphVisualization graph={{ nodes, edges }} />
+      <GraphVisualization graph={renderedGraph} />
       <div
         id="drag-area"
         style={{ width, height }}

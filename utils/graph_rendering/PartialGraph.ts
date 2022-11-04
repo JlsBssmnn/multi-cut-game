@@ -33,9 +33,16 @@ export default class PartialGraph {
    */
   edges: LogicalEdge[];
 
-  constructor(nodes: PartialClusterNode[], edges: LogicalEdge[]) {
+  logicalGraph: LogicalGraph;
+
+  constructor(
+    nodes: PartialClusterNode[],
+    edges: LogicalEdge[],
+    logicalGraph: LogicalGraph
+  ) {
     this.nodes = nodes;
     this.edges = edges;
+    this.logicalGraph = logicalGraph;
   }
 
   /**

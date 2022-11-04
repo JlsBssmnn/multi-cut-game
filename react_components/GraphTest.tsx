@@ -73,7 +73,7 @@ export default function GraphTest() {
           width={1100}
           height={800}
           nodeSize={30}
-          graph={graph}
+          logicalGraph={graph}
           signalHandlers={{
             removeNodeFromCluster,
             moveNodeToCluster,

@@ -101,9 +101,7 @@ export default function InteractiveGraph({
 
   function pointerUp() {
     if (draggedNode == null) return;
-    if (partialGraph.sendAction(draggedNode, signalHandlers) === "rerender") {
-      setPartialGraph((info) => copyObject(info));
-    }
+    partialGraph.sendAction(draggedNode, signalHandlers);
   }
 
   return (

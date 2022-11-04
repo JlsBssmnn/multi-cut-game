@@ -4,18 +4,8 @@ import {
 } from "../../react_components/InteractiveGraph";
 import { Point } from "../../types/geometry";
 import { LogicalEdge, Node, PartialClusterNode } from "../../types/graph";
-import {
-  clusterOffset,
-  pointInSquare,
-  squaresIntersect,
-} from "../calculations/geometry";
+import { pointInSquare, squaresIntersect } from "../calculations/geometry";
 import { copyObject } from "../utils";
-
-/**
- * If the value is `'rerender'` this mean that the graph has changed it's
- * data and thus should be rerendered. Otherwise nothing changed.
- */
-export type Rerender = "rerender" | null;
 
 /**
  * This represents a partially rendered graph: The nodes are rendered (contain
@@ -62,6 +52,11 @@ export default class PartialGraph {
       if (pointInSquare(position, clusterNode, clusterNode.size)) {
         clusterNodeIdx = i;
         const subgraph = clusterNode.subgraph;
+
+        if (subgraph.nodes.length < 2) {
+          // if the cluster is a singleton, then select the entire cluster
+          break;
+        }
 
         // check for collision with nodes inside the cluster
         for (let j = 0; j < subgraph.nodes.length; j++) {
@@ -111,9 +106,9 @@ export default class PartialGraph {
       newGraph.nodes[clusterNode].x = pointerPosition.x - pointerOffset.x;
       newGraph.nodes[clusterNode].y = pointerPosition.y - pointerOffset.y;
     } else {
-      newGraph.nodes[clusterNode].subgraph!.nodes[node].x =
+      newGraph.nodes[clusterNode].subgraph.nodes[node].x =
         pointerPosition.x - pointerOffset.x;
-      newGraph.nodes[clusterNode].subgraph!.nodes[node].y =
+      newGraph.nodes[clusterNode].subgraph.nodes[node].y =
         pointerPosition.y - pointerOffset.y;
     }
 
@@ -124,20 +119,14 @@ export default class PartialGraph {
    * This function checks the given `draggedNode` and decides which action
    * is represented by it. It then calls the correct function from `signalHandlers`
    * that is meant for handling this action.
-   * @returns 'rerender' if the position of a node was changed without an action
-   * dispatched (wich means the graph should be rerendered), otherwise returns `null`
    */
-  sendAction(
-    draggedNode: DraggedNode,
-    signalHandlers: SignalHandlers
-  ): Rerender {
+  sendAction(draggedNode: DraggedNode, signalHandlers: SignalHandlers) {
     const { clusterNode, node } = draggedNode;
 
     if (node === undefined) {
       this.handleClusterMove(clusterNode, signalHandlers);
-      return null;
     } else {
-      return this.handleNodeMove(clusterNode, node, signalHandlers);
+      this.handleNodeMove(clusterNode, node, signalHandlers);
     }
   }
 
@@ -165,7 +154,7 @@ export default class PartialGraph {
     clusterNodeIdx: number,
     nodeIdx: number,
     signalHandlers: SignalHandlers
-  ): Rerender {
+  ) {
     const clusterNode = this.nodes[clusterNodeIdx];
     const node = clusterNode.subgraph.nodes[nodeIdx];
 
@@ -176,8 +165,7 @@ export default class PartialGraph {
     };
 
     // the node is still inside the cluster
-    if (pointInSquare(absolutePosition, clusterNode, clusterNode.size))
-      return null;
+    if (pointInSquare(absolutePosition, clusterNode, clusterNode.size)) return;
 
     // check for collision with clusters
     for (let i = 0; i < this.nodes.length; i++) {
@@ -189,22 +177,11 @@ export default class PartialGraph {
           node.id,
           parseInt(otherClusterNode.id)
         );
-        return null;
+        return;
       }
-    }
-
-    // node is already in a singleton, so reset it's position
-    // the rerender will not be caused automatically (that's why we
-    // return 'rerender' here)
-    if (clusterNode.subgraph!.nodes.length < 2) {
-      const offset = clusterOffset(1, node.size);
-      node.x = offset;
-      node.y = offset;
-      return "rerender";
     }
 
     // move the node into a singleton
     signalHandlers.removeNodeFromCluster(node.id);
-    return null;
   }
 }

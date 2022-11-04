@@ -60,16 +60,16 @@ export default function InteractiveGraph({
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
     const partialGraph = layoutGraph(logicalGraph, nodeSize);
     scaleGraph(partialGraph, width, height, nodeSize);
+    partialGraph.signalHandlers = signalHandlers;
     return partialGraph;
   });
 
   useEffect(() => {
     const partialGraph = layoutGraph(logicalGraph, nodeSize);
     scaleGraph(partialGraph, width, height, nodeSize);
+    partialGraph.signalHandlers = signalHandlers;
     setPartialGraph(partialGraph);
   }, [logicalGraph]);
-
-  const [draggedNode, setDraggedNode] = useState<DraggedNode | null>(null);
 
   const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
@@ -79,28 +79,24 @@ export default function InteractiveGraph({
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
     };
-    setDraggedNode(partialGraph.nodeAt(pointerPosition));
+    setPartialGraph((partialGraph) => partialGraph.nodeAt(pointerPosition));
   }
 
   function pointerMove(event: PointerEvent) {
     if (
       event.buttons === 1 &&
-      draggedNode != null &&
       (event.target as HTMLElement).id === "drag-area"
     ) {
       const pointerPosition = {
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
       };
-      setPartialGraph((partialGraph) =>
-        partialGraph.moveNode(pointerPosition, draggedNode)
-      );
+      setPartialGraph((partialGraph) => partialGraph.moveNode(pointerPosition));
     }
   }
 
   function pointerUp() {
-    if (draggedNode == null) return;
-    partialGraph.sendAction(draggedNode, signalHandlers);
+    partialGraph.sendAction();
   }
 
   return (

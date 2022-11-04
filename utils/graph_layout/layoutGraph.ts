@@ -146,7 +146,7 @@ export default function layoutGraph(
     id: obj.id,
     x: obj.x ?? 0,
     y: obj.y ?? 0,
-    color: d3.schemeTableau10[obj.id % 10],
+    color: "rgb(224 235 245)",
     size: clusterDiameter(obj.numOfElements, defaultNodeSize),
     subgraph: {
       nodes: [],
@@ -184,5 +184,5 @@ export default function layoutGraph(
     cluster.subgraph = renderedCluster;
   });
 
-  return new PartialGraph(nodes, edges);
+  return new PartialGraph(nodes, edges, graph);
 }

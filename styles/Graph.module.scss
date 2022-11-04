@@ -9,6 +9,14 @@
   position: absolute;
 }
 
+.clusterNode {
+  box-sizing: content-box;
+  background-color: black;
+  border-radius: 50%;
+  position: absolute;
+  border: 1px solid black;
+}
+
 .edge {
   padding: 0px;
   margin: 0px;

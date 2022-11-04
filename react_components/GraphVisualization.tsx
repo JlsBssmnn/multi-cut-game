@@ -19,7 +19,7 @@ export default function GraphVisualization({ graph }: GraphProps) {
       {nodes.map((node, i) => (
         <div
           key={"n" + i}
-          className={styles.node}
+          className={"subgraph" in node ? styles.clusterNode : styles.node}
           style={{
             left: node.x,
             top: node.y,

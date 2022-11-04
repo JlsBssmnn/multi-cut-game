@@ -1,11 +1,14 @@
-import {
-  DraggedNode,
-  SignalHandlers,
-} from "../../react_components/InteractiveGraph";
+import { SignalHandlers } from "../../react_components/InteractiveGraph";
 import { Point } from "../../types/geometry";
-import { LogicalEdge, Node, PartialClusterNode } from "../../types/graph";
+import {
+  LogicalEdge,
+  LogicalGraph,
+  Node,
+  PartialClusterNode,
+} from "../../types/graph";
 import { pointInSquare, squaresIntersect } from "../calculations/geometry";
 import { copyObject } from "../utils";
+import DragEvent from "./DragEvent";
 
 /**
  * This represents a partially rendered graph: The nodes are rendered (contain
@@ -24,6 +27,8 @@ export default class PartialGraph {
   edges: LogicalEdge[];
 
   logicalGraph: LogicalGraph;
+  dragEvent: DragEvent | null = null;
+  signalHandlers!: SignalHandlers;
 
   constructor(
     nodes: PartialClusterNode[],
@@ -40,7 +45,7 @@ export default class PartialGraph {
    * the offset of the position to the node. The information is returned
    * as `DraggedNode`.
    */
-  nodeAt(position: Point): DraggedNode | null {
+  nodeAt(position: Point): PartialGraph {
     let clusterNode: PartialClusterNode | null = null;
     let node: Node | null = null;
     let clusterNodeIdx, nodeIdx;
@@ -76,7 +81,7 @@ export default class PartialGraph {
     }
 
     if (clusterNodeIdx == null) {
-      return null;
+      return copyObject(this);
     }
     const selectedNodeX = nodeIdx === undefined ? clusterNode!.x : node!.x;
     const selectedNodeY = nodeIdx === undefined ? clusterNode!.y : node!.y;
@@ -86,33 +91,30 @@ export default class PartialGraph {
       y: position.y - selectedNodeY,
     };
 
-    return {
-      clusterNode: clusterNodeIdx,
-      pointerOffset,
-      node: nodeIdx,
-    };
+    this.dragEvent = new DragEvent(clusterNodeIdx, pointerOffset, nodeIdx);
+    return copyObject(this);
   }
 
   /**
    * Returns a new instance of `PartiallyRenderedGraph` where the node positions
    * are adjusted to the pointer position depending on the provided `DraggedNode`.
    */
-  moveNode(pointerPosition: Point, draggedNode: DraggedNode): PartialGraph {
-    const newGraph = copyObject(this);
+  moveNode(pointerPosition: Point): PartialGraph {
+    if (this.dragEvent == null) return this;
 
-    const { clusterNode, pointerOffset, node } = draggedNode;
+    const { clusterNodeID, pointerOffset, nodeID } = this.dragEvent;
 
-    if (node === undefined) {
-      newGraph.nodes[clusterNode].x = pointerPosition.x - pointerOffset.x;
-      newGraph.nodes[clusterNode].y = pointerPosition.y - pointerOffset.y;
+    if (nodeID === undefined) {
+      this.nodes[clusterNodeID].x = pointerPosition.x - pointerOffset.x;
+      this.nodes[clusterNodeID].y = pointerPosition.y - pointerOffset.y;
     } else {
-      newGraph.nodes[clusterNode].subgraph.nodes[node].x =
+      this.nodes[clusterNodeID].subgraph.nodes[nodeID].x =
         pointerPosition.x - pointerOffset.x;
-      newGraph.nodes[clusterNode].subgraph.nodes[node].y =
+      this.nodes[clusterNodeID].subgraph.nodes[nodeID].y =
         pointerPosition.y - pointerOffset.y;
     }
 
-    return newGraph;
+    return copyObject(this);
   }
 
   /**
@@ -120,40 +122,34 @@ export default class PartialGraph {
    * is represented by it. It then calls the correct function from `signalHandlers`
    * that is meant for handling this action.
    */
-  sendAction(draggedNode: DraggedNode, signalHandlers: SignalHandlers) {
-    const { clusterNode, node } = draggedNode;
+  sendAction() {
+    if (this.dragEvent == null) return;
+    const { clusterNodeID, nodeID } = this.dragEvent;
 
-    if (node === undefined) {
-      this.handleClusterMove(clusterNode, signalHandlers);
+    if (nodeID === undefined) {
+      this.handleClusterMove(clusterNodeID);
     } else {
-      this.handleNodeMove(clusterNode, node, signalHandlers);
+      this.handleNodeMove(clusterNodeID, nodeID);
     }
   }
 
-  private handleClusterMove(
-    clusterNode: number,
-    signalHandlers: SignalHandlers
-  ) {
-    const cluster = this.nodes[clusterNode];
+  private handleClusterMove(clusterNodeID: number) {
+    const cluster = this.nodes[clusterNodeID];
     for (let i = 0; i < this.nodes.length; i++) {
       const otherCluster = this.nodes[i];
       if (
-        i !== clusterNode &&
+        i !== clusterNodeID &&
         squaresIntersect(cluster, otherCluster, cluster.size, otherCluster.size)
       ) {
-        signalHandlers.joinClusters(cluster.id, otherCluster.id);
+        this.signalHandlers.joinClusters(cluster.id, otherCluster.id);
         return;
       }
     }
   }
 
-  private handleNodeMove(
-    clusterNodeIdx: number,
-    nodeIdx: number,
-    signalHandlers: SignalHandlers
-  ) {
-    const clusterNode = this.nodes[clusterNodeIdx];
-    const node = clusterNode.subgraph.nodes[nodeIdx];
+  private handleNodeMove(clusterNodeID: number, nodeID: number) {
+    const clusterNode = this.nodes[clusterNodeID];
+    const node = clusterNode.subgraph.nodes[nodeID];
 
     // The absolute position of the node within the entire visualization
     const absolutePosition = {
@@ -170,12 +166,12 @@ export default class PartialGraph {
       if (
         pointInSquare(absolutePosition, otherClusterNode, otherClusterNode.size)
       ) {
-        signalHandlers.moveNodeToCluster(node.id, otherClusterNode.id);
+        this.signalHandlers.moveNodeToCluster(node.id, otherClusterNode.id);
         return;
       }
     }
 
     // move the node into a singleton
-    signalHandlers.removeNodeFromCluster(node.id);
+    this.signalHandlers.removeNodeFromCluster(node.id);
   }
 }

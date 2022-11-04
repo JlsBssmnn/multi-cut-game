@@ -141,10 +141,7 @@ export default class PartialGraph {
         i !== clusterNode &&
         squaresIntersect(cluster, otherCluster, cluster.size, otherCluster.size)
       ) {
-        signalHandlers.joinClusters(
-          parseInt(cluster.id),
-          parseInt(otherCluster.id)
-        );
+        signalHandlers.joinClusters(cluster.id, otherCluster.id);
         return;
       }
     }
@@ -173,10 +170,7 @@ export default class PartialGraph {
       if (
         pointInSquare(absolutePosition, otherClusterNode, otherClusterNode.size)
       ) {
-        signalHandlers.moveNodeToCluster(
-          node.id,
-          parseInt(otherClusterNode.id)
-        );
+        signalHandlers.moveNodeToCluster(node.id, otherClusterNode.id);
         return;
       }
     }

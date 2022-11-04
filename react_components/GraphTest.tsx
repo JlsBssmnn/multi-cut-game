@@ -5,7 +5,7 @@ import fullyConnected from "../graphs/fullyConnected";
 // use no SSR for the graph renderer, because otherwise there is a
 // problem, where the styles are different for the server and client
 import dynamic from "next/dynamic";
-const GraphRenderer = dynamic(() => import("./InteractiveGraph"), {
+const InteractiveGraph = dynamic(() => import("./InteractiveGraph"), {
   ssr: false,
 });
 
@@ -21,7 +21,7 @@ export default function GraphTest() {
     setGraph((graph) => fullyConnected(graph.nodes.length + 1));
   }
 
-  function removeNodeFromCluster(nodeID: string) {
+  function removeNodeFromCluster(nodeID: number) {
     setGraph((graph) => {
       const newGraph = { ...graph };
       const maxGroup = Math.max(...graph.nodes.map((node) => node.group));
@@ -33,7 +33,7 @@ export default function GraphTest() {
     });
   }
 
-  function moveNodeToCluster(nodeID: string, group: number) {
+  function moveNodeToCluster(nodeID: number, group: number) {
     setGraph((graph) => {
       const newGraph = { ...graph };
       const node = newGraph.nodes.find((node) => node.id == nodeID);
@@ -69,7 +69,7 @@ export default function GraphTest() {
       <button onClick={addNew}>Add new Element</button>
       <br />
       <div style={{ border: "solid 5px black", display: "inline-block" }}>
-        <GraphRenderer
+        <InteractiveGraph
           width={1100}
           height={800}
           nodeSize={30}

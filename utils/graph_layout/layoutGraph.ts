@@ -51,8 +51,8 @@ export function getClusterEdges(graph: LogicalGraph): ClusterEdge[] {
   return Array.from(
     graph.edges
       .reduce((map, e) => {
-        let sourceGroup = graph.nodes[parseInt(e.source)].group;
-        let targetGroup = graph.nodes[parseInt(e.target)].group;
+        let sourceGroup = graph.nodes[e.source].group;
+        let targetGroup = graph.nodes[e.target].group;
 
         if (sourceGroup === targetGroup) {
           return map;
@@ -109,8 +109,8 @@ export function layoutCluster(
       targetID = (edge.target as unknown as D3Node).id;
 
     return {
-      source: String(graph.nodes.findIndex((node) => node.id == sourceID)),
-      target: String(graph.nodes.findIndex((node) => node.id == targetID)),
+      source: graph.nodes.findIndex((node) => node.id == sourceID),
+      target: graph.nodes.findIndex((node) => node.id == targetID),
       value: edge.value,
     };
   });
@@ -143,7 +143,7 @@ export default function layoutGraph(
     .tick(300);
 
   const nodes: PartialClusterNode[] = simulation.nodes().map((obj) => ({
-    id: String(obj.id),
+    id: obj.id,
     x: obj.x ?? 0,
     y: obj.y ?? 0,
     color: d3.schemeTableau10[obj.id % 10],
@@ -156,8 +156,8 @@ export default function layoutGraph(
 
   const clusterIDs = clusters.map((node) => node.id);
   const edges = clusterEdges.map((edge) => ({
-    source: String(clusterIDs.indexOf((edge.source as D3ClusterNode).id)),
-    target: String(clusterIDs.indexOf((edge.target as D3ClusterNode).id)),
+    source: clusterIDs.indexOf((edge.source as D3ClusterNode).id),
+    target: clusterIDs.indexOf((edge.target as D3ClusterNode).id),
     value: edge.value,
   }));
 
@@ -171,8 +171,8 @@ export default function layoutGraph(
     const clusterEdges = graph.edges
       .filter(
         (edge) =>
-          graph.nodes[parseInt(edge.source)].group === clusterID &&
-          graph.nodes[parseInt(edge.target)].group === clusterID
+          graph.nodes[edge.source].group === clusterID &&
+          graph.nodes[edge.target].group === clusterID
       )
       .map((edge) => ({ ...edge }));
 

@@ -7,37 +7,37 @@ import {
 } from "../utils/graph_layout/layoutGraph";
 
 const nodes1: LogicalNode[] = [
-  { id: "0", group: 0 },
-  { id: "1", group: 0 },
-  { id: "2", group: 0 },
-  { id: "3", group: 0 },
-  { id: "4", group: 0 },
+  { id: 0, group: 0 },
+  { id: 1, group: 0 },
+  { id: 2, group: 0 },
+  { id: 3, group: 0 },
+  { id: 4, group: 0 },
 ];
 const nodes2: LogicalNode[] = [
-  { id: "0", group: 0 },
-  { id: "1", group: 1 },
-  { id: "2", group: 2 },
-  { id: "3", group: 3 },
-  { id: "4", group: 4 },
+  { id: 0, group: 0 },
+  { id: 1, group: 1 },
+  { id: 2, group: 2 },
+  { id: 3, group: 3 },
+  { id: 4, group: 4 },
 ];
 const nodes3: LogicalNode[] = [
-  { id: "0", group: 0 },
-  { id: "1", group: 0 },
-  { id: "2", group: 1 },
-  { id: "3", group: 0 },
-  { id: "4", group: 1 },
+  { id: 0, group: 0 },
+  { id: 1, group: 0 },
+  { id: 2, group: 1 },
+  { id: 3, group: 0 },
+  { id: 4, group: 1 },
 ];
 const edges1: LogicalEdge[] = [
-  { source: "0", target: "1", value: 1 },
-  { source: "2", target: "3", value: 2 },
-  { source: "3", target: "0", value: -5 },
+  { source: 0, target: 1, value: 1 },
+  { source: 2, target: 3, value: 2 },
+  { source: 3, target: 0, value: -5 },
 ];
 const edges2: LogicalEdge[] = [
-  { source: "0", target: "1", value: 1 },
-  { source: "1", target: "2", value: -5 },
-  { source: "2", target: "3", value: 1.3 },
-  { source: "3", target: "4", value: 4 },
-  { source: "4", target: "0", value: -1.9 },
+  { source: 0, target: 1, value: 1 },
+  { source: 1, target: 2, value: -5 },
+  { source: 2, target: 3, value: 1.3 },
+  { source: 3, target: 4, value: 4 },
+  { source: 4, target: 0, value: -1.9 },
 ];
 
 test("getting the clusters", () => {
@@ -145,15 +145,15 @@ test("fully connected 6: cluster and edges", () => {
 test("layout cluster", () => {
   const graph1: LogicalGraph = {
     nodes: [
-      { id: "0", group: 1 },
-      { id: "3", group: 1 },
-      { id: "5", group: 1 },
-      { id: "6", group: 1 },
+      { id: 0, group: 1 },
+      { id: 3, group: 1 },
+      { id: 5, group: 1 },
+      { id: 6, group: 1 },
     ],
     edges: [
-      { source: "0", target: "3", value: 1 },
-      { source: "0", target: "6", value: 1 },
-      { source: "3", target: "5", value: 1 },
+      { source: 0, target: 3, value: 1 },
+      { source: 0, target: 6, value: 1 },
+      { source: 3, target: 5, value: 1 },
     ],
   };
   const rendered1 = layoutCluster(graph1, 10);

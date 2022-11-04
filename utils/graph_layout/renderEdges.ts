@@ -17,16 +17,8 @@ export default function renderEdges(
   });
 
   const edges = graph.edges.map((edge) => {
-    let {
-      x: sourceX,
-      y: sourceY,
-      size: sourceSize,
-    } = graph.nodes[parseInt(edge.source)];
-    let {
-      x: targetX,
-      y: targetY,
-      size: targetSize,
-    } = graph.nodes[parseInt(edge.target)];
+    let { x: sourceX, y: sourceY, size: sourceSize } = graph.nodes[edge.source];
+    let { x: targetX, y: targetY, size: targetSize } = graph.nodes[edge.target];
 
     sourceX += sourceSize / 2;
     sourceY += sourceSize / 2;

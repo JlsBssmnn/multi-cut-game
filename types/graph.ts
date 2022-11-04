@@ -1,11 +1,11 @@
 export interface LogicalNode {
-  id: string;
+  id: number;
   group: number;
 }
 
 export interface LogicalEdge {
-  source: string;
-  target: string;
+  source: LogicalNode["id"];
+  target: LogicalNode["id"];
   value: number;
 }
 
@@ -15,7 +15,7 @@ export interface LogicalGraph {
 }
 
 export type PartialClusterNode = {
-  id: string;
+  id: number;
   x: number;
   y: number;
   color: string;

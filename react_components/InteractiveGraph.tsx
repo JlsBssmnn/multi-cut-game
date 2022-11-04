@@ -6,7 +6,6 @@ import layoutGraph from "../utils/graph_layout/layoutGraph";
 import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph";
-import { copyObject } from "../utils/utils";
 import GraphVisualization from "./GraphVisualization";
 
 export interface DraggedNode {
@@ -29,8 +28,8 @@ export interface DraggedNode {
 }
 
 export interface SignalHandlers {
-  removeNodeFromCluster: (nodeID: string) => void;
-  moveNodeToCluster: (nodeID: string, group: number) => void;
+  removeNodeFromCluster: (nodeID: number) => void;
+  moveNodeToCluster: (nodeID: number, group: number) => void;
   joinClusters: (group1: number, group2: number) => void;
 }
 

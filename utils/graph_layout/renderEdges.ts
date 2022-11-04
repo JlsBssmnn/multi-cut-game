@@ -1,5 +1,5 @@
-import { RenderedGraph, RenderedNode } from "../../types/graph";
-import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
+import { Graph, ClusterNode, PartialSubgraph } from "../../types/graph";
+import PartialGraph from "../graph_rendering/PartialGraph";
 
 /**
  * This function takes a partially rendered graph and renders the edges of that
@@ -7,24 +7,25 @@ import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
  * are connected by an edge. The result of this function is a fully rendered graph.
  */
 export default function renderEdges(
-  renderInfo: PartiallyRenderedGraph
-): RenderedGraph {
-  const nodes = renderInfo.nodes.map((node) => {
-    if (!node.subgraph) return node as RenderedNode;
-    else return { ...node, subgraph: renderEdges(node.subgraph) };
+  graph: PartialGraph | PartialSubgraph
+): Graph {
+  const nodes = graph.nodes.map((node) => {
+    if ("subgraph" in node)
+      return { ...node, subgraph: renderEdges(node.subgraph) };
+    else return node as ClusterNode;
   });
 
-  const edges = renderInfo.edges.map((edge) => {
+  const edges = graph.edges.map((edge) => {
     let {
       x: sourceX,
       y: sourceY,
       size: sourceSize,
-    } = renderInfo.nodes[parseInt(edge.source)];
+    } = graph.nodes[parseInt(edge.source)];
     let {
       x: targetX,
       y: targetY,
       size: targetSize,
-    } = renderInfo.nodes[parseInt(edge.target)];
+    } = graph.nodes[parseInt(edge.target)];
 
     sourceX += sourceSize / 2;
     sourceY += sourceSize / 2;

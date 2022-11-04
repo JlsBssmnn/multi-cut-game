@@ -1,13 +1,13 @@
 import { PointerEvent, useEffect, useState } from "react";
 import styles from "../styles/Graph.module.scss";
 import { Point } from "../types/geometry";
-import { Graph as GraphType } from "../types/graph";
+import { LogicalGraph as GraphType } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
-import renderEdges from "../utils/graph_layout/renderEdges";
+import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
-import PartiallyRenderedGraph from "../utils/graph_rendering/PartiallyRenderedGraph";
+import PartialGraph from "../utils/graph_rendering/PartialGraph";
 import { copyObject } from "../utils/utils";
-import Graph from "./Graph";
+import GraphVisualization from "./GraphVisualization";
 
 export interface DraggedNode {
   /**
@@ -56,7 +56,7 @@ export default function InteractiveGraph({
   graph,
   signalHandlers,
 }: InteractiveGraphProps) {
-  const [renderInfo, setRenderInfo] = useState<PartiallyRenderedGraph>(() => {
+  const [renderInfo, setRenderInfo] = useState<PartialGraph>(() => {
     const info = layoutGraph(graph, nodeSize);
     scaleGraph(info, width, height, nodeSize);
     return info;
@@ -70,7 +70,7 @@ export default function InteractiveGraph({
 
   const [draggedNode, setDraggedNode] = useState<DraggedNode | null>(null);
 
-  const { nodes, edges } = renderEdges(renderInfo);
+  const { nodes, edges } = renderGraph(renderInfo);
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();
@@ -113,7 +113,7 @@ export default function InteractiveGraph({
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
     >
-      <Graph graph={{ nodes, edges }} />
+      <GraphVisualization graph={{ nodes, edges }} />
       <div
         id="drag-area"
         style={{ width, height }}

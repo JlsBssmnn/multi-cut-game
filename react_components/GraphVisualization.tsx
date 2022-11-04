@@ -1,14 +1,14 @@
 import styles from "../styles/Graph.module.scss";
-import { RenderedGraph } from "../types/graph";
+import { Graph, Subgraph } from "../types/graph";
 
 export interface GraphProps {
-  graph: RenderedGraph;
+  graph: Graph | Subgraph;
 }
 
 /**
  * This component displays a rendered graph.
  */
-export default function Graph({ graph }: GraphProps) {
+export default function GraphVisualization({ graph }: GraphProps) {
   const { nodes, edges } = graph;
 
   return (
@@ -28,7 +28,9 @@ export default function Graph({ graph }: GraphProps) {
             backgroundColor: node.color,
           }}
         >
-          {node.subgraph && <Graph graph={node.subgraph} key={"g" + i} />}
+          {"subgraph" in node && (
+            <GraphVisualization graph={node.subgraph} key={"g" + i} />
+          )}
         </div>
       ))}
     </>

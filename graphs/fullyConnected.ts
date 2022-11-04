@@ -1,6 +1,6 @@
-import { Graph } from "../types/graph";
+import { LogicalGraph } from "../types/graph";
 
-export default function fullyConnected(numOfNodes: number): Graph {
+export default function fullyConnected(numOfNodes: number): LogicalGraph {
   const nodes = Array.from(Array(numOfNodes).keys()).map((i) => ({
     id: String(i),
     group: 0,

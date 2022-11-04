@@ -1,20 +1,26 @@
 import * as d3 from "d3";
 import { SimulationLinkDatum, SimulationNodeDatum } from "d3";
-import { Edge, Graph, Node, PartiallyRenderedNode } from "../../types/graph";
+import {
+  LogicalEdge,
+  LogicalGraph,
+  LogicalNode,
+  PartialClusterNode,
+  PartialSubgraph,
+} from "../../types/graph";
 import { clusterDiameter } from "../calculations/geometry";
-import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
+import PartialGraph from "../graph_rendering/PartialGraph";
 
 // d3 will take nodes and edges and attach additional information to them (like
 // position). These new types are defined here.
-type D3Node = SimulationNodeDatum & Node;
-type D3Edge = SimulationLinkDatum<D3Node> & Edge;
+type D3Node = SimulationNodeDatum & LogicalNode;
+type D3Edge = SimulationLinkDatum<D3Node> & LogicalEdge;
 
-type ClusterNode = SimulationNodeDatum & {
+type D3ClusterNode = SimulationNodeDatum & {
   id: number;
   numOfElements: number;
 };
 
-type ClusterEdge = SimulationLinkDatum<ClusterNode> & {
+type ClusterEdge = SimulationLinkDatum<D3ClusterNode> & {
   source: number;
   target: number;
   value: number;
@@ -23,7 +29,7 @@ type ClusterEdge = SimulationLinkDatum<ClusterNode> & {
 /**
  * Takes in a graph and computes the corresponding cluster nodes from it.
  */
-export function getClusters(graph: Graph): ClusterNode[] {
+export function getClusters(graph: LogicalGraph): D3ClusterNode[] {
   const clusterMap = graph.nodes.reduce((map, node) => {
     if (map.has(node.group)) {
       map.set(node.group, map.get(node.group)! + 1);
@@ -41,7 +47,7 @@ export function getClusters(graph: Graph): ClusterNode[] {
 /**
  * Takes in a graph and computes the corresponding cluster edges from it.
  */
-export function getClusterEdges(graph: Graph): ClusterEdge[] {
+export function getClusterEdges(graph: LogicalGraph): ClusterEdge[] {
   return Array.from(
     graph.edges
       .reduce((map, e) => {
@@ -71,9 +77,9 @@ export function getClusterEdges(graph: Graph): ClusterEdge[] {
 }
 
 export function layoutCluster(
-  graph: Graph,
+  graph: LogicalGraph,
   nodeSize: number
-): PartiallyRenderedGraph {
+): PartialSubgraph {
   const forceLink = d3
     .forceLink<D3Node, D3Edge>(graph.edges)
     .id((node) => node.id)
@@ -109,42 +115,49 @@ export function layoutCluster(
     };
   });
 
-  return new PartiallyRenderedGraph(nodes, edges);
+  return {
+    nodes,
+    edges,
+  };
 }
 
 export default function layoutGraph(
-  graph: Graph,
+  graph: LogicalGraph,
   defaultNodeSize: number
-): PartiallyRenderedGraph {
+): PartialGraph {
   const clusters = getClusters(graph);
   const clusterEdges = getClusterEdges(graph);
 
   const forceLink = d3
-    .forceLink<ClusterNode, ClusterEdge>(clusterEdges)
+    .forceLink<D3ClusterNode, ClusterEdge>(clusterEdges)
     .id((node) => node.id)
     .strength(1)
     .distance(20)
     .iterations(10);
 
   const simulation = d3
-    .forceSimulation<ClusterNode>(clusters)
+    .forceSimulation<D3ClusterNode>(clusters)
     .force("link", forceLink)
     .force("charge", d3.forceManyBody().strength(-30))
     .force("center", d3.forceCenter())
     .tick(300);
 
-  const nodes: PartiallyRenderedNode[] = simulation.nodes().map((obj) => ({
+  const nodes: PartialClusterNode[] = simulation.nodes().map((obj) => ({
     id: String(obj.id),
     x: obj.x ?? 0,
     y: obj.y ?? 0,
     color: d3.schemeTableau10[obj.id % 10],
     size: clusterDiameter(obj.numOfElements, defaultNodeSize),
+    subgraph: {
+      nodes: [],
+      edges: [],
+    },
   }));
 
   const clusterIDs = clusters.map((node) => node.id);
   const edges = clusterEdges.map((edge) => ({
-    source: String(clusterIDs.indexOf((edge.source as ClusterNode).id)),
-    target: String(clusterIDs.indexOf((edge.target as ClusterNode).id)),
+    source: String(clusterIDs.indexOf((edge.source as D3ClusterNode).id)),
+    target: String(clusterIDs.indexOf((edge.target as D3ClusterNode).id)),
     value: edge.value,
   }));
 
@@ -171,5 +184,5 @@ export default function layoutGraph(
     cluster.subgraph = renderedCluster;
   });
 
-  return new PartiallyRenderedGraph(nodes, edges);
+  return new PartialGraph(nodes, edges);
 }

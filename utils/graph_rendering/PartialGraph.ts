@@ -3,7 +3,7 @@ import {
   SignalHandlers,
 } from "../../react_components/InteractiveGraph";
 import { Point } from "../../types/geometry";
-import { Edge, PartiallyRenderedNode } from "../../types/graph";
+import { LogicalEdge, Node, PartialClusterNode } from "../../types/graph";
 import {
   clusterOffset,
   pointInSquare,
@@ -22,18 +22,18 @@ export type Rerender = "rerender" | null;
  * actual coordinates that will be used to position the elements), but the edges
  * are just indices into the nodes and don't contain any position-properties.
  */
-export default class PartiallyRenderedGraph {
+export default class PartialGraph {
   /**
    * An array of positions for the nodes.
    */
-  nodes: PartiallyRenderedNode[];
+  nodes: PartialClusterNode[];
 
   /**
    * The indices of the source and target node that are connected by this edge
    */
-  edges: Edge[];
+  edges: LogicalEdge[];
 
-  constructor(nodes: PartiallyRenderedNode[], edges: Edge[]) {
+  constructor(nodes: PartialClusterNode[], edges: LogicalEdge[]) {
     this.nodes = nodes;
     this.edges = edges;
   }
@@ -44,8 +44,8 @@ export default class PartiallyRenderedGraph {
    * as `DraggedNode`.
    */
   nodeAt(position: Point): DraggedNode | null {
-    let clusterNode: PartiallyRenderedNode | null = null;
-    let node: PartiallyRenderedNode | null = null;
+    let clusterNode: PartialClusterNode | null = null;
+    let node: Node | null = null;
     let clusterNodeIdx, nodeIdx;
 
     // check for collision with clusters
@@ -55,7 +55,6 @@ export default class PartiallyRenderedGraph {
       if (pointInSquare(position, clusterNode, clusterNode.size)) {
         clusterNodeIdx = i;
         const subgraph = clusterNode.subgraph;
-        if (!subgraph) break;
 
         // check for collision with nodes inside the cluster
         for (let j = 0; j < subgraph.nodes.length; j++) {
@@ -96,10 +95,7 @@ export default class PartiallyRenderedGraph {
    * Returns a new instance of `PartiallyRenderedGraph` where the node positions
    * are adjusted to the pointer position depending on the provided `DraggedNode`.
    */
-  moveNode(
-    pointerPosition: Point,
-    draggedNode: DraggedNode
-  ): PartiallyRenderedGraph {
+  moveNode(pointerPosition: Point, draggedNode: DraggedNode): PartialGraph {
     const newGraph = copyObject(this);
 
     const { clusterNode, pointerOffset, node } = draggedNode;
@@ -164,7 +160,7 @@ export default class PartiallyRenderedGraph {
     signalHandlers: SignalHandlers
   ): Rerender {
     const clusterNode = this.nodes[clusterNodeIdx];
-    const node = this.nodes[clusterNodeIdx].subgraph!.nodes[nodeIdx];
+    const node = clusterNode.subgraph.nodes[nodeIdx];
 
     // The absolute position of the node within the entire visualization
     const absolutePosition = {

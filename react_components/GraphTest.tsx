@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Graph } from "../types/graph";
+import { LogicalGraph } from "../types/graph";
 import fullyConnected from "../graphs/fullyConnected";
 
 // use no SSR for the graph renderer, because otherwise there is a
@@ -15,7 +15,7 @@ export interface Bar {
 }
 
 export default function GraphTest() {
-  const [graph, setGraph] = useState<Graph>(fullyConnected(6));
+  const [graph, setGraph] = useState<LogicalGraph>(fullyConnected(6));
 
   function addNew() {
     setGraph((graph) => fullyConnected(graph.nodes.length + 1));

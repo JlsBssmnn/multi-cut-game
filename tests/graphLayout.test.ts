@@ -1,38 +1,38 @@
 import fullyConnected from "../graphs/fullyConnected";
-import { Node, Edge, Graph } from "../types/graph";
+import { LogicalNode, LogicalEdge, LogicalGraph } from "../types/graph";
 import {
   getClusterEdges,
   getClusters,
   layoutCluster,
 } from "../utils/graph_layout/layoutGraph";
 
-const nodes1: Node[] = [
+const nodes1: LogicalNode[] = [
   { id: "0", group: 0 },
   { id: "1", group: 0 },
   { id: "2", group: 0 },
   { id: "3", group: 0 },
   { id: "4", group: 0 },
 ];
-const nodes2: Node[] = [
+const nodes2: LogicalNode[] = [
   { id: "0", group: 0 },
   { id: "1", group: 1 },
   { id: "2", group: 2 },
   { id: "3", group: 3 },
   { id: "4", group: 4 },
 ];
-const nodes3: Node[] = [
+const nodes3: LogicalNode[] = [
   { id: "0", group: 0 },
   { id: "1", group: 0 },
   { id: "2", group: 1 },
   { id: "3", group: 0 },
   { id: "4", group: 1 },
 ];
-const edges1: Edge[] = [
+const edges1: LogicalEdge[] = [
   { source: "0", target: "1", value: 1 },
   { source: "2", target: "3", value: 2 },
   { source: "3", target: "0", value: -5 },
 ];
-const edges2: Edge[] = [
+const edges2: LogicalEdge[] = [
   { source: "0", target: "1", value: 1 },
   { source: "1", target: "2", value: -5 },
   { source: "2", target: "3", value: 1.3 },
@@ -121,7 +121,7 @@ test("getting the clusteredges", () => {
 });
 
 test("fully connected 6: cluster and edges", () => {
-  const graph: Graph = fullyConnected(6);
+  const graph: LogicalGraph = fullyConnected(6);
   graph.nodes[0].group = 2;
   graph.nodes[1].group = 1;
   graph.nodes[2].group = 0;
@@ -143,7 +143,7 @@ test("fully connected 6: cluster and edges", () => {
 });
 
 test("layout cluster", () => {
-  const graph1: Graph = {
+  const graph1: LogicalGraph = {
     nodes: [
       { id: "0", group: 1 },
       { id: "3", group: 1 },

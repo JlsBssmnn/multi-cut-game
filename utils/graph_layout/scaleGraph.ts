@@ -1,5 +1,6 @@
+import { Node } from "../../types/graph";
 import { clusterOffset } from "../calculations/geometry";
-import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
+import PartialGraph from "../graph_rendering/PartialGraph";
 
 /**
  * This function takes a partially rendered graph and scales all the cluster nodes to
@@ -7,7 +8,7 @@ import PartiallyRenderedGraph from "../graph_rendering/PartiallyRenderedGraph";
  * offset, s.t. they are within their cluster nodes.
  */
 export default function scaleGraph(
-  graph: PartiallyRenderedGraph,
+  graph: PartialGraph,
   width: number,
   height: number,
   nodeSize: number
@@ -15,7 +16,6 @@ export default function scaleGraph(
   scaleLayout(graph.nodes, width, height);
 
   graph.nodes.forEach((cluster) => {
-    if (!cluster.subgraph) return;
     const clusterNodes = cluster.subgraph.nodes;
 
     const clusterSize = clusterNodes.length * nodeSize; // Might have to be parameterized
@@ -36,10 +36,10 @@ export default function scaleGraph(
  * `height`. The `nodeSize` is the size for one node of the graph.
  */
 export function scaleLayout(
-  nodes: PartiallyRenderedGraph["nodes"],
+  nodes: Node[],
   width: number,
   height: number
-): PartiallyRenderedGraph["nodes"] {
+): Node[] {
   // find the minimum and maximum for the x and y coordinates among the nodes
   let minX: number, minY: number, maxX: number, maxY: number;
   (minX = minY = Infinity), (maxX = maxY = -Infinity);

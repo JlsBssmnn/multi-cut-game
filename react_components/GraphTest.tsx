@@ -80,6 +80,7 @@ export default function GraphTest() {
             joinClusters,
           }}
           edgeThickness={6}
+          opacity={0.5}
         />
       </div>
     </div>

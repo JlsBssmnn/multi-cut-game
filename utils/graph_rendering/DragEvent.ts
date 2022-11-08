@@ -1,7 +1,7 @@
 import { Point } from "../../types/geometry";
-import { LogicalEdge } from "../../types/graph";
+import { ClusterAction, NodeAction } from "./Action";
 
-export default class DragEvent {
+export class DragEvent {
   /**
    * The id of the cluster that is dragged or the id of cluster that
    * contains the node that is dragged.
@@ -9,50 +9,73 @@ export default class DragEvent {
   clusterNodeID: number;
 
   /**
+   * The value of `clusterNodeID` when the event was created.
+   */
+  originClusterNodeID: number;
+
+  /**
    * The distance from the dragged node's origin to the pointer.
    */
   pointerOffset: Point;
 
   /**
-   * The id of the node in the cluster that is dragged. If no
-   * node in the cluster but just the cluster is dragged this
-   * is undefined.
+   * The absolute position of the pointer when the event was created
    */
-  nodeID?: number;
+  originPointerPosition: Point;
 
+  constructor(clusterNodeID: number, position: Point, pointerOffset: Point) {
+    this.clusterNodeID = clusterNodeID;
+    this.originClusterNodeID = clusterNodeID;
+    this.pointerOffset = pointerOffset;
+    this.originPointerPosition = position;
+  }
+}
+
+export class ClusterDragEvent extends DragEvent {
   /**
    * The action that would be executed if the pointerOut event
    * would fire. This object also contains information that is
    * necessary to undo this action.
    */
-  action: Reposition | MoveOut | MoveToCluster | JoinClusters = {
+  action: ClusterAction = {
     name: "reposition",
   };
 
-  constructor(clusterNodeID: number, pointerOffset: Point, nodeID?: number) {
-    this.clusterNodeID = clusterNodeID;
-    this.pointerOffset = pointerOffset;
-    this.nodeID = nodeID;
+  constructor(clusterNodeID: number, position: Point, pointerOffset: Point) {
+    super(clusterNodeID, position, pointerOffset);
   }
 }
 
-interface Reposition {
-  name: "reposition";
-}
+export class NodeDragEvent extends DragEvent {
+  /**
+   * The id of the node in the cluster that is dragged. If no
+   * node in the cluster but just the cluster is dragged this
+   * is undefined.
+   */
+  nodeID: number;
 
-interface MoveOut {
-  name: "moveOut";
-  originClusterID: number;
-}
+  /**
+   * the relative position of the pointer within the node that is
+   * currently dragged, thus the position is relative to the node itself.
+   */
+  relativeNodePosition: Point;
 
-interface MoveToCluster {
-  name: "moveToCluster";
-  originClusterID: number;
-  destinationClusterID: number;
-}
+  /**
+   * Same as for the `ClusterDragEvent`
+   */
+  action: NodeAction = {
+    name: "reposition",
+  };
 
-interface JoinClusters {
-  name: "joinClusters";
-  removedEdges: LogicalEdge[];
-  destinationClusterID: number;
+  constructor(
+    clusterNodeID: number,
+    position: Point,
+    pointerOffset: Point,
+    nodeID: number,
+    relativeNodePosition: Point
+  ) {
+    super(clusterNodeID, position, pointerOffset);
+    this.nodeID = nodeID;
+    this.relativeNodePosition = relativeNodePosition;
+  }
 }

@@ -26,6 +26,8 @@ export default function GraphVisualization({ graph }: GraphProps) {
             height: node.size,
             width: node.size,
             backgroundColor: node.color,
+            borderColor:
+              "subgraph" in node ? node.borderColor ?? "black" : undefined,
           }}
         >
           {"subgraph" in node && (

@@ -1,5 +1,5 @@
 import { Graph, ClusterNode, PartialSubgraph } from "../../types/graph";
-import PartialGraph from "../graph_rendering/PartialGraph";
+import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
 
 /**
  * This function takes a partially rendered graph and renders the edges of that
@@ -17,8 +17,16 @@ export default function renderEdges(
   });
 
   const edges = graph.edges.map((edge) => {
-    let { x: sourceX, y: sourceY, size: sourceSize } = graph.nodes[edge.source];
-    let { x: targetX, y: targetY, size: targetSize } = graph.nodes[edge.target];
+    let {
+      x: sourceX,
+      y: sourceY,
+      size: sourceSize,
+    } = graph.nodes.find((node) => node.id === edge.source)!;
+    let {
+      x: targetX,
+      y: targetY,
+      size: targetSize,
+    } = graph.nodes.find((node) => node.id === edge.target)!;
 
     sourceX += sourceSize / 2;
     sourceY += sourceSize / 2;
@@ -38,6 +46,7 @@ export default function renderEdges(
       height: computeEdgeThickness(edgeThickness, edge.value),
       backgroundColor: edge.value < 0 ? "red" : "green",
       transform: `rotate(${angle}deg)`,
+      opacity: edge.opacity,
     };
   });
 

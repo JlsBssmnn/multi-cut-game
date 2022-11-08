@@ -1,31 +1,11 @@
 import { PointerEvent, useEffect, useState } from "react";
 import styles from "../styles/Graph.module.scss";
-import { Point } from "../types/geometry";
 import { LogicalGraph } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
 import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
-import PartialGraph from "../utils/graph_rendering/PartialGraph";
+import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import GraphVisualization from "./GraphVisualization";
-
-export interface DraggedNode {
-  /**
-   * The index of the cluster that is dragged.
-   */
-  clusterNode: number;
-
-  /**
-   * The distance from the dragged node's origin to the pointer.
-   */
-  pointerOffset: Point;
-
-  /**
-   * The index of the node in the cluster that is dragged. If no
-   * node in the cluster but just the cluster is dragged this
-   * is undefined.
-   */
-  node?: number;
-}
 
 export interface SignalHandlers {
   removeNodeFromCluster: (nodeID: number) => void;
@@ -40,6 +20,7 @@ export interface InteractiveGraphProps {
   logicalGraph: LogicalGraph;
   signalHandlers: SignalHandlers;
   edgeThickness: number;
+  opacity: number;
 }
 
 /**
@@ -56,16 +37,17 @@ export default function InteractiveGraph({
   logicalGraph,
   signalHandlers,
   edgeThickness,
+  opacity,
 }: InteractiveGraphProps) {
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
-    const partialGraph = layoutGraph(logicalGraph, nodeSize);
+    const partialGraph = layoutGraph(logicalGraph, nodeSize, opacity);
     scaleGraph(partialGraph, width, height, nodeSize);
     partialGraph.signalHandlers = signalHandlers;
     return partialGraph;
   });
 
   useEffect(() => {
-    const partialGraph = layoutGraph(logicalGraph, nodeSize);
+    const partialGraph = layoutGraph(logicalGraph, nodeSize, opacity);
     scaleGraph(partialGraph, width, height, nodeSize);
     partialGraph.signalHandlers = signalHandlers;
     setPartialGraph(partialGraph);
@@ -95,7 +77,11 @@ export default function InteractiveGraph({
     }
   }
 
-  function pointerUp() {
+  function pointerUp(event: PointerEvent) {
+    const pointerPosition = {
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    };
     partialGraph.sendAction();
   }
 

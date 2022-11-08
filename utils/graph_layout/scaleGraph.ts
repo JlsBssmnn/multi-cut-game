@@ -1,6 +1,6 @@
 import { Node } from "../../types/graph";
-import { clusterOffset } from "../calculations/geometry";
-import PartialGraph from "../graph_rendering/PartialGraph";
+import { clusterGraphSize, clusterOffset } from "../calculations/geometry";
+import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
 
 /**
  * This function takes a partially rendered graph and scales all the cluster nodes to
@@ -18,7 +18,7 @@ export default function scaleGraph(
   graph.nodes.forEach((cluster) => {
     const clusterNodes = cluster.subgraph.nodes;
 
-    const clusterSize = clusterNodes.length * nodeSize; // Might have to be parameterized
+    const clusterSize = clusterGraphSize(clusterNodes.length, nodeSize);
     scaleLayout(clusterNodes, clusterSize, clusterSize);
 
     const offset = clusterOffset(cluster.subgraph.nodes.length, nodeSize);

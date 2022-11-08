@@ -8,7 +8,7 @@ import {
   PartialSubgraph,
 } from "../../types/graph";
 import { clusterDiameter } from "../calculations/geometry";
-import PartialGraph from "../graph_rendering/PartialGraph";
+import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
 
 // d3 will take nodes and edges and attach additional information to them (like
 // position). These new types are defined here.
@@ -104,16 +104,11 @@ export function layoutCluster(
 
   // The edges point to nodes that got modified by d3 and are now actually
   // of a different type.
-  const edges = graph.edges.map((edge) => {
-    const sourceID = (edge.source as unknown as D3Node).id,
-      targetID = (edge.target as unknown as D3Node).id;
-
-    return {
-      source: graph.nodes.findIndex((node) => node.id == sourceID),
-      target: graph.nodes.findIndex((node) => node.id == targetID),
-      value: edge.value,
-    };
-  });
+  const edges = graph.edges.map((edge) => ({
+    source: (edge.source as unknown as D3Node).id,
+    target: (edge.target as unknown as D3Node).id,
+    value: edge.value,
+  }));
 
   return {
     nodes,
@@ -123,7 +118,8 @@ export function layoutCluster(
 
 export default function layoutGraph(
   graph: LogicalGraph,
-  defaultNodeSize: number
+  defaultNodeSize: number,
+  opacity: number
 ): PartialGraph {
   const clusters = getClusters(graph);
   const clusterEdges = getClusterEdges(graph);
@@ -156,8 +152,8 @@ export default function layoutGraph(
 
   const clusterIDs = clusters.map((node) => node.id);
   const edges = clusterEdges.map((edge) => ({
-    source: clusterIDs.indexOf((edge.source as D3ClusterNode).id),
-    target: clusterIDs.indexOf((edge.target as D3ClusterNode).id),
+    source: (edge.source as D3ClusterNode).id,
+    target: (edge.target as D3ClusterNode).id,
     value: edge.value,
   }));
 
@@ -184,5 +180,5 @@ export default function layoutGraph(
     cluster.subgraph = renderedCluster;
   });
 
-  return new PartialGraph(nodes, edges, graph);
+  return new PartialGraph(nodes, edges, graph, defaultNodeSize, opacity);
 }

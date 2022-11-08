@@ -7,6 +7,7 @@ export interface LogicalEdge {
   source: LogicalNode["id"];
   target: LogicalNode["id"];
   value: number;
+  opacity?: number;
 }
 
 export interface LogicalGraph {
@@ -21,6 +22,7 @@ export type PartialClusterNode = {
   color: string;
   size: number;
   subgraph: PartialSubgraph;
+  borderColor?: string;
 };
 
 export interface PartialSubgraph {
@@ -39,6 +41,7 @@ export interface Edge {
   top: number;
   width: number;
   transform: string;
+  opacity?: number;
 }
 
 export interface Subgraph {

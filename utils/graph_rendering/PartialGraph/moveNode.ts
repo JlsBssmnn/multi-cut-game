@@ -18,7 +18,7 @@ export function moveNode(
   const newAction = this.getAction(pointerPosition);
 
   if (differentActions(action, newAction)) {
-    this.unvisualizeAction(action);
+    this.unvisualizeAction(action, pointerPosition);
     this.dragEvent.action = this.completeAction(newAction);
     this.visualizeAction(this.dragEvent.action, pointerPosition);
   }

@@ -13,9 +13,10 @@ import {
   unvisualizeAction,
   visualizeAction,
 } from "./actions/general";
-import { visualizeMoveOut } from "./actions/moveOut";
+import { unvisualizeMoveOut, visualizeMoveOut } from "./actions/moveOut";
 import {
   computeClusterEdges,
+  computeSubgraphEdges,
   getClusterNode,
   getClusterNodeID,
   getNode,
@@ -71,6 +72,7 @@ export default class PartialGraph {
   removeNode = removeNode;
   removeClusterNode = removeClusterNode;
   computeClusterEdges = computeClusterEdges;
+  computeSubgraphEdges = computeSubgraphEdges;
 
   // the 3 main stages
   nodeAt = nodeAt;
@@ -88,4 +90,5 @@ export default class PartialGraph {
   unvisualizeAction = unvisualizeAction;
   visualizeAction = visualizeAction;
   visualizeMoveOut = visualizeMoveOut;
+  unvisualizeMoveOut = unvisualizeMoveOut;
 }

@@ -116,8 +116,18 @@ export function completeAction(
  * Removes all the visual stuff that was added to show the given action,
  * such that the represented action after this method is reposition.
  */
-export function unvisualizeAction(this: PartialGraph, action: Action) {
-  if (action.name === "reposition") return;
+export function unvisualizeAction(
+  this: PartialGraph,
+  action: Action,
+  pointerPosition: Point
+) {
+  switch (action.name) {
+    case "reposition":
+      return;
+    case "moveOut":
+      this.unvisualizeMoveOut(pointerPosition);
+      break;
+  }
 }
 
 /**

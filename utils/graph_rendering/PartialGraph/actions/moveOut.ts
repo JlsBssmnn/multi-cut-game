@@ -4,8 +4,16 @@ import { ClusterDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
 
 export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
-  if (this.dragEvent == null || this.dragEvent instanceof ClusterDragEvent)
-    return;
+  if (
+    this.dragEvent == null ||
+    this.dragEvent instanceof ClusterDragEvent ||
+    this.dragEvent.action.name !== "moveOut"
+  ) {
+    throw new Error(
+      "visualizeMoveOut was called even though the moveOut action wasn't \
+			represented by the drag event"
+    );
+  }
 
   const { nodeID } = this.dragEvent;
 
@@ -52,5 +60,51 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   this.dragEvent.pointerOffset = {
     x: offset + relativePosition.x,
     y: offset + relativePosition.y,
+  };
+}
+
+export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
+  if (
+    this.dragEvent == null ||
+    this.dragEvent instanceof ClusterDragEvent ||
+    this.dragEvent.action.name !== "moveOut"
+  ) {
+    throw new Error(
+      "unvisualizeMoveOut was called even though the moveOut action wasn't \
+			represented by the drag event"
+    );
+  }
+
+  const { clusterNodeID, nodeID, originClusterNodeID, relativeNodePosition } =
+    this.dragEvent;
+
+  this.removeNode(nodeID);
+
+  // move node to it's old cluster
+  const clusterNode = this.getClusterNode(originClusterNodeID);
+  clusterNode.subgraph.nodes.push({
+    x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
+    y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
+    size: this.nodeSize,
+    color: "black",
+    id: nodeID,
+  });
+
+  // add back edges in the subgraph
+  clusterNode.subgraph.edges.push(
+    ...this.computeSubgraphEdges(nodeID, originClusterNodeID)
+  );
+
+  // remove the previously added cluster edges
+  this.edges = this.edges.filter(
+    (edge) => edge.source !== clusterNodeID && edge.target !== clusterNodeID
+  );
+
+  // update the drag event
+  this.dragEvent.clusterNodeID = originClusterNodeID;
+  const relativePosition = this.dragEvent.relativeNodePosition;
+  this.dragEvent.pointerOffset = {
+    x: clusterNode.x + relativePosition.x,
+    y: clusterNode.y + relativePosition.y,
   };
 }

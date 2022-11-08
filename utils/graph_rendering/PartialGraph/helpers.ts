@@ -75,7 +75,7 @@ export function getNodeAbsolutePosition(this: PartialGraph, id: number): Point {
 
 /**
  * Removes the node with the given id and all edges that are connect to it.
- * If the node is in a singleton cluster, the entire cluseter is removed.
+ * If the node is in a singleton cluster, the entire cluster is removed.
  */
 export function removeNode(this: PartialGraph, nodeID: number) {
   for (let i = 0; i < this.nodes.length; i++) {
@@ -141,4 +141,36 @@ export function computeClusterEdges(
     }
     return value;
   }, new Map<number, number>());
+}
+
+/**
+ * Computes all edges between the given node and all other nodes in the given cluster.
+ */
+export function computeSubgraphEdges(
+  this: PartialGraph,
+  nodeID: number,
+  clusterNodeID: number
+): LogicalEdge[] {
+  const clusterNode = this.getClusterNode(clusterNodeID);
+  const nodesInCluster = new Set(
+    clusterNode.subgraph.nodes.map((node) => node.id)
+  );
+
+  return this.logicalGraph.edges.reduce((edges, edge) => {
+    if (
+      (edge.source !== nodeID && edge.target !== nodeID) ||
+      edge.source === edge.target
+    )
+      return edges;
+
+    const otherNodeID = edge.source !== nodeID ? edge.source : edge.target;
+    if (nodesInCluster.has(otherNodeID)) {
+      edges.push({
+        source: nodeID,
+        target: otherNodeID,
+        value: edge.value,
+      });
+    }
+    return edges;
+  }, [] as LogicalEdge[]);
 }

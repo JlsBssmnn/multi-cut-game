@@ -61,6 +61,9 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     x: offset + relativePosition.x,
     y: offset + relativePosition.y,
   };
+
+  // store that the new cluster is just temporary
+  this.temporaryCluster = maxClusterID + 1;
 }
 
 export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
@@ -107,4 +110,7 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     x: clusterNode.x + relativePosition.x,
     y: clusterNode.y + relativePosition.y,
   };
+
+  // reset temporary cluster
+  this.temporaryCluster = null;
 }

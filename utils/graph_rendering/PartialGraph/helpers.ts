@@ -61,7 +61,7 @@ export function getClusterNodeID(this: PartialGraph, nodeID: number): number {
 /**
  * Computes the absolute position of the node that has the given id.
  */
-export function getNodeAbsolutePosition(this: PartialGraph, id: number): Point {
+export function getAbsoluteNodePosition(this: PartialGraph, id: number): Point {
   for (let clusterNode of this.nodes) {
     const node = clusterNode.subgraph.nodes.find((node) => node.id === id);
     if (node === undefined) continue;

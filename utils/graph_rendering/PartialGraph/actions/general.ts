@@ -61,10 +61,9 @@ export function handleNodeMove(
 ): PartialAction {
   // a node is dragged
   const originClusterNode = this.getClusterNode(originClusterNodeID);
-  const newClusterID = this.dragEvent!.clusterNodeID;
 
   // The absolute position of the node within the entire visualization
-  const absolutePosition = this.getNodeAbsolutePosition(nodeID);
+  const absolutePosition = this.getAbsoluteNodePosition(nodeID);
 
   // the node is still inside the cluster
   if (
@@ -77,7 +76,7 @@ export function handleNodeMove(
   // check for collision with clusters
   for (let i = 0; i < this.nodes.length; i++) {
     const otherClusterNode = this.nodes[i];
-    if (otherClusterNode.id === newClusterID) continue;
+    if (otherClusterNode.id === this.temporaryCluster) continue;
     if (
       pointInSquare(absolutePosition, otherClusterNode, otherClusterNode.size)
     ) {
@@ -127,6 +126,9 @@ export function unvisualizeAction(
     case "moveOut":
       this.unvisualizeMoveOut(pointerPosition);
       break;
+    case "moveToCluster":
+      this.unvisualizeMoveToCluster(pointerPosition);
+      break;
   }
 }
 
@@ -144,6 +146,9 @@ export function visualizeAction(
       return;
     case "moveOut":
       this.visualizeMoveOut(pointerPosition);
+      break;
+    case "moveToCluster":
+      this.visualizeMoveToCluster(pointerPosition);
       break;
   }
 }

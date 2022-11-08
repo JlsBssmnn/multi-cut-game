@@ -15,12 +15,16 @@ import {
 } from "./actions/general";
 import { unvisualizeMoveOut, visualizeMoveOut } from "./actions/moveOut";
 import {
+  unvisualizeMoveToCluster,
+  visualizeMoveToCluster,
+} from "./actions/moveToCluster";
+import {
   computeClusterEdges,
   computeSubgraphEdges,
   getClusterNode,
   getClusterNodeID,
   getNode,
-  getNodeAbsolutePosition,
+  getAbsoluteNodePosition,
   removeClusterNode,
   removeNode,
 } from "./helpers";
@@ -45,10 +49,17 @@ export default class PartialGraph {
   edges: LogicalEdge[];
 
   logicalGraph: LogicalGraph;
-  dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
   signalHandlers!: SignalHandlers;
   nodeSize: number;
   opacity: number;
+
+  dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
+
+  /**
+   * Holds the clusterNodeID of a cluster that was created for visualizing/previewing
+   * an action, but the cluster doesn't actually exist in the actual clustering.
+   */
+  temporaryCluster: number | null = null;
 
   constructor(
     nodes: PartialClusterNode[],
@@ -67,7 +78,7 @@ export default class PartialGraph {
   // helpers
   getClusterNode = getClusterNode;
   getNode = getNode;
-  getNodeAbsolutePosition = getNodeAbsolutePosition;
+  getAbsoluteNodePosition = getAbsoluteNodePosition;
   getClusterNodeID = getClusterNodeID;
   removeNode = removeNode;
   removeClusterNode = removeClusterNode;
@@ -91,4 +102,6 @@ export default class PartialGraph {
   visualizeAction = visualizeAction;
   visualizeMoveOut = visualizeMoveOut;
   unvisualizeMoveOut = unvisualizeMoveOut;
+  visualizeMoveToCluster = visualizeMoveToCluster;
+  unvisualizeMoveToCluster = unvisualizeMoveToCluster;
 }

@@ -44,7 +44,7 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   });
 
   // add the new edges
-  const newEdges = this.computeClusterEdges(nodeID);
+  const newEdges = this.computeClusterEdges(maxClusterID + 1);
   Array.from(newEdges.entries()).forEach(([otherClusterID, value]) => {
     this.edges.push({
       source: maxClusterID + 1,

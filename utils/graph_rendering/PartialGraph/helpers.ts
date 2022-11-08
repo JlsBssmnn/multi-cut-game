@@ -114,30 +114,46 @@ export function removeClusterNode(this: PartialGraph, nodeID: number) {
 }
 
 /**
- * Computes and aggregates all edges between the given node and all other nodes grouped by
- * their cluster (edges from nodes in the same cluster are aggregated). This can
- * be used to find new cluster edges when creating a new cluster.
+ * Computes the edges between the given cluster node and all other cluster nodes
+ * (values of the edges are the aggregated values of all edges connecting nodes from
+ * the first cluster to the second).
  * @returns A map where each key is the clusterNodeID and the value is the aggregated value
  * of all edge values to nodes in that cluster
  */
 export function computeClusterEdges(
   this: PartialGraph,
-  nodeID: number
+  clusterNodeID: number
 ): Map<number, number> {
+  const nodeToCluster = new Map<number, number>();
+  this.nodes.forEach((clusterNode) => {
+    clusterNode.subgraph.nodes.forEach((node) => {
+      nodeToCluster.set(node.id, clusterNode.id);
+    });
+  });
+
   return this.logicalGraph.edges.reduce((value, edge) => {
+    const sourceCluster = nodeToCluster.get(edge.source);
+    const targetCluster = nodeToCluster.get(edge.target);
+    if (sourceCluster === undefined || targetCluster === undefined) {
+      throw new Error(
+        "Partial graph contains edges that connect not-existing nodes"
+      );
+    }
     if (
-      (edge.source !== nodeID && edge.target !== nodeID) ||
-      edge.source === edge.target
-    )
+      (sourceCluster !== clusterNodeID && targetCluster !== clusterNodeID) ||
+      sourceCluster === targetCluster
+    ) {
       return value;
-    const clusterNodeID =
-      edge.source === nodeID
-        ? this.getClusterNodeID(edge.target)
-        : this.getClusterNodeID(edge.source);
-    if (value.has(clusterNodeID)) {
-      value.set(clusterNodeID, value.get(clusterNodeID)! + edge.value);
+    }
+    const otherClusterNodeID =
+      sourceCluster === clusterNodeID ? targetCluster : sourceCluster;
+    if (value.has(otherClusterNodeID)) {
+      value.set(
+        otherClusterNodeID,
+        value.get(otherClusterNodeID)! + edge.value
+      );
     } else {
-      value.set(clusterNodeID, edge.value);
+      value.set(otherClusterNodeID, edge.value);
     }
     return value;
   }, new Map<number, number>());

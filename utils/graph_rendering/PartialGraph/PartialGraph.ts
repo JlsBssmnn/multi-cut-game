@@ -13,6 +13,10 @@ import {
   unvisualizeAction,
   visualizeAction,
 } from "./actions/general";
+import {
+  unvisualizeJoinClusters,
+  visualizeJoinClusters,
+} from "./actions/joinClusters";
 import { unvisualizeMoveOut, visualizeMoveOut } from "./actions/moveOut";
 import {
   unvisualizeMoveToCluster,
@@ -104,4 +108,6 @@ export default class PartialGraph {
   unvisualizeMoveOut = unvisualizeMoveOut;
   visualizeMoveToCluster = visualizeMoveToCluster;
   unvisualizeMoveToCluster = unvisualizeMoveToCluster;
+  visualizeJoinClusters = visualizeJoinClusters;
+  unvisualizeJoinClusters = unvisualizeJoinClusters;
 }

@@ -129,6 +129,9 @@ export function unvisualizeAction(
     case "moveToCluster":
       this.unvisualizeMoveToCluster(pointerPosition);
       break;
+    case "joinClusters":
+      this.unvisualizeJoinClusters(pointerPosition);
+      break;
   }
 }
 
@@ -149,6 +152,9 @@ export function visualizeAction(
       break;
     case "moveToCluster":
       this.visualizeMoveToCluster(pointerPosition);
+      break;
+    case "joinClusters":
+      this.visualizeJoinClusters(pointerPosition);
       break;
   }
 }

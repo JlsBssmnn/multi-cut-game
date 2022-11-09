@@ -118,4 +118,7 @@ export function commitMoveOut(this: PartialGraph) {
   }
   this.makeOpaque();
   this.updateClusterNode(this.dragEvent.originClusterNodeID);
+
+  // reset temporary cluster
+  this.temporaryCluster = null;
 }

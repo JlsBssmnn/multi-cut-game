@@ -78,7 +78,12 @@ export function handleNodeMove(
     const otherClusterNode = this.nodes[i];
     if (otherClusterNode.id === this.temporaryCluster) continue;
     if (
-      pointInSquare(absolutePosition, otherClusterNode, otherClusterNode.size)
+      squaresIntersect(
+        absolutePosition,
+        otherClusterNode,
+        this.nodeSize,
+        otherClusterNode.size
+      )
     ) {
       return {
         name: "moveToCluster",

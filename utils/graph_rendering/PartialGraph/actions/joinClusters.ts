@@ -36,11 +36,13 @@ export function visualizeJoinClusters(
   });
   clusterNode.subgraph.edges.forEach((edge) => (edge.opacity = this.opacity));
 
-  // enlarge the other cluster
+  // enlarge the other cluster (the number of nodes for the first cluster must
+  // be divided by 2 because we introduced the white duplicates for each node)
   const otherClusterNode = this.getClusterNode(destinationClusterID);
   this.changeClusterSize(
     otherClusterNode,
-    clusterNode.subgraph.nodes.length + otherClusterNode.subgraph.nodes.length
+    clusterNode.subgraph.nodes.length / 2 +
+      otherClusterNode.subgraph.nodes.length
   );
 
   // remove cluster edges

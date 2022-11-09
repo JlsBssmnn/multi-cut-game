@@ -15,7 +15,7 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     );
   }
 
-  const { nodeID } = this.dragEvent;
+  const { originClusterNodeID, nodeID } = this.dragEvent;
 
   this.removeNode(nodeID);
   const maxClusterID = Math.max(...this.nodes.map((node) => node.id));
@@ -43,16 +43,9 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     },
   });
 
-  // add the new edges
-  const newEdges = this.computeClusterEdges(maxClusterID + 1);
-  Array.from(newEdges.entries()).forEach(([otherClusterID, value]) => {
-    this.edges.push({
-      source: maxClusterID + 1,
-      target: otherClusterID,
-      value: value,
-      opacity: this.opacity,
-    });
-  });
+  // update the cluster edges
+  this.updateClusterEdges(originClusterNodeID, true);
+  this.updateClusterEdges(maxClusterID + 1, true);
 
   // update the drag event
   this.dragEvent.clusterNodeID = maxClusterID + 1;
@@ -78,8 +71,7 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     );
   }
 
-  const { clusterNodeID, nodeID, originClusterNodeID, relativeNodePosition } =
-    this.dragEvent;
+  const { nodeID, originClusterNodeID, relativeNodePosition } = this.dragEvent;
 
   this.removeNode(nodeID);
 
@@ -98,10 +90,8 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     ...this.computeSubgraphEdges(nodeID, originClusterNodeID)
   );
 
-  // remove the previously added cluster edges
-  this.edges = this.edges.filter(
-    (edge) => edge.source !== clusterNodeID && edge.target !== clusterNodeID
-  );
+  // update the cluster edges of the origin cluster
+  this.updateClusterEdges(originClusterNodeID, false);
 
   // update the drag event
   this.dragEvent.clusterNodeID = originClusterNodeID;

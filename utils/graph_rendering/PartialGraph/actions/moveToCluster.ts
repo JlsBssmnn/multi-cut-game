@@ -1,5 +1,4 @@
 import { Point } from "../../../../types/geometry";
-import { clusterDiameter } from "../../../calculations/geometry";
 import { ClusterDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
 
@@ -18,7 +17,8 @@ export function visualizeMoveToCluster(
     );
   }
 
-  const { action, nodeID, relativeNodePosition } = this.dragEvent;
+  const { action, nodeID, relativeNodePosition, originClusterNodeID } =
+    this.dragEvent;
   const { destinationClusterID } = action;
 
   this.removeNode(nodeID);
@@ -34,10 +34,14 @@ export function visualizeMoveToCluster(
     id: nodeID,
   });
 
-  // add the new edges
+  // add the new edges inside the cluster
   const newEdges = this.computeSubgraphEdges(nodeID, destinationClusterID);
   newEdges.forEach((edge) => (edge.opacity = this.opacity));
   clusterNode.subgraph.edges.push(...newEdges);
+
+  // update the cluster edges
+  this.updateClusterEdges(originClusterNodeID, true);
+  this.updateClusterEdges(destinationClusterID, true);
 
   // update the drag event
   this.dragEvent.clusterNodeID = destinationClusterID;
@@ -85,6 +89,10 @@ export function unvisualizeMoveToCluster(
   clusterNode.subgraph.edges.push(
     ...this.computeSubgraphEdges(nodeID, originClusterNodeID)
   );
+
+  // update the cluster edges
+  this.updateClusterEdges(originClusterNodeID, false);
+  this.updateClusterEdges(clusterNodeID, false);
 
   // update the drag event
   this.dragEvent.clusterNodeID = originClusterNodeID;

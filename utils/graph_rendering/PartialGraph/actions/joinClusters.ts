@@ -1,5 +1,4 @@
 import { Point } from "../../../../types/geometry";
-import { clusterDiameter } from "../../../calculations/geometry";
 import { NodeDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
 
@@ -111,34 +110,7 @@ export function unvisualizeJoinClusters(
     otherClusterNode.subgraph.nodes.length
   );
 
-  // restore cluster edges
-  const previousEdges = this.computeClusterEdges(clusterNodeID);
-  Array.from(previousEdges.entries()).forEach(([otherClusterID, value]) => {
-    this.edges.push({
-      source: clusterNodeID,
-      target: otherClusterID,
-      value: value,
-    });
-  });
-
-  // reset the cluster edges of the destination cluster
-  const newEdges = this.computeClusterEdges(destinationClusterID);
-  this.edges.forEach((edge) => {
-    if (
-      edge.source !== destinationClusterID &&
-      edge.target !== destinationClusterID
-    )
-      return;
-    const otherClusterID =
-      edge.source !== destinationClusterID ? edge.source : edge.target;
-
-    const newValue = newEdges.get(otherClusterID);
-    if (newValue === undefined) {
-      throw new Error(
-        "There was an edge that connects nodes that are not in the node set"
-      );
-    }
-    edge.value = newValue;
-    edge.opacity = 1;
-  });
+  // update the cluster edges
+  this.updateClusterEdges(clusterNodeID, false);
+  this.updateClusterEdges(destinationClusterID, false);
 }

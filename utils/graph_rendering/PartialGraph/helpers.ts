@@ -213,3 +213,27 @@ export function changeClusterSize(
     node.y -= positionChange;
   });
 }
+
+/**
+ * Removes all edges involving the given cluster and recomputes
+ * their value. The edges are then added either transparent (if the
+ * corresponding parameter is true) or opaque.
+ */
+export function updateClusterEdges(
+  this: PartialGraph,
+  clusterNodeID: number,
+  transparent: boolean
+) {
+  this.edges = this.edges.filter(
+    (edge) => edge.source !== clusterNodeID && edge.target !== clusterNodeID
+  );
+  const updatedEdges = this.computeClusterEdges(clusterNodeID);
+  Array.from(updatedEdges.entries()).forEach(([otherClusterID, value]) => {
+    this.edges.push({
+      source: clusterNodeID,
+      target: otherClusterID,
+      value: value,
+      opacity: transparent ? this.opacity : undefined,
+    });
+  });
+}

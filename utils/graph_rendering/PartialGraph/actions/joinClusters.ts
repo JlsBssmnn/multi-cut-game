@@ -39,9 +39,9 @@ export function visualizeJoinClusters(
 
   // enlarge the other cluster
   const otherClusterNode = this.getClusterNode(destinationClusterID);
-  otherClusterNode.size = clusterDiameter(
-    clusterNode.subgraph.nodes.length + otherClusterNode.subgraph.nodes.length,
-    this.nodeSize
+  this.changeClusterSize(
+    otherClusterNode,
+    clusterNode.subgraph.nodes.length + otherClusterNode.subgraph.nodes.length
   );
 
   // remove cluster edges
@@ -106,9 +106,9 @@ export function unvisualizeJoinClusters(
 
   // reset the size of the other cluster
   const otherClusterNode = this.getClusterNode(destinationClusterID);
-  otherClusterNode.size = clusterDiameter(
-    otherClusterNode.subgraph.nodes.length,
-    this.nodeSize
+  this.changeClusterSize(
+    otherClusterNode,
+    otherClusterNode.subgraph.nodes.length
   );
 
   // restore cluster edges

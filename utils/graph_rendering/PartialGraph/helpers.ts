@@ -1,5 +1,6 @@
 import { Point } from "../../../types/geometry";
 import { LogicalEdge, Node, PartialClusterNode } from "../../../types/graph";
+import { clusterDiameter } from "../../calculations/geometry";
 import PartialGraph from "./PartialGraph";
 
 /**
@@ -189,4 +190,26 @@ export function computeSubgraphEdges(
     }
     return edges;
   }, [] as LogicalEdge[]);
+}
+
+/**
+ * Changes the size of the given cluster node such that there is enough
+ * space to fit in the given number of nodes
+ */
+export function changeClusterSize(
+  this: PartialGraph,
+  clusterNode: PartialClusterNode,
+  numOfNodes: number
+) {
+  const newSize = clusterDiameter(numOfNodes, this.nodeSize);
+  const positionChange = (clusterNode.size - newSize) / 2;
+
+  clusterNode.size = newSize;
+  clusterNode.x += positionChange;
+  clusterNode.y += positionChange;
+
+  clusterNode.subgraph.nodes.forEach((node) => {
+    node.x -= positionChange;
+    node.y -= positionChange;
+  });
 }

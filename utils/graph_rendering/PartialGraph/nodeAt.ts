@@ -7,8 +7,8 @@ import PartialGraph from "./PartialGraph";
 
 /**
  * Calculates which node is at the specified position as well as
- * the offset of the position to the node. The information is returned
- * as `DraggedNode`.
+ * the offset of the position to the node. The information is stored
+ * as a `DragEvent`.
  */
 export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
   let clusterNode: PartialClusterNode | null = null;

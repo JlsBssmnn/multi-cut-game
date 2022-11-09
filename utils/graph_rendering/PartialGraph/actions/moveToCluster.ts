@@ -25,10 +25,7 @@ export function visualizeMoveToCluster(
 
   // add the node to the other cluster and enlarge clusterNode
   const clusterNode = this.getClusterNode(destinationClusterID);
-  clusterNode.size = clusterDiameter(
-    clusterNode.subgraph.nodes.length + 1,
-    this.nodeSize
-  );
+  this.changeClusterSize(clusterNode, clusterNode.subgraph.nodes.length + 1);
   clusterNode.subgraph.nodes.push({
     x: clusterNode.x + relativeNodePosition.x,
     y: clusterNode.y + relativeNodePosition.y,
@@ -82,10 +79,7 @@ export function unvisualizeMoveToCluster(
 
   // reset cluster size
   const formerCluster = this.getClusterNode(clusterNodeID);
-  formerCluster.size = clusterDiameter(
-    formerCluster.subgraph.nodes.length,
-    this.nodeSize
-  );
+  this.changeClusterSize(formerCluster, formerCluster.subgraph.nodes.length);
 
   // add back edges in the subgraph
   clusterNode.subgraph.edges.push(

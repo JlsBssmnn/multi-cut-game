@@ -1,20 +1,32 @@
 import styles from "../styles/Graph.module.scss";
-import { Graph, Subgraph } from "../types/graph";
+import { ClusterNode, Graph, Subgraph } from "../types/graph";
 
 export interface GraphProps {
   graph: Graph | Subgraph;
+  draggedClusterID?: number;
 }
 
 /**
  * This component displays a rendered graph.
  */
-export default function GraphVisualization({ graph }: GraphProps) {
+export default function GraphVisualization({
+  graph,
+  draggedClusterID,
+}: GraphProps) {
   const { nodes, edges } = graph;
+  let isClusterGraph = false;
+  if (nodes.length > 0) {
+    isClusterGraph = "subgraph" in nodes[0];
+  }
 
   return (
     <>
       {edges.map((edge, i) => (
-        <div key={"e" + i} className={styles.edge} style={edge}></div>
+        <div
+          key={"e" + i}
+          className={styles.edge}
+          style={{ ...edge, zIndex: isClusterGraph ? 1 : 3 }}
+        ></div>
       ))}
       {nodes.map((node, i) => (
         <div
@@ -26,12 +38,18 @@ export default function GraphVisualization({ graph }: GraphProps) {
             height: node.size,
             width: node.size,
             backgroundColor: node.color,
-            borderColor:
-              "subgraph" in node ? node.borderColor ?? "black" : undefined,
+            borderColor: isClusterGraph
+              ? node.borderColor ?? "black"
+              : undefined,
+            zIndex:
+              node.id === draggedClusterID && isClusterGraph ? 5 : undefined,
           }}
         >
-          {"subgraph" in node && (
-            <GraphVisualization graph={node.subgraph} key={"g" + i} />
+          {isClusterGraph && (
+            <GraphVisualization
+              graph={(node as ClusterNode).subgraph}
+              key={"g" + i}
+            />
           )}
         </div>
       ))}

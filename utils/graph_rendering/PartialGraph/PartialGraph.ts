@@ -31,6 +31,7 @@ import {
   getAbsoluteNodePosition,
   removeClusterNode,
   removeNode,
+  changeClusterSize,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
@@ -88,6 +89,7 @@ export default class PartialGraph {
   removeClusterNode = removeClusterNode;
   computeClusterEdges = computeClusterEdges;
   computeSubgraphEdges = computeSubgraphEdges;
+  changeClusterSize = changeClusterSize;
 
   // the 3 main stages
   nodeAt = nodeAt;

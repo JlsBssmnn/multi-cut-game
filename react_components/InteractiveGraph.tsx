@@ -96,7 +96,10 @@ export default function InteractiveGraph({
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
     >
-      <GraphVisualization graph={renderedGraph} />
+      <GraphVisualization
+        graph={renderedGraph}
+        draggedClusterID={partialGraph.dragEvent?.clusterNodeID}
+      />
       <div
         id="drag-area"
         style={{ width, height }}

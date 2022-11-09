@@ -104,3 +104,18 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   // reset temporary cluster
   this.temporaryCluster = null;
 }
+
+export function commitMoveOut(this: PartialGraph) {
+  if (
+    this.dragEvent == null ||
+    this.dragEvent instanceof ClusterDragEvent ||
+    this.dragEvent.action.name !== "moveOut"
+  ) {
+    throw new Error(
+      "commitMoveOut was called even though the moveOut action wasn't \
+			represented by the drag event"
+    );
+  }
+  this.makeOpaque();
+  this.updateClusterNode(this.dragEvent.originClusterNodeID);
+}

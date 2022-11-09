@@ -114,3 +114,42 @@ export function unvisualizeJoinClusters(
   this.updateClusterEdges(clusterNodeID, false);
   this.updateClusterEdges(destinationClusterID, false);
 }
+
+export function commitJoinClusters(this: PartialGraph) {
+  if (
+    this.dragEvent == null ||
+    this.dragEvent instanceof NodeDragEvent ||
+    this.dragEvent.action.name !== "joinClusters"
+  ) {
+    throw new Error(
+      "commitJoinClusters was called even though the joinClusters action \
+			wasn't represented by the drag event"
+    );
+  }
+  const { originClusterNodeID, action } = this.dragEvent;
+  const { destinationClusterID } = action;
+
+  const smallerID = Math.min(originClusterNodeID, destinationClusterID);
+
+  const orgClusterNode = this.getClusterNode(originClusterNodeID);
+  const destClusterNode = this.getClusterNode(destinationClusterID);
+
+  // delete the dragged cluster node
+  this.nodes.splice(this.nodes.indexOf(orgClusterNode), 1);
+
+  // because the new cluster gets the id of the cluster with the smallest id,
+  // change the id of the destination cluster to that minimum
+  if (destClusterNode.id > smallerID) {
+    this.edges.forEach((edge) => {
+      if (edge.source === destClusterNode.id) {
+        edge.source = smallerID;
+      } else if (edge.target === destClusterNode.id) {
+        edge.target = smallerID;
+      }
+    });
+  }
+  destClusterNode.id = smallerID;
+
+  this.updateClusterNode(smallerID);
+  this.makeOpaque();
+}

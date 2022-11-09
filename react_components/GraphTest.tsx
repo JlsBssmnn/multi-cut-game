@@ -21,49 +21,6 @@ export default function GraphTest() {
     setGraph((graph) => fullyConnected(graph.nodes.length + 1));
   }
 
-  function removeNodeFromCluster(nodeID: number) {
-    setGraph((graph) => {
-      const newGraph = { ...graph };
-      const maxGroup = Math.max(...graph.nodes.map((node) => node.group));
-      const node = newGraph.nodes.find((node) => node.id == nodeID);
-
-      if (node === undefined) return newGraph;
-      node.group = maxGroup + 1;
-      return newGraph;
-    });
-  }
-
-  function moveNodeToCluster(nodeID: number, group: number) {
-    setGraph((graph) => {
-      const newGraph = { ...graph };
-      const node = newGraph.nodes.find((node) => node.id == nodeID);
-
-      if (node === undefined) return newGraph;
-      node.group = group;
-      return newGraph;
-    });
-  }
-
-  function joinClusters(group1: number, group2: number) {
-    if (group1 > group2) {
-      [group1, group2] = [group2, group1];
-    }
-    setGraph((graph) => {
-      const newGraph = {
-        nodes: graph.nodes.map((node) => {
-          if (node.group === group2) {
-            return { ...node, group: group1 };
-          } else {
-            return { ...node };
-          }
-        }),
-        edges: [...graph.edges],
-      };
-
-      return newGraph;
-    });
-  }
-
   return (
     <div>
       <button onClick={addNew}>Add new Element</button>
@@ -74,13 +31,14 @@ export default function GraphTest() {
           height={800}
           nodeSize={30}
           logicalGraph={graph}
-          signalHandlers={{
-            removeNodeFromCluster,
-            moveNodeToCluster,
-            joinClusters,
-          }}
           edgeThickness={6}
           opacity={0.5}
+          graphTheme={{
+            clusterNodeColor: "rgb(224 235 245)",
+            nodeColor: "black",
+            tempClusterColor: "white",
+          }}
+          emitGraphChange={setGraph}
         />
       </div>
     </div>

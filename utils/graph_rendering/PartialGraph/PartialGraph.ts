@@ -1,4 +1,4 @@
-import { SignalHandlers } from "../../../react_components/InteractiveGraph";
+import { Dispatch, SetStateAction } from "react";
 import {
   LogicalEdge,
   LogicalGraph,
@@ -14,11 +14,17 @@ import {
   visualizeAction,
 } from "./actions/general";
 import {
+  commitJoinClusters,
   unvisualizeJoinClusters,
   visualizeJoinClusters,
 } from "./actions/joinClusters";
-import { unvisualizeMoveOut, visualizeMoveOut } from "./actions/moveOut";
 import {
+  commitMoveOut,
+  unvisualizeMoveOut,
+  visualizeMoveOut,
+} from "./actions/moveOut";
+import {
+  commitMoveToCluster,
   unvisualizeMoveToCluster,
   visualizeMoveToCluster,
 } from "./actions/moveToCluster";
@@ -33,10 +39,17 @@ import {
   removeNode,
   changeClusterSize,
   updateClusterEdges,
+  makeOpaque,
+  updateClusterNode,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
-import { sendAction } from "./sendAction";
+import {
+  applyJoinClusters,
+  applyMoveToCluster,
+  applyMoveOut,
+  sendAction,
+} from "./sendAction";
 
 /**
  * This represents a partially rendered graph: The nodes are rendered (contain
@@ -55,9 +68,19 @@ export default class PartialGraph {
   edges: LogicalEdge[];
 
   logicalGraph: LogicalGraph;
-  signalHandlers!: SignalHandlers;
   nodeSize: number;
   opacity: number;
+  theme!: {
+    nodeColor: string;
+    clusterNodeColor: string;
+    tempClusterColor: string;
+  };
+
+  /**
+   * A react state setter, which will be called with the new logcial graph
+   * whenever the logical graph changes.
+   */
+  emitGraphChange!: Dispatch<SetStateAction<LogicalGraph>>;
 
   dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
 
@@ -81,6 +104,10 @@ export default class PartialGraph {
     this.opacity = opacity;
   }
 
+  setTheme(theme: typeof this.theme) {
+    this.theme = theme;
+  }
+
   // helpers
   getClusterNode = getClusterNode;
   getNode = getNode;
@@ -92,11 +119,18 @@ export default class PartialGraph {
   computeSubgraphEdges = computeSubgraphEdges;
   changeClusterSize = changeClusterSize;
   updateClusterEdges = updateClusterEdges;
+  makeOpaque = makeOpaque;
+  updateClusterNode = updateClusterNode;
 
   // the 3 main stages
   nodeAt = nodeAt;
   moveNode = moveNode;
   sendAction = sendAction;
+
+  // change the logical graph
+  applyMoveOut = applyMoveOut;
+  applyMoveToCluster = applyMoveToCluster;
+  applyJoinClusters = applyJoinClusters;
 
   // everything concerning actions and how to display them
   // helpers
@@ -105,13 +139,16 @@ export default class PartialGraph {
   protected handleNodeMove = handleNodeMove;
   completeAction = completeAction;
 
-  // visualizting
+  // visualizing
   unvisualizeAction = unvisualizeAction;
   visualizeAction = visualizeAction;
   visualizeMoveOut = visualizeMoveOut;
   unvisualizeMoveOut = unvisualizeMoveOut;
+  commitMoveOut = commitMoveOut;
   visualizeMoveToCluster = visualizeMoveToCluster;
   unvisualizeMoveToCluster = unvisualizeMoveToCluster;
+  commitMoveToCluster = commitMoveToCluster;
   visualizeJoinClusters = visualizeJoinClusters;
   unvisualizeJoinClusters = unvisualizeJoinClusters;
+  commitJoinClusters = commitJoinClusters;
 }

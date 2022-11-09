@@ -1,4 +1,4 @@
-import { PointerEvent, useEffect, useState } from "react";
+import { Dispatch, PointerEvent, SetStateAction, useState } from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
@@ -7,20 +7,15 @@ import scaleGraph from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import GraphVisualization from "./GraphVisualization";
 
-export interface SignalHandlers {
-  removeNodeFromCluster: (nodeID: number) => void;
-  moveNodeToCluster: (nodeID: number, group: number) => void;
-  joinClusters: (group1: number, group2: number) => void;
-}
-
 export interface InteractiveGraphProps {
   width: number;
   height: number;
   nodeSize: number;
   logicalGraph: LogicalGraph;
-  signalHandlers: SignalHandlers;
   edgeThickness: number;
   opacity: number;
+  graphTheme: PartialGraph["theme"];
+  emitGraphChange: Dispatch<SetStateAction<LogicalGraph>>;
 }
 
 /**
@@ -35,23 +30,18 @@ export default function InteractiveGraph({
   height,
   nodeSize,
   logicalGraph,
-  signalHandlers,
   edgeThickness,
   opacity,
+  graphTheme,
+  emitGraphChange,
 }: InteractiveGraphProps) {
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
     const partialGraph = layoutGraph(logicalGraph, nodeSize, opacity);
     scaleGraph(partialGraph, width, height, nodeSize);
-    partialGraph.signalHandlers = signalHandlers;
+    partialGraph.setTheme(graphTheme);
+    partialGraph.emitGraphChange = emitGraphChange;
     return partialGraph;
   });
-
-  useEffect(() => {
-    const partialGraph = layoutGraph(logicalGraph, nodeSize, opacity);
-    scaleGraph(partialGraph, width, height, nodeSize);
-    partialGraph.signalHandlers = signalHandlers;
-    setPartialGraph(partialGraph);
-  }, [logicalGraph]);
 
   const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
@@ -77,11 +67,7 @@ export default function InteractiveGraph({
     }
   }
 
-  function pointerUp(event: PointerEvent) {
-    const pointerPosition = {
-      x: event.nativeEvent.offsetX,
-      y: event.nativeEvent.offsetY,
-    };
+  function pointerUp() {
     partialGraph.sendAction();
   }
 

@@ -1,6 +1,12 @@
 import { Point } from "../../../types/geometry";
 import { LogicalEdge, Node, PartialClusterNode } from "../../../types/graph";
-import { clusterDiameter } from "../../calculations/geometry";
+import {
+  clusterDiameter,
+  clusterGraphSize,
+  clusterOffset,
+} from "../../calculations/geometry";
+import { layoutCluster } from "../../graph_layout/layoutGraph";
+import { scaleLayout } from "../../graph_layout/scaleGraph";
 import PartialGraph from "./PartialGraph";
 
 /**
@@ -236,4 +242,73 @@ export function updateClusterEdges(
       opacity: transparent ? this.opacity : undefined,
     });
   });
+}
+
+/**
+ * Loops through all parts of the graph and makes them opaque
+ */
+export function makeOpaque(this: PartialGraph) {
+  for (const edge of this.edges) {
+    if (edge.opacity !== undefined) {
+      delete edge.opacity;
+    }
+  }
+
+  for (const clusterNode of this.nodes) {
+    if (clusterNode.borderColor !== undefined) {
+      delete clusterNode.borderColor;
+      clusterNode.color = this.theme.clusterNodeColor;
+    }
+
+    for (const node of clusterNode.subgraph.nodes) {
+      node.color = this.theme.nodeColor;
+    }
+    for (const edge of clusterNode.subgraph.edges) {
+      if (edge.opacity !== undefined) {
+        delete edge.opacity;
+      }
+    }
+  }
+}
+
+/**
+ * Updates the given cluster node such that it represents the information
+ * which is currently held by the logical graph. This includes resizing the
+ * node, updating the subgraph as well as layout the subgraph again.
+ */
+export function updateClusterNode(this: PartialGraph, clusterNodeID: number) {
+  const nodesInCluster = new Set();
+  this.logicalGraph.nodes.forEach((node) => {
+    if (node.group === clusterNodeID) {
+      nodesInCluster.add(node.id);
+    }
+  });
+  const clusterNode = this.getClusterNode(clusterNodeID);
+
+  // resize the cluster node
+  this.changeClusterSize(clusterNode, nodesInCluster.size);
+
+  // re-layout the subgraph
+  const nodes = this.logicalGraph.nodes
+    .filter((node) => node.group === clusterNodeID)
+    .map((node) => ({ ...node }));
+  const edges = this.logicalGraph.edges
+    .filter(
+      (edge) =>
+        nodesInCluster.has(edge.source) && nodesInCluster.has(edge.target)
+    )
+    .map((edge) => ({ ...edge }));
+
+  const renderedCluster = layoutCluster({ nodes, edges }, this.nodeSize);
+
+  const innerRecSize = clusterGraphSize(nodesInCluster.size, this.nodeSize);
+  const offset = clusterOffset(nodesInCluster.size, this.nodeSize);
+
+  scaleLayout(renderedCluster.nodes, innerRecSize, innerRecSize);
+  renderedCluster.nodes.forEach((node) => {
+    node.x += offset;
+    node.y += offset;
+  });
+
+  clusterNode.subgraph = renderedCluster;
 }

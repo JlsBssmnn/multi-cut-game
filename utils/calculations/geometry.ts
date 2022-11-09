@@ -1,8 +1,8 @@
 import { Point } from "../../types/geometry";
 
 /**
- * Computes the length of the square inside cluster which holds
- * the subgraph of that cluster.
+ * Computes the length of the square inside the cluster node
+ * which holds the subgraph of that cluster.
  */
 export function clusterGraphSize(
   numOfElements: number,

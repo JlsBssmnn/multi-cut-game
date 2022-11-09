@@ -102,3 +102,19 @@ export function unvisualizeMoveToCluster(
     y: clusterNode.y + relativePosition.y,
   };
 }
+
+export function commitMoveToCluster(this: PartialGraph) {
+  if (
+    this.dragEvent == null ||
+    this.dragEvent instanceof ClusterDragEvent ||
+    this.dragEvent.action.name !== "moveToCluster"
+  ) {
+    throw new Error(
+      "commitMoveToCluster was called even though the moveToCluster action wasn't \
+			represented by the drag event"
+    );
+  }
+  this.makeOpaque();
+  this.updateClusterNode(this.dragEvent.originClusterNodeID);
+  this.updateClusterNode(this.dragEvent.clusterNodeID);
+}

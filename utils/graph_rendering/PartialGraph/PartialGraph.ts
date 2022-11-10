@@ -5,8 +5,8 @@ import {
   PartialClusterNode,
 } from "../../../types/graph";
 import { ClusterDragEvent, NodeDragEvent } from "../DragEvent";
+import PartialGraphTheme from "../PartialGraphTheme";
 import {
-  completeAction,
   getAction,
   handleClusterMove,
   handleNodeMove,
@@ -69,12 +69,7 @@ export default class PartialGraph {
 
   logicalGraph: LogicalGraph;
   nodeSize: number;
-  opacity: number;
-  theme!: {
-    nodeColor: string;
-    clusterNodeColor: string;
-    tempClusterColor: string;
-  };
+  theme: PartialGraphTheme;
 
   /**
    * A react state setter, which will be called with the new logcial graph
@@ -95,16 +90,12 @@ export default class PartialGraph {
     edges: LogicalEdge[],
     logicalGraph: LogicalGraph,
     nodeSize: number,
-    opacity: number
+    theme: PartialGraphTheme
   ) {
     this.nodes = nodes;
     this.edges = edges;
     this.logicalGraph = logicalGraph;
     this.nodeSize = nodeSize;
-    this.opacity = opacity;
-  }
-
-  setTheme(theme: typeof this.theme) {
     this.theme = theme;
   }
 
@@ -137,7 +128,6 @@ export default class PartialGraph {
   getAction = getAction;
   protected handleClusterMove = handleClusterMove;
   protected handleNodeMove = handleNodeMove;
-  completeAction = completeAction;
 
   // visualizing
   unvisualizeAction = unvisualizeAction;

@@ -5,6 +5,7 @@ import fullyConnected from "../graphs/fullyConnected";
 // use no SSR for the graph renderer, because otherwise there is a
 // problem, where the styles are different for the server and client
 import dynamic from "next/dynamic";
+import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 const InteractiveGraph = dynamic(() => import("./InteractiveGraph"), {
   ssr: false,
 });
@@ -21,6 +22,14 @@ export default function GraphTest() {
     setGraph((graph) => fullyConnected(graph.nodes.length + 1));
   }
 
+  const graphTheme = new PartialGraphTheme(
+    [0, 0, 0],
+    [224, 235, 245],
+    [255, 255, 255],
+    [0, 0, 0],
+    0.5
+  );
+
   return (
     <div>
       <button onClick={addNew}>Add new Element</button>
@@ -32,12 +41,7 @@ export default function GraphTest() {
           nodeSize={30}
           logicalGraph={graph}
           edgeThickness={6}
-          opacity={0.5}
-          graphTheme={{
-            clusterNodeColor: "rgb(224 235 245)",
-            nodeColor: "black",
-            tempClusterColor: "white",
-          }}
+          graphTheme={graphTheme}
           emitGraphChange={setGraph}
         />
       </div>

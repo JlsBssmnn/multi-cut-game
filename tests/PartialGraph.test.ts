@@ -1,5 +1,6 @@
 import { PartialClusterNode } from "../types/graph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
+import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
 function createPartialGraph(
   ids: { id: number; nodeIDs: number[] }[]
@@ -10,6 +11,7 @@ function createPartialGraph(
     y: 0,
     color: "",
     size: 0,
+    borderColor: "black",
     subgraph: {
       nodes: idStruct.nodeIDs.map((nodeID) => ({
         id: nodeID,
@@ -30,7 +32,13 @@ function createPartialGraph(
       edges: [],
     },
     20,
-    0.5
+    new PartialGraphTheme(
+      [0, 0, 255],
+      [224, 235, 245],
+      [255, 255, 255],
+      [0, 0, 0],
+      0.5
+    )
   );
 }
 

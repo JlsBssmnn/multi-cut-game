@@ -239,7 +239,7 @@ export function updateClusterEdges(
       source: clusterNodeID,
       target: otherClusterID,
       value: value,
-      opacity: transparent ? this.opacity : undefined,
+      opacity: transparent ? this.theme.opacity : undefined,
     });
   });
 }
@@ -256,12 +256,12 @@ export function makeOpaque(this: PartialGraph) {
 
   for (const clusterNode of this.nodes) {
     if (clusterNode.borderColor !== undefined) {
-      delete clusterNode.borderColor;
-      clusterNode.color = this.theme.clusterNodeColor;
+      clusterNode.borderColor = this.theme.getColor("clusterBorderColor");
+      clusterNode.color = this.theme.getColor("clusterNodeColor");
     }
 
     for (const node of clusterNode.subgraph.nodes) {
-      node.color = this.theme.nodeColor;
+      node.color = this.theme.getColor("nodeColor");
     }
     for (const edge of clusterNode.subgraph.edges) {
       if (edge.opacity !== undefined) {
@@ -299,7 +299,11 @@ export function updateClusterNode(this: PartialGraph, clusterNodeID: number) {
     )
     .map((edge) => ({ ...edge }));
 
-  const renderedCluster = layoutCluster({ nodes, edges }, this.nodeSize);
+  const renderedCluster = layoutCluster(
+    { nodes, edges },
+    this.nodeSize,
+    this.theme
+  );
 
   const innerRecSize = clusterGraphSize(nodesInCluster.size, this.nodeSize);
   const offset = clusterOffset(nodesInCluster.size, this.nodeSize);

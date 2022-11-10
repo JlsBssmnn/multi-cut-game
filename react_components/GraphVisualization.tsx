@@ -39,7 +39,7 @@ export default function GraphVisualization({
             width: node.size,
             backgroundColor: node.color,
             borderColor: isClusterGraph
-              ? node.borderColor ?? "black"
+              ? (node as ClusterNode).borderColor
               : undefined,
             zIndex:
               node.id === draggedClusterID && isClusterGraph ? 5 : undefined,

@@ -9,6 +9,7 @@ import {
 } from "../../types/graph";
 import { clusterDiameter } from "../calculations/geometry";
 import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
+import PartialGraphTheme from "../graph_rendering/PartialGraphTheme";
 
 // d3 will take nodes and edges and attach additional information to them (like
 // position). These new types are defined here.
@@ -78,7 +79,8 @@ export function getClusterEdges(graph: LogicalGraph): ClusterEdge[] {
 
 export function layoutCluster(
   graph: LogicalGraph,
-  nodeSize: number
+  nodeSize: number,
+  theme: PartialGraphTheme
 ): PartialSubgraph {
   const forceLink = d3
     .forceLink<D3Node, D3Edge>(graph.edges)
@@ -98,7 +100,7 @@ export function layoutCluster(
     id: obj.id,
     x: obj.x ?? 0,
     y: obj.y ?? 0,
-    color: "black",
+    color: theme.getColor("nodeColor"),
     size: nodeSize,
   }));
 
@@ -118,8 +120,8 @@ export function layoutCluster(
 
 export default function layoutGraph(
   graph: LogicalGraph,
-  defaultNodeSize: number,
-  opacity: number
+  nodeSize: number,
+  theme: PartialGraphTheme
 ): PartialGraph {
   const clusters = getClusters(graph);
   const clusterEdges = getClusterEdges(graph);
@@ -142,12 +144,13 @@ export default function layoutGraph(
     id: obj.id,
     x: obj.x ?? 0,
     y: obj.y ?? 0,
-    color: "rgb(224 235 245)",
-    size: clusterDiameter(obj.numOfElements, defaultNodeSize),
+    color: theme.getColor("clusterNodeColor"),
+    size: clusterDiameter(obj.numOfElements, nodeSize),
     subgraph: {
       nodes: [],
       edges: [],
     },
+    borderColor: theme.getColor("clusterBorderColor"),
   }));
 
   const clusterIDs = clusters.map((node) => node.id);
@@ -161,24 +164,26 @@ export default function layoutGraph(
   nodes.forEach((cluster, i) => {
     const clusterID = clusterIDs[i];
 
-    const clusterNodes = graph.nodes
+    // store all the ids of nodes in this cluster
+    const nodesInCluster = new Set();
+    const nodes = graph.nodes
       .filter((node) => node.group === clusterID)
-      .map((node) => ({ ...node }));
-    const clusterEdges = graph.edges
+      .map((node) => {
+        nodesInCluster.add(node.id);
+        return { ...node };
+      });
+
+    const edges = graph.edges
       .filter(
         (edge) =>
-          graph.nodes[edge.source].group === clusterID &&
-          graph.nodes[edge.target].group === clusterID
+          nodesInCluster.has(edge.source) && nodesInCluster.has(edge.target)
       )
       .map((edge) => ({ ...edge }));
 
-    const renderedCluster = layoutCluster(
-      { nodes: clusterNodes, edges: clusterEdges },
-      defaultNodeSize
-    );
+    const renderedCluster = layoutCluster({ nodes, edges }, nodeSize, theme);
 
     cluster.subgraph = renderedCluster;
   });
 
-  return new PartialGraph(nodes, edges, graph, defaultNodeSize, opacity);
+  return new PartialGraph(nodes, edges, graph, nodeSize, theme);
 }

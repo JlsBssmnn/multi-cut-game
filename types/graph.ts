@@ -22,7 +22,7 @@ export type PartialClusterNode = {
   color: string;
   size: number;
   subgraph: PartialSubgraph;
-  borderColor?: string;
+  borderColor: string;
 };
 
 export interface PartialSubgraph {
@@ -34,7 +34,7 @@ export type ClusterNode = Omit<PartialClusterNode, "subgraph"> & {
   subgraph: Subgraph;
 };
 
-export type Node = Omit<PartialClusterNode, "subgraph">;
+export type Node = Omit<PartialClusterNode, "subgraph" | "borderColor">;
 
 export interface Edge {
   left: number;

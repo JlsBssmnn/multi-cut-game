@@ -30,13 +30,13 @@ export function visualizeMoveToCluster(
     x: clusterNode.x + relativeNodePosition.x,
     y: clusterNode.y + relativeNodePosition.y,
     size: this.nodeSize,
-    color: `rgba(0,0,0,${this.opacity})`,
+    color: this.theme.getTransparentColor("nodeColor"),
     id: nodeID,
   });
 
   // add the new edges inside the cluster
   const newEdges = this.computeSubgraphEdges(nodeID, destinationClusterID);
-  newEdges.forEach((edge) => (edge.opacity = this.opacity));
+  newEdges.forEach((edge) => (edge.opacity = this.theme.opacity));
   clusterNode.subgraph.edges.push(...newEdges);
 
   // update the cluster edges
@@ -77,7 +77,7 @@ export function unvisualizeMoveToCluster(
     x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
     y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
     size: this.nodeSize,
-    color: "black",
+    color: this.theme.getColor("nodeColor"),
     id: nodeID,
   });
 

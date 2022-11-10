@@ -5,6 +5,7 @@ import {
   getClusters,
   layoutCluster,
 } from "../utils/graph_layout/layoutGraph";
+import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
 const nodes1: LogicalNode[] = [
   { id: 0, group: 0 },
@@ -156,7 +157,18 @@ test("layout cluster", () => {
       { source: 3, target: 5, value: 1 },
     ],
   };
-  const rendered1 = layoutCluster(graph1, 10);
+  const rendered1 = layoutCluster(
+    graph1,
+    10,
+    new PartialGraphTheme(
+      [0, 0, 255],
+      [224, 235, 245],
+      [255, 255, 255],
+      [0, 0, 0],
+      0.5
+    )
+  );
+
   expect(rendered1.nodes).toHaveLength(4);
   expect(rendered1.edges).toEqual([
     { source: "0", target: "1", value: 1 },

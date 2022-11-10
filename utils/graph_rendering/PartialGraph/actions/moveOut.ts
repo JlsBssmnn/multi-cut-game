@@ -23,19 +23,19 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
 
   // add the new cluster
   this.nodes.push({
-    color: "white",
+    color: this.theme.getColor("tempClusterColor"),
     id: maxClusterID + 1,
     size: clusterDiameter(1, this.nodeSize),
     x: pointerPosition.x,
     y: pointerPosition.y,
-    borderColor: `rgba(0,0,0,${this.opacity})`,
+    borderColor: this.theme.getTransparentColor("clusterBorderColor"),
     subgraph: {
       nodes: [
         {
           x: offset,
           y: offset,
           size: this.nodeSize,
-          color: `rgba(0,0,0,${this.opacity})`,
+          color: this.theme.getTransparentColor("nodeColor"),
           id: nodeID,
         },
       ],
@@ -81,7 +81,7 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
     y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
     size: this.nodeSize,
-    color: "black",
+    color: this.theme.getColor("nodeColor"),
     id: nodeID,
   });
 

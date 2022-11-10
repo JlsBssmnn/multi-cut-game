@@ -3,7 +3,7 @@ import {
   pointInSquare,
   squaresIntersect,
 } from "../../../calculations/geometry";
-import { Action, PartialAction } from "../../Action";
+import { Action } from "../../Action";
 import { ClusterDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
 
@@ -11,10 +11,7 @@ import PartialGraph from "../PartialGraph";
  * Computes which action is currently represented by the pointerPosition.
  * If the current `dragEvent` is null, this function returns null.
  */
-export function getAction(
-  this: PartialGraph,
-  pointerPosition: Point
-): PartialAction {
+export function getAction(this: PartialGraph, pointerPosition: Point): Action {
   if (this.dragEvent == null)
     throw new Error("Cannot get action if drag event is null");
 
@@ -30,7 +27,7 @@ export function getAction(
 export function handleClusterMove(
   this: PartialGraph,
   clusterNodeID: number
-): PartialAction {
+): Action {
   const clusterNode = this.getClusterNode(clusterNodeID);
   for (let i = 0; i < this.nodes.length; i++) {
     const otherCluster = this.nodes[i];
@@ -58,7 +55,7 @@ export function handleNodeMove(
   this: PartialGraph,
   originClusterNodeID: number,
   nodeID: number
-): PartialAction {
+): Action {
   // a node is dragged
   const originClusterNode = this.getClusterNode(originClusterNodeID);
 
@@ -96,24 +93,6 @@ export function handleNodeMove(
   return {
     name: "moveOut",
   };
-}
-
-/**
- * Takes in a `PartialAction` and completes it, thus returning an
- * `Action` object which contains more information.
- */
-export function completeAction(
-  this: PartialGraph,
-  action: PartialAction
-): Action {
-  if (action.name === "joinClusters") {
-    return {
-      ...action,
-      removedEdges: [], //TODO: compute the edges
-    };
-  } else {
-    return action;
-  }
 }
 
 /**

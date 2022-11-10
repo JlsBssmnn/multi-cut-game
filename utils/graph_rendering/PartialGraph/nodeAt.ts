@@ -58,11 +58,7 @@ export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
   };
 
   if (nodeID === undefined) {
-    this.dragEvent = new ClusterDragEvent(
-      clusterNodeID,
-      position,
-      pointerOffset
-    );
+    this.dragEvent = new ClusterDragEvent(clusterNodeID, pointerOffset);
   } else {
     const relativePosition = {
       x: position.x - clusterNode!.x - node!.x,
@@ -70,7 +66,6 @@ export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
     };
     this.dragEvent = new NodeDragEvent(
       clusterNodeID,
-      position,
       pointerOffset,
       nodeID,
       relativePosition

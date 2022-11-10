@@ -22,19 +22,23 @@ export function visualizeJoinClusters(
 
   // make the dragged cluster transparent
   const clusterNode = this.getClusterNode(clusterNodeID);
-  clusterNode.borderColor = `rgba(0,0,0,${this.opacity})`;
-  clusterNode.color = "white";
-  clusterNode.subgraph.nodes.forEach((node) => {
-    node.color = "white";
+  clusterNode.borderColor =
+    this.theme.getTransparentColor("clusterBorderColor");
+  clusterNode.color = this.theme.getColor("tempClusterColor");
 
+  clusterNode.subgraph.nodes.forEach((node) => {
     // duplicate nodes with white color such that you
     // can't see the edges below the nodes
+    node.color = "white";
+
     clusterNode.subgraph.nodes.push({
       ...node,
-      color: `rgba(0,0,0,${this.opacity})`,
+      color: this.theme.getTransparentColor("nodeColor"),
     });
   });
-  clusterNode.subgraph.edges.forEach((edge) => (edge.opacity = this.opacity));
+  clusterNode.subgraph.edges.forEach(
+    (edge) => (edge.opacity = this.theme.opacity)
+  );
 
   // enlarge the other cluster (the number of nodes for the first cluster must
   // be divided by 2 because we introduced the white duplicates for each node)
@@ -68,7 +72,7 @@ export function visualizeJoinClusters(
       );
     }
     edge.value += newValue;
-    edge.opacity = this.opacity;
+    edge.opacity = this.theme.opacity;
   });
 }
 
@@ -92,9 +96,11 @@ export function unvisualizeJoinClusters(
 
   // make the dragged cluster opaque
   const clusterNode = this.getClusterNode(clusterNodeID);
-  clusterNode.borderColor = "black";
-  clusterNode.color = "rgb(224 235 245)";
-  clusterNode.subgraph.nodes.forEach((node) => (node.color = "black"));
+  clusterNode.borderColor = this.theme.getColor("clusterBorderColor");
+  clusterNode.color = this.theme.getColor("clusterNodeColor");
+  clusterNode.subgraph.nodes.forEach(
+    (node) => (node.color = this.theme.getColor("nodeColor"))
+  );
   clusterNode.subgraph.edges.forEach((edge) => (edge.opacity = 1));
 
   // remove duplicate nodes

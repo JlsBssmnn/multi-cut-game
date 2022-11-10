@@ -5,6 +5,7 @@ import layoutGraph from "../utils/graph_layout/layoutGraph";
 import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
+import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
 
 export interface InteractiveGraphProps {
@@ -13,8 +14,7 @@ export interface InteractiveGraphProps {
   nodeSize: number;
   logicalGraph: LogicalGraph;
   edgeThickness: number;
-  opacity: number;
-  graphTheme: PartialGraph["theme"];
+  graphTheme: PartialGraphTheme;
   emitGraphChange: Dispatch<SetStateAction<LogicalGraph>>;
 }
 
@@ -31,14 +31,12 @@ export default function InteractiveGraph({
   nodeSize,
   logicalGraph,
   edgeThickness,
-  opacity,
   graphTheme,
   emitGraphChange,
 }: InteractiveGraphProps) {
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
-    const partialGraph = layoutGraph(logicalGraph, nodeSize, opacity);
+    const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
     scaleGraph(partialGraph, width, height, nodeSize);
-    partialGraph.setTheme(graphTheme);
     partialGraph.emitGraphChange = emitGraphChange;
     return partialGraph;
   });

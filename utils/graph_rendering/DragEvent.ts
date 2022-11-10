@@ -18,16 +18,10 @@ export class DragEvent {
    */
   pointerOffset: Point;
 
-  /**
-   * The absolute position of the pointer when the event was created
-   */
-  originPointerPosition: Point;
-
-  constructor(clusterNodeID: number, position: Point, pointerOffset: Point) {
+  constructor(clusterNodeID: number, pointerOffset: Point) {
     this.clusterNodeID = clusterNodeID;
     this.originClusterNodeID = clusterNodeID;
     this.pointerOffset = pointerOffset;
-    this.originPointerPosition = position;
   }
 }
 
@@ -41,8 +35,8 @@ export class ClusterDragEvent extends DragEvent {
     name: "reposition",
   };
 
-  constructor(clusterNodeID: number, position: Point, pointerOffset: Point) {
-    super(clusterNodeID, position, pointerOffset);
+  constructor(clusterNodeID: number, pointerOffset: Point) {
+    super(clusterNodeID, pointerOffset);
   }
 }
 
@@ -69,12 +63,11 @@ export class NodeDragEvent extends DragEvent {
 
   constructor(
     clusterNodeID: number,
-    position: Point,
     pointerOffset: Point,
     nodeID: number,
     relativeNodePosition: Point
   ) {
-    super(clusterNodeID, position, pointerOffset);
+    super(clusterNodeID, pointerOffset);
     this.nodeID = nodeID;
     this.relativeNodePosition = relativeNodePosition;
   }

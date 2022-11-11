@@ -32,6 +32,7 @@ export default function GraphVisualization({
         <div
           key={"n" + i}
           className={"subgraph" in node ? styles.clusterNode : styles.node}
+          id={(isClusterGraph ? 'cluster' : 'node') + node.id}
           style={{
             left: node.x,
             top: node.y,

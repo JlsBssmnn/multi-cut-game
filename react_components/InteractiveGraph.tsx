@@ -1,4 +1,10 @@
-import { Dispatch, PointerEvent, SetStateAction, useState } from "react";
+import {
+  Dispatch,
+  PointerEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
@@ -43,6 +49,10 @@ export default function InteractiveGraph({
 
   const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
+  useEffect(() => {
+    emitGraphChange({ ...partialGraph.logicalGraph });
+  }, [partialGraph]);
+
   function pointerDown(event: PointerEvent) {
     event.preventDefault();
     const pointerPosition = {
@@ -66,7 +76,16 @@ export default function InteractiveGraph({
   }
 
   function pointerUp() {
-    partialGraph.sendAction();
+    // react for some reason sometimes calls the callback multiple times
+    // with an inconsistent state in partialGraph (dragEvent is not null
+    // but temporary nodes have been removed). These calls are prevented
+    // here, because they would cause an error.
+    let updated = false;
+    setPartialGraph((partialGraph) => {
+      if (updated) return partialGraph;
+      updated = true;
+      return partialGraph.sendAction();
+    });
   }
 
   return (

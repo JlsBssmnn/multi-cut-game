@@ -1,3 +1,4 @@
+import { copyObject } from "../../utils";
 import { ClusterDragEvent } from "../DragEvent";
 import PartialGraph from "./PartialGraph";
 
@@ -8,36 +9,26 @@ import PartialGraph from "./PartialGraph";
  * passed to the react setter that was used to instantiate this class.
  */
 export function sendAction(this: PartialGraph) {
-  if (this.dragEvent == null) return;
+  if (this.dragEvent == null) return this;
 
   if (this.dragEvent instanceof ClusterDragEvent) {
     const { originClusterNodeID, action } = this.dragEvent;
-    switch (action.name) {
-      case "joinClusters":
-        this.applyJoinClusters(
-          originClusterNodeID,
-          action.destinationClusterID
-        );
-        this.commitJoinClusters();
-        break;
-      case "reposition":
-        break;
+    if (action.name === "joinClusters") {
+      this.applyJoinClusters(originClusterNodeID, action.destinationClusterID);
+      this.commitJoinClusters();
     }
   } else {
     const { nodeID, action, clusterNodeID } = this.dragEvent;
-    switch (action.name) {
-      case "moveOut":
-        this.applyMoveOut(nodeID, clusterNodeID);
-        this.commitMoveOut();
-        break;
-      case "moveToCluster":
-        this.applyMoveToCluster(nodeID, clusterNodeID);
-        this.commitMoveToCluster();
-        break;
-      case "reposition":
-        break;
+    if (action.name === "moveOut") {
+      this.applyMoveOut(nodeID, clusterNodeID);
+      this.commitMoveOut();
+    } else if (action.name === "moveToCluster") {
+      this.applyMoveToCluster(nodeID, clusterNodeID);
+      this.commitMoveToCluster();
     }
   }
+  this.dragEvent = null;
+  return copyObject(this);
 }
 
 export function applyMoveOut(
@@ -52,8 +43,6 @@ export function applyMoveOut(
     );
   }
   node.group = newClusterID;
-
-  this.emitGraphChange({ ...this.logicalGraph });
 }
 
 export function applyMoveToCluster(
@@ -67,8 +56,6 @@ export function applyMoveToCluster(
 										node doesn't exist`);
   }
   node.group = group;
-
-  this.emitGraphChange({ ...this.logicalGraph });
 }
 
 export function applyJoinClusters(
@@ -84,5 +71,4 @@ export function applyJoinClusters(
       node.group = group1;
     }
   });
-  this.emitGraphChange({ ...this.logicalGraph });
 }

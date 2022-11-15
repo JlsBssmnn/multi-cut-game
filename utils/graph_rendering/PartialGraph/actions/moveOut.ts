@@ -32,11 +32,11 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     subgraph: {
       nodes: [
         {
+          id: nodeID,
           x: offset,
           y: offset,
-          size: this.nodeSize,
           color: this.theme.getTransparentColor("nodeColor"),
-          id: nodeID,
+          size: this.nodeSize,
         },
       ],
       edges: [],
@@ -78,11 +78,11 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   // move node to it's old cluster
   const clusterNode = this.getClusterNode(originClusterNodeID);
   clusterNode.subgraph.nodes.push({
+    id: nodeID,
     x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
     y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
-    size: this.nodeSize,
     color: this.theme.getColor("nodeColor"),
-    id: nodeID,
+    size: this.nodeSize,
   });
 
   // add back edges in the subgraph

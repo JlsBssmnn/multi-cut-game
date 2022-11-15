@@ -46,6 +46,7 @@ export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
   }
 
   if (clusterNodeID == null) {
+    this.dragEvent = null;
     return copyObject(this);
   }
 

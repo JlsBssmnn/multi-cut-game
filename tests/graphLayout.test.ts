@@ -171,8 +171,8 @@ test("layout cluster", () => {
 
   expect(rendered1.nodes).toHaveLength(4);
   expect(rendered1.edges).toEqual([
-    { source: "0", target: "1", value: 1 },
-    { source: "0", target: "3", value: 1 },
-    { source: "1", target: "2", value: 1 },
+    { source: 0, target: 3, value: 1 },
+    { source: 0, target: 6, value: 1 },
+    { source: 3, target: 5, value: 1 },
   ]);
 });

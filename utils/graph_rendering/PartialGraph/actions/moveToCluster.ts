@@ -27,11 +27,11 @@ export function visualizeMoveToCluster(
   const clusterNode = this.getClusterNode(destinationClusterID);
   this.changeClusterSize(clusterNode, clusterNode.subgraph.nodes.length + 1);
   clusterNode.subgraph.nodes.push({
+    id: nodeID,
     x: clusterNode.x + relativeNodePosition.x,
     y: clusterNode.y + relativeNodePosition.y,
-    size: this.nodeSize,
     color: this.theme.getTransparentColor("nodeColor"),
-    id: nodeID,
+    size: this.nodeSize,
   });
 
   // add the new edges inside the cluster
@@ -74,11 +74,11 @@ export function unvisualizeMoveToCluster(
   // move node to it's old cluster
   const clusterNode = this.getClusterNode(originClusterNodeID);
   clusterNode.subgraph.nodes.push({
+    id: nodeID,
     x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
     y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
-    size: this.nodeSize,
     color: this.theme.getColor("nodeColor"),
-    id: nodeID,
+    size: this.nodeSize,
   });
 
   // reset cluster size

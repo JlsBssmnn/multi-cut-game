@@ -67,7 +67,6 @@ test("graph4", async () => {
   const dec = solution.decisions;
 
   expect(solution.cost).toBe(-1);
-  console.log(dec);
   expect(dec["0-1"]).toBe(1);
   expect(dec["0-3"]).toBe(0);
   expect(dec["1-2"]).toBe(1);

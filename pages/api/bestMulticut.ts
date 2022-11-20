@@ -14,7 +14,11 @@ export default async function handler(
     return;
   }
 
-  const edges: LogicalEdge[] = req.body;
+  let edges: LogicalEdge[] | string = req.body;
+
+  if (typeof edges === "string") {
+    edges = JSON.parse(edges);
+  }
 
   if (!Array.isArray(edges)) {
     res.status(400).json({

@@ -53,7 +53,7 @@ export default function InteractiveGraph({
 
   useEffect(() => {
     emitGraphChange({ ...partialGraph.logicalGraph });
-  }, [partialGraph]);
+  }, [partialGraph.logicalGraph]);
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();

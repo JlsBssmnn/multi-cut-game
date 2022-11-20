@@ -27,6 +27,10 @@ export function sendAction(this: PartialGraph) {
       this.commitMoveToCluster();
     }
   }
+
+  // necessary to fire the useEffect in the `InteractiveGraph`
+  this.logicalGraph = copyObject(this.logicalGraph);
+
   this.dragEvent = null;
   return copyObject(this);
 }

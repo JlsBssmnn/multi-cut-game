@@ -17,6 +17,7 @@ import GraphVisualization from "./GraphVisualization";
 export interface InteractiveGraphProps {
   width: number;
   height: number;
+  margin: number;
   nodeSize: number;
   logicalGraph: LogicalGraph;
   edgeThickness: number;
@@ -34,6 +35,7 @@ export interface InteractiveGraphProps {
 export default function InteractiveGraph({
   width,
   height,
+  margin,
   nodeSize,
   logicalGraph,
   edgeThickness,
@@ -42,7 +44,7 @@ export default function InteractiveGraph({
 }: InteractiveGraphProps) {
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
     const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
-    scaleGraph(partialGraph, width, height, nodeSize);
+    scaleGraph(partialGraph, width, height, nodeSize, margin);
     partialGraph.emitGraphChange = emitGraphChange;
     return partialGraph;
   });

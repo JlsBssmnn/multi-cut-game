@@ -11,9 +11,10 @@ export default function scaleGraph(
   graph: PartialGraph,
   width: number,
   height: number,
-  nodeSize: number
+  nodeSize: number,
+  margin: number = 0
 ) {
-  scaleLayout(graph.nodes, width, height);
+  scaleLayout(graph.nodes, width, height, margin);
 
   graph.nodes.forEach((cluster) => {
     const clusterNodes = cluster.subgraph.nodes;
@@ -38,8 +39,12 @@ export default function scaleGraph(
 export function scaleLayout(
   nodes: Node[],
   width: number,
-  height: number
+  height: number,
+  margin: number = 0
 ): Node[] {
+  width -= margin * 2;
+  height -= margin * 2;
+
   // find the minimum and maximum for the x and y coordinates among the nodes
   let minX: number, minY: number, maxX: number, maxY: number;
   (minX = minY = Infinity), (maxX = maxY = -Infinity);
@@ -54,14 +59,14 @@ export function scaleLayout(
 
   // scale the nodes positions, s.t. they fill the given width and height
   nodes.forEach((node) => {
-    node.x = (width - node.size) * ((node.x - minX) / maxX);
-    node.y = (height - node.size) * ((node.y - minY) / maxY);
+    node.x = (width - node.size) * ((node.x - minX) / maxX) + margin;
+    node.y = (height - node.size) * ((node.y - minY) / maxY) + margin;
 
     if (Number.isNaN(node.x)) {
-      node.x = 0;
+      node.x = margin;
     }
     if (Number.isNaN(node.y)) {
-      node.y = 0;
+      node.y = margin;
     }
   });
 

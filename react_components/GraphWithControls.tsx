@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { LogicalGraph } from "../types/graph";
-import fullyConnected from "../graphs/fullyConnected";
 
 // use no SSR for the graph renderer, because otherwise there is a
 // problem, where the styles are different for the server and client
 import dynamic from "next/dynamic";
-import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
+import { graphTheme } from "../utils/constants";
 const GameControls = dynamic(() => import("./GameControls"), {
   ssr: false,
 });
@@ -13,21 +12,12 @@ const InteractiveGraph = dynamic(() => import("./InteractiveGraph"), {
   ssr: false,
 });
 
-export interface Bar {
-  width: number;
-  color: string;
+export interface GraphWithControlsProps {
+  graph: LogicalGraph;
 }
 
-export default function GraphWithControls() {
-  const [graph, setGraph] = useState<LogicalGraph>(fullyConnected(7));
-
-  const graphTheme = new PartialGraphTheme(
-    [0, 0, 0],
-    [224, 235, 245],
-    [255, 255, 255],
-    [0, 0, 0],
-    0.5
-  );
+export default function GraphWithControls(props: GraphWithControlsProps) {
+  const [graph, setGraph] = useState<LogicalGraph>(props.graph);
 
   return (
     <div>

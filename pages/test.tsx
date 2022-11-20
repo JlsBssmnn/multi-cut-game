@@ -1,10 +1,9 @@
-import GraphTest from "../react_components/GraphTest";
+import GraphWithControls from "../react_components/GraphWithControls";
 
 export default function Test() {
   return (
     <>
-      <h1>Hello World</h1>
-      <GraphTest />
+      <GraphWithControls />
     </>
   );
 }

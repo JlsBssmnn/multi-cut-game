@@ -6,6 +6,9 @@ import fullyConnected from "../graphs/fullyConnected";
 // problem, where the styles are different for the server and client
 import dynamic from "next/dynamic";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
+const GameControls = dynamic(() => import("./GameControls"), {
+  ssr: false,
+});
 const InteractiveGraph = dynamic(() => import("./InteractiveGraph"), {
   ssr: false,
 });
@@ -15,12 +18,8 @@ export interface Bar {
   color: string;
 }
 
-export default function GraphTest() {
-  const [graph, setGraph] = useState<LogicalGraph>(fullyConnected(6));
-
-  function addNew() {
-    setGraph((graph) => fullyConnected(graph.nodes.length + 1));
-  }
+export default function GraphWithControls() {
+  const [graph, setGraph] = useState<LogicalGraph>(fullyConnected(7));
 
   const graphTheme = new PartialGraphTheme(
     [0, 0, 0],
@@ -32,12 +31,12 @@ export default function GraphTest() {
 
   return (
     <div>
-      <button onClick={addNew}>Add new Element</button>
-      <br />
+      <GameControls graph={graph} theme={graphTheme} />
       <div style={{ border: "solid 5px black", display: "inline-block" }}>
         <InteractiveGraph
           width={1100}
           height={800}
+          margin={20}
           nodeSize={30}
           logicalGraph={graph}
           edgeThickness={6}

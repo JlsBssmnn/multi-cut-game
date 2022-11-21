@@ -31,43 +31,66 @@ export function getGraphFromSolution(
 ): LogicalGraph {
   const newGraph = structuredClone(graph);
 
-  const nodeMap = new Map<number, LogicalNode>();
-  newGraph.nodes.forEach((node) => nodeMap.set(node.id, node));
-
-  const neighbors = new Map<number, Set<number>>();
-  newGraph.edges.forEach((edge) => {
+  // remove cut edges
+  newGraph.edges = newGraph.edges.filter((edge) => {
     let { source, target } = edge;
     if (target < source) {
       [source, target] = [target, source];
     }
-    // check if edge was cut
-    if (solution.decisions[`${source}-${target}`] === 0) {
-      if (neighbors.has(source)) {
-        neighbors.get(source)!.add(target);
-      } else {
-        neighbors.set(source, new Set([target]));
-      }
+    return solution.decisions[`${source}-${target}`] === 0;
+  });
 
-      if (neighbors.has(target)) {
-        neighbors.get(target)!.add(source);
-      } else {
-        neighbors.set(target, new Set([source]));
-      }
+  const components = connectedComponents(newGraph);
+  components.forEach((component, i) => {
+    component.forEach((node) => {
+      node.group = i;
+    });
+  });
+
+  return {
+    nodes: newGraph.nodes,
+    edges: graph.edges,
+  };
+}
+
+/**
+ * Find the connected components in the given graph and returns them
+ * as an array of arrays of nodes.
+ */
+export function connectedComponents(graph: LogicalGraph): LogicalNode[][] {
+  const nodeMap = new Map<number, LogicalNode>();
+  graph.nodes.forEach((node) => nodeMap.set(node.id, node));
+
+  const neighbors = new Map<number, number[]>();
+  graph.edges.forEach((edge) => {
+    let { source, target } = edge;
+
+    if (neighbors.has(source)) {
+      neighbors.get(source)!.push(target);
+    } else {
+      neighbors.set(source, [target]);
+    }
+
+    if (neighbors.has(target)) {
+      neighbors.get(target)!.push(source);
+    } else {
+      neighbors.set(target, [source]);
     }
   });
 
+  const components: LogicalNode[][] = [];
   const visitedNodes = new Set<number>();
-  let group = 0;
 
-  function bfs(node: LogicalNode) {
-    if (visitedNodes.has(node.id)) return;
+  function bfs(node: LogicalNode, component: LogicalNode[]): LogicalNode[] {
+    if (visitedNodes.has(node.id)) return component;
 
     visitedNodes.add(node.id);
-    node.group = group;
-    const nodeNeighbors = neighbors.get(node.id);
-    if (!nodeNeighbors) return;
+    component.push(node);
 
-    for (const otherNode of Array.from(nodeNeighbors)) {
+    const nodeNeighbors = neighbors.get(node.id);
+    if (!nodeNeighbors) return component;
+
+    for (const otherNode of nodeNeighbors) {
       const newNode = nodeMap.get(otherNode);
       if (!newNode) {
         throw new Error(
@@ -75,14 +98,16 @@ export function getGraphFromSolution(
             "exist in the nodes of the graph"
         );
       }
-      bfs(newNode);
+      bfs(newNode, component);
     }
+    return component;
   }
 
-  newGraph.nodes.forEach((node) => {
-    bfs(node);
-    group++;
+  graph.nodes.forEach((node) => {
+    if (!visitedNodes.has(node.id)) {
+      components.push(bfs(node, []));
+    }
   });
 
-  return newGraph;
+  return components;
 }

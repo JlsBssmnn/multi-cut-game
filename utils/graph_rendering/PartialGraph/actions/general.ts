@@ -64,7 +64,12 @@ export function handleNodeMove(
 
   // the node is still inside the cluster
   if (
-    pointInSquare(absolutePosition, originClusterNode, originClusterNode.size)
+    squaresIntersect(
+      absolutePosition,
+      originClusterNode,
+      this.nodeSize,
+      originClusterNode.size
+    )
   )
     return {
       name: "reposition",

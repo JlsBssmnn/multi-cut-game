@@ -35,7 +35,7 @@ export function clusterOffset(numOfElements: number, nodeSize: number): number {
 }
 
 /**
- * This function computes wheter the given point is within the given square.
+ * This function computes whether the given point is within the given square.
  * @param point The point that will be tested.
  * @param squareStart The upper left corner of the square.
  * @param squareSize The length of any of the sides of the square.

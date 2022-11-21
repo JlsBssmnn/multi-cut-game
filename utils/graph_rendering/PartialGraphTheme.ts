@@ -5,13 +5,21 @@ type Color =
   | "nodeColor"
   | "clusterNodeColor"
   | "tempClusterColor"
-  | "clusterBorderColor";
+  | "clusterBorderColor"
+  | "positiveEdgeColor"
+  | "negativeEdgeColor"
+  | "neutralEdgeColor";
 
 export default class PartialGraphTheme {
   nodeColor: RGBColor;
   clusterNodeColor: RGBColor;
   tempClusterColor: RGBColor;
   clusterBorderColor: RGBColor;
+
+  positiveEdgeColor: RGBColor;
+  negativeEdgeColor: RGBColor;
+  neutralEdgeColor: RGBColor;
+
   opacity: number;
 
   constructor(
@@ -19,12 +27,20 @@ export default class PartialGraphTheme {
     clusterNodeColor: RGBColor,
     tempClusterColor: RGBColor,
     clusterBorderColor: RGBColor,
+    positiveEdgeColor: RGBColor,
+    negativeEdgeColor: RGBColor,
+    neutralEdgeColor: RGBColor,
     opacity: number
   ) {
     this.nodeColor = nodeColor;
     this.clusterNodeColor = clusterNodeColor;
     this.tempClusterColor = tempClusterColor;
     this.clusterBorderColor = clusterBorderColor;
+
+    this.positiveEdgeColor = positiveEdgeColor;
+    this.negativeEdgeColor = negativeEdgeColor;
+    this.neutralEdgeColor = neutralEdgeColor;
+
     this.opacity = opacity;
   }
 

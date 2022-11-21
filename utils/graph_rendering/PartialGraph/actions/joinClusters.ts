@@ -55,6 +55,8 @@ export function visualizeJoinClusters(
   );
 
   // change the cluster edges of the destination cluster
+  // this is done by computing the additional costs that arise when the nodes
+  // of the origin cluster are joined to the destination cluster
   const newEdges = this.computeClusterEdges(clusterNodeID);
   this.edges.forEach((edge) => {
     if (
@@ -67,12 +69,24 @@ export function visualizeJoinClusters(
 
     const newValue = newEdges.get(otherClusterID);
     if (newValue === undefined) {
-      throw new Error(
-        "There was an edge that connects nodes that are not in the node set"
-      );
+      return;
     }
     edge.value += newValue;
     edge.opacity = this.theme.opacity;
+    newEdges.delete(otherClusterID);
+  });
+
+  // add new edges for connections between clusterX to the dragged
+  // cluster where there is no connection between that clusterX
+  // and the destination cluster
+  Array.from(newEdges.entries()).forEach(([otherClusterID, value]) => {
+    if (otherClusterID === destinationClusterID) return;
+    this.edges.push({
+      source: destinationClusterID,
+      target: otherClusterID,
+      value,
+      opacity: this.theme.opacity,
+    });
   });
 }
 

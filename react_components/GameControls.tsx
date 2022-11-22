@@ -7,6 +7,7 @@ import {
 } from "../utils/calculations/graphCalculations";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import { Solution } from "../utils/server_utils/findBestMulticut";
+import GameSuccess from "./GameTools/GameSuccess";
 import OptimalCost from "./GameTools/OptimalCost";
 import OptimalMulticut from "./GameTools/OptimalMulticut";
 
@@ -45,6 +46,7 @@ export default function GameControls({ graph, theme }: StatsProps) {
         </div>
         <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
         <OptimalCost optimalSolution={optimalSolution} />
+        <GameSuccess currentCost={cost} optimalSolution={optimalSolution} />
       </div>
       <br />
     </>

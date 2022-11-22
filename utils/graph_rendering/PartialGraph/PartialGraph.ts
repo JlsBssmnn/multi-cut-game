@@ -85,6 +85,17 @@ export default class PartialGraph {
    */
   temporaryCluster: number | null = null;
 
+  /**
+   * A history of valid states throughout the playthrough of the game. This is
+   * used to reset the graph when the user performs an invalid action or when
+   * the user wants to undo an action.
+   */
+  lastStates: {
+    nodes: PartialClusterNode[];
+    edges: LogicalEdge[];
+    logicalGraph: LogicalGraph;
+  }[] = [];
+
   constructor(
     nodes: PartialClusterNode[],
     edges: LogicalEdge[],

@@ -3,6 +3,7 @@ import {
   pointInSquare,
   squaresIntersect,
 } from "../../../calculations/geometry";
+import { connectedComponents } from "../../../calculations/graphCalculations";
 import { Action } from "../../Action";
 import { ClusterDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
@@ -40,9 +41,23 @@ export function handleClusterMove(
         otherCluster.size
       )
     ) {
+      // this action is valid if there is an edge that connects a node
+      // in one cluster to a node in the other cluster
+      const sourceNodes = new Set(
+        clusterNode.subgraph.nodes.map((node) => node.id)
+      );
+      const targetNodes = new Set(
+        otherCluster.subgraph.nodes.map((node) => node.id)
+      );
+      const valid = this.logicalGraph.edges.some(
+        (edge) =>
+          (sourceNodes.has(edge.source) && targetNodes.has(edge.target)) ||
+          (targetNodes.has(edge.source) && sourceNodes.has(edge.target))
+      );
       return {
         name: "joinClusters",
         destinationClusterID: otherCluster.id,
+        valid,
       };
     }
   }
@@ -75,6 +90,18 @@ export function handleNodeMove(
       name: "reposition",
     };
 
+  // get connected components of the subgraph of the dragged node
+  // when this node is removed and check that there is only 1
+  const newSubgraph = {
+    nodes: originClusterNode.subgraph.nodes
+      .filter((node) => node.id !== nodeID)
+      .map((node) => ({ ...node, group: originClusterNodeID })),
+    edges: originClusterNode.subgraph.edges.filter(
+      (edge) => edge.source !== nodeID && edge.target !== nodeID
+    ),
+  };
+  const validMoveOut = connectedComponents(newSubgraph).length === 1;
+
   // check for collision with clusters
   for (let i = 0; i < this.nodes.length; i++) {
     const otherClusterNode = this.nodes[i];
@@ -87,9 +114,18 @@ export function handleNodeMove(
         otherClusterNode.size
       )
     ) {
+      const nodesInNewCluster = new Set(
+        otherClusterNode.subgraph.nodes.map((node) => node.id)
+      );
+      const validInNewCluster = this.logicalGraph.edges.some(
+        (edge) =>
+          (edge.source === nodeID && nodesInNewCluster.has(edge.target)) ||
+          (nodesInNewCluster.has(edge.source) && edge.target === nodeID)
+      );
       return {
         name: "moveToCluster",
         destinationClusterID: otherClusterNode.id,
+        valid: validMoveOut && validInNewCluster,
       };
     }
   }
@@ -97,6 +133,7 @@ export function handleNodeMove(
   // move the node into a singleton
   return {
     name: "moveOut",
+    valid: validMoveOut,
   };
 }
 

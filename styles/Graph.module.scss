@@ -27,6 +27,21 @@
   transform-origin: 0 50%;
 }
 
+.invalidActionNotification {
+  $outline: 1px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  background-color: rgba(100, 100, 100, 0.4);
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+  color: white;
+  text-shadow: -$outline $outline 0 #000, $outline $outline 0 #000,
+    $outline (-$outline) 0 #000, (-$outline) (-$outline) 0 #000;
+}
+
 .dragArea {
   position: absolute;
   top: 0;

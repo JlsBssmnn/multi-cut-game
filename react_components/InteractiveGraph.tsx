@@ -90,6 +90,12 @@ export default function InteractiveGraph({
     });
   }
 
+  let validAction = true;
+  const action = partialGraph.dragEvent?.action;
+  if (action) {
+    validAction = action.name === "reposition" || action.valid;
+  }
+
   return (
     <div
       className={`noTouchAction ${styles.graph}`}
@@ -105,6 +111,14 @@ export default function InteractiveGraph({
         graph={renderedGraph}
         draggedClusterID={partialGraph.dragEvent?.clusterNodeID}
       />
+      {!validAction && (
+        <div
+          className={styles.invalidActionNotification}
+          style={{ width, height }}
+        >
+          Invalid action
+        </div>
+      )}
       <div
         id="drag-area"
         style={{ width, height }}

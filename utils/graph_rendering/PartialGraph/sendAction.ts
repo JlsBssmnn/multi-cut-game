@@ -11,6 +11,21 @@ import PartialGraph from "./PartialGraph";
 export function sendAction(this: PartialGraph) {
   if (this.dragEvent == null) return this;
 
+  const action = this.dragEvent.action;
+  if (action.name !== "reposition" && !action.valid) {
+    if (this.lastStates.length === 0)
+      throw new Error(
+        "There was an invalid action, but the" +
+          " last valid state wasn't stored!"
+      );
+    const lastState = this.lastStates.pop()!;
+    this.nodes = lastState.nodes;
+    this.edges = lastState.edges;
+    this.dragEvent = null;
+    this.temporaryCluster = null;
+    return copyObject(this);
+  }
+
   if (this.dragEvent instanceof ClusterDragEvent) {
     const { originClusterNodeID, action } = this.dragEvent;
     if (action.name === "joinClusters") {

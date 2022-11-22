@@ -72,5 +72,10 @@ export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
       relativePosition
     );
   }
+  this.lastStates.push({
+    nodes: structuredClone(this.nodes),
+    edges: structuredClone(this.edges),
+    logicalGraph: structuredClone(this.logicalGraph),
+  });
   return copyObject(this);
 }

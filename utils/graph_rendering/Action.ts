@@ -9,16 +9,19 @@ export interface Reposition {
 
 export interface MoveOut {
   name: "moveOut";
+  valid: boolean;
 }
 
 export interface MoveToCluster {
   name: "moveToCluster";
   destinationClusterID: number;
+  valid: boolean;
 }
 
 export interface JoinClusters {
   name: "joinClusters";
   destinationClusterID: number;
+  valid: boolean;
 }
 
 /**

@@ -1,3 +1,5 @@
+import { Fab, Grow } from "@mui/material";
+import UndoIcon from "@mui/icons-material/Undo";
 import {
   Dispatch,
   PointerEvent,
@@ -90,11 +92,17 @@ export default function InteractiveGraph({
     });
   }
 
+  function undoLastAction() {
+    setPartialGraph((partialGraph) => partialGraph.undoAction());
+  }
+
   let validAction = true;
   const action = partialGraph.dragEvent?.action;
   if (action) {
     validAction = action.name === "reposition" || action.valid;
   }
+
+  const undoPossible = partialGraph.lastStates.length > 0;
 
   return (
     <div
@@ -119,6 +127,13 @@ export default function InteractiveGraph({
           Invalid action
         </div>
       )}
+      <Grow in={undoPossible}>
+        <div className={styles.undoButton}>
+          <Fab onClick={undoLastAction} color="primary">
+            <UndoIcon />
+          </Fab>
+        </div>
+      </Grow>
       <div
         id="drag-area"
         style={{ width, height }}

@@ -7,6 +7,7 @@ import {
 } from "../../calculations/geometry";
 import { layoutCluster } from "../../graph_layout/layoutGraph";
 import { scaleLayout } from "../../graph_layout/scaleGraph";
+import { copyObject } from "../../utils";
 import PartialGraph from "./PartialGraph";
 
 /**
@@ -315,4 +316,22 @@ export function updateClusterNode(this: PartialGraph, clusterNodeID: number) {
   });
 
   clusterNode.subgraph = renderedCluster;
+}
+
+/**
+ * Undoes the last action by popping the latest stored state and setting
+ * the appropriate properties on the graph. If there is no previous state
+ * this function will do nothing.
+ * @returns A copy of the changed graph
+ */
+export function undoAction(this: PartialGraph): PartialGraph {
+  const lastState = this.lastStates.pop();
+  if (!lastState) return copyObject(this);
+
+  this.nodes = lastState.nodes;
+  this.edges = lastState.edges;
+  this.logicalGraph = lastState.logicalGraph;
+  this.dragEvent = null;
+  this.temporaryCluster = null;
+  return copyObject(this);
 }

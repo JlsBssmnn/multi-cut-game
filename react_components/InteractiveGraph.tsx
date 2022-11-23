@@ -46,7 +46,7 @@ export default function InteractiveGraph({
 }: InteractiveGraphProps) {
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
     const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
-    scaleGraph(partialGraph, width, height, nodeSize, margin);
+    scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
     partialGraph.emitGraphChange = emitGraphChange;
     return partialGraph;
   });

@@ -25,7 +25,7 @@ export default function NonInteractiveGraph({
   graphTheme,
 }: NonInteractiveGraphProps) {
   const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
-  scaleGraph(partialGraph, width, height, nodeSize, margin);
+  scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
   const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
   return (

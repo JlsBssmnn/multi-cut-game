@@ -1,11 +1,11 @@
 import { randomCostGenerator } from "../graphs/edgeCostGenerators";
 import gridGraph from "../graphs/grid";
-import GraphWithControls from "../react_components/GraphWithControls";
+import NonSSRGame from "../react_components/NonSSRGame";
 
 export default function Level2() {
   return (
     <>
-      <GraphWithControls graph={randomCostGenerator(gridGraph(4))} />
+      <NonSSRGame graph={randomCostGenerator(gridGraph(4))} />
     </>
   );
 }

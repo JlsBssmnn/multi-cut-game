@@ -42,6 +42,7 @@ import {
   makeOpaque,
   updateClusterNode,
   undoAction,
+  scaleGraphRelative,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
@@ -125,6 +126,7 @@ export default class PartialGraph {
   makeOpaque = makeOpaque;
   updateClusterNode = updateClusterNode;
   undoAction = undoAction;
+  scaleGraphRelative = scaleGraphRelative;
 
   // the 3 main stages
   nodeAt = nodeAt;

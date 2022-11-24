@@ -5,16 +5,18 @@ import {
   PointerEvent,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
 import renderGraph from "../utils/graph_layout/renderEdges";
-import scaleGraph from "../utils/graph_layout/scaleGraph";
+import scaleGraph, { GraphDimensions } from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
+import { copyObject } from "../utils/utils";
 
 export interface InteractiveGraphProps {
   width: number;
@@ -46,16 +48,43 @@ export default function InteractiveGraph({
 }: InteractiveGraphProps) {
   const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
     const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
-    scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
     partialGraph.emitGraphChange = emitGraphChange;
     return partialGraph;
   });
+  const previousDimensions = useRef<GraphDimensions | null>(null);
 
   const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
   useEffect(() => {
     emitGraphChange({ ...partialGraph.logicalGraph });
   }, [partialGraph.logicalGraph]);
+
+  useEffect(() => {
+    // as the page renders width and height will have weird
+    // negative values we want to ignore
+    if (width <= 0 || height <= 0) {
+      return;
+    }
+    setPartialGraph((partialGraph) => {
+      const newDimensions: GraphDimensions = {
+        width,
+        height,
+        nodeSize,
+      };
+      if (previousDimensions.current == null) {
+        previousDimensions.current = newDimensions;
+        scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
+        return copyObject(partialGraph);
+      } else {
+        const newGraph = partialGraph.scaleGraphRelative(
+          previousDimensions.current,
+          newDimensions
+        );
+        previousDimensions.current = newDimensions;
+        return newGraph;
+      }
+    });
+  }, [width, height, nodeSize]);
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();

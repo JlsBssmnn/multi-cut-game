@@ -1,6 +1,12 @@
 import { Node, PartialClusterNode } from "../../types/graph";
 import { clusterGraphSize, clusterOffset } from "../calculations/geometry";
 
+export interface GraphDimensions {
+  width: number;
+  height: number;
+  nodeSize: number;
+}
+
 /**
  * This function takes the nodes of a partially rendered graph and scales all the cluster
  * nodes to fill the given width and height. Furthermore it'll scale the subgraphs of the
@@ -70,4 +76,25 @@ export function scaleLayout(
   });
 
   return nodes;
+}
+
+/**
+ * Scales the given nodes of a PartialGraph to the given dimensions relative
+ * to the given `previousLayout`. Thus the relative positions of all nodes
+ * within the previous layout will be preserved.
+ * TODO: support a change in `nodeSize`
+ */
+export function scaleRelative(
+  clusterNodes: PartialClusterNode[],
+  previousDimensions: GraphDimensions,
+  newDimensions: GraphDimensions
+) {
+  const xChange = newDimensions.width / previousDimensions.width;
+  const yChange = newDimensions.height / previousDimensions.height;
+
+  clusterNodes.forEach((clusterNode) => {
+    const radius = clusterNode.size / 2;
+    clusterNode.x = (clusterNode.x + radius) * xChange - radius;
+    clusterNode.y = (clusterNode.y + radius) * yChange - radius;
+  });
 }

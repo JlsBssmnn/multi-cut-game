@@ -6,7 +6,11 @@ import {
   clusterOffset,
 } from "../../calculations/geometry";
 import { layoutCluster } from "../../graph_layout/layoutGraph";
-import { scaleLayout } from "../../graph_layout/scaleGraph";
+import {
+  GraphDimensions,
+  scaleLayout,
+  scaleRelative,
+} from "../../graph_layout/scaleGraph";
 import { copyObject } from "../../utils";
 import PartialGraph from "./PartialGraph";
 
@@ -333,5 +337,23 @@ export function undoAction(this: PartialGraph): PartialGraph {
   this.logicalGraph = lastState.logicalGraph;
   this.dragEvent = null;
   this.temporaryCluster = null;
+  return copyObject(this);
+}
+
+/**
+ * Scales the graph and all stored states to the given width, height and nodeSize.
+ * @returns A copy of the changed graph
+ */
+export function scaleGraphRelative(
+  this: PartialGraph,
+  previousLayout: GraphDimensions,
+  newLayout: GraphDimensions
+): PartialGraph {
+  scaleRelative(this.nodes, previousLayout, newLayout);
+  this.lastStates.forEach((state) =>
+    scaleRelative(state.nodes, previousLayout, newLayout)
+  );
+  this.nodeSize = newLayout.nodeSize;
+
   return copyObject(this);
 }

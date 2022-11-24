@@ -3,6 +3,7 @@ import { Box } from "@mui/system";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import AppHead from "./AppHead";
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ export default function Layout({ children, title }: LayoutProps) {
 
   return (
     <>
+      <AppHead />
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>

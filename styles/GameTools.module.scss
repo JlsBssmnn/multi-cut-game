@@ -1,12 +1,36 @@
+@import "breakpoints";
+
+$containerDesktopWidth: 350px;
+
 .container {
-  border: 1px solid black;
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 3rem 3rem;
+  display: flex;
   align-items: center;
-  font-size: 2rem;
-  gap: 30px;
+  justify-content: center;
   padding: 10px;
+
+  @include phone {
+    flex-direction: row;
+    font-size: 1rem;
+    gap: 5px;
+  }
+
+  @include tablet {
+    flex-direction: row;
+    font-size: 1.7rem;
+    gap: 30px;
+  }
+
+  @include desktop {
+    font-size: 2rem;
+    flex-direction: column;
+    width: $containerDesktopWidth;
+    height: 260px;
+    gap: 30px;
+  }
+}
+
+.currentCost {
+  text-align: center;
 }
 
 .optimalCost {
@@ -35,4 +59,9 @@
 .successMessage {
   margin: 50px;
   font-size: 3rem;
+  text-align: center;
+}
+
+:export {
+  containerDesktopWidth: $containerDesktopWidth;
 }

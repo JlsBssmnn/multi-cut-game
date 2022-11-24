@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { Paper } from "@mui/material";
+import { forwardRef, useEffect, useState } from "react";
 import styles from "../styles/GameTools.module.scss";
 import { LogicalGraph } from "../types/graph";
 import {
@@ -16,7 +17,10 @@ export interface StatsProps {
   theme: PartialGraphTheme;
 }
 
-export default function GameControls({ graph, theme }: StatsProps) {
+export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
+  { graph, theme },
+  ref
+) {
   const [optimalSolution, setOptimalSolution] = useState<Solution | null>(null);
   const [optimalMulticut, setOptimalMulticut] = useState<LogicalGraph | null>(
     null
@@ -38,17 +42,14 @@ export default function GameControls({ graph, theme }: StatsProps) {
   const cost = getGraphScore(graph);
 
   return (
-    <>
-      <div className={styles.container}>
-        <div>
-          Current multicut cost:{" "}
-          <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
-        </div>
-        <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
-        <OptimalCost optimalSolution={optimalSolution} />
-        <GameSuccess currentCost={cost} optimalSolution={optimalSolution} />
+    <Paper elevation={10} className={styles.container} ref={ref}>
+      <div className={styles.currentCost}>
+        Current cost:{" "}
+        <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
       </div>
-      <br />
-    </>
+      <OptimalCost optimalSolution={optimalSolution} />
+      <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
+      <GameSuccess currentCost={cost} optimalSolution={optimalSolution} />
+    </Paper>
   );
-}
+});

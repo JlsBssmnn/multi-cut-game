@@ -1,0 +1,29 @@
+@import "breakpoints";
+
+$topMargin: 10px;
+$flexGap: 10px;
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $flexGap;
+  margin-top: $topMargin;
+
+  @include phone {
+    flex-direction: column;
+  }
+
+  @include tablet {
+    flex-direction: column;
+  }
+
+  @include desktop {
+    flex-direction: row;
+  }
+}
+
+:export {
+  topMargin: $topMargin;
+  flexGap: $flexGap;
+}

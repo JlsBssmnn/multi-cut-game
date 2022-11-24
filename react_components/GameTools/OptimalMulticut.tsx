@@ -12,6 +12,8 @@ import LoadingSpinner from "./LoadingSpinner";
 import NonInteractiveGraph from "../NonInteractiveGraph";
 import { LogicalGraph } from "../../types/graph";
 import PartialGraphTheme from "../../utils/graph_rendering/PartialGraphTheme";
+import { getUserDevice } from "../../utils/cssUtils";
+import { useWindowSize } from "../../utils/customHooks";
 
 export interface OptimalMulticutProps {
   optimalMulticut: LogicalGraph | null;
@@ -24,6 +26,23 @@ export default function OptimalMulticut({
 }: OptimalMulticutProps) {
   const [showOptimalMulticut, setShowOptimalMulticut] =
     useState<boolean>(false);
+  const [width, height] = useWindowSize();
+
+  const [dialog, setDialog] = useState<HTMLElement | null>(null);
+  let dialogContentWidth = width;
+  let dialogContentHeight = height;
+
+  if (dialog) {
+    const style = getComputedStyle(dialog);
+    dialogContentWidth =
+      dialog.clientWidth -
+      parseFloat(style.paddingLeft) -
+      parseFloat(style.paddingRight);
+    dialogContentHeight =
+      dialog.clientHeight -
+      parseFloat(style.paddingTop) -
+      parseFloat(style.paddingBottom);
+  }
 
   if (optimalMulticut == null) {
     return (
@@ -33,10 +52,26 @@ export default function OptimalMulticut({
     );
   }
 
+  const userDevice = getUserDevice(width, height);
+
+  if (userDevice === "phone") {
+    var showButtonText = "Best Solution";
+    var nodeSize = 15;
+  } else {
+    var showButtonText = "Show optimal solution";
+    var nodeSize = 30;
+  }
+
   return (
     <div className={styles.buttons}>
-      <Button variant="contained" onClick={() => setShowOptimalMulticut(true)}>
-        Show optimal solution
+      <Button
+        variant="contained"
+        onClick={() => setShowOptimalMulticut(true)}
+        sx={{
+          fontSize: "1.1rem",
+        }}
+      >
+        {showButtonText}
       </Button>
       <Dialog
         onClose={() => setShowOptimalMulticut(false)}
@@ -56,12 +91,12 @@ export default function OptimalMulticut({
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent ref={(newRef) => setDialog(newRef as HTMLElement)}>
           <NonInteractiveGraph
-            width={1100}
-            height={800}
-            margin={20}
-            nodeSize={30}
+            width={dialogContentWidth}
+            height={dialogContentHeight}
+            margin={5}
+            nodeSize={nodeSize}
             logicalGraph={optimalMulticut}
             edgeThickness={6}
             graphTheme={theme}

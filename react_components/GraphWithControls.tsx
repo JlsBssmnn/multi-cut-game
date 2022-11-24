@@ -1,16 +1,14 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LogicalGraph } from "../types/graph";
+import styles from "../styles/Game.module.scss";
+import gameToolStyles from "../styles/GameTools.module.scss";
 
-// use no SSR for the graph renderer, because otherwise there is a
-// problem, where the styles are different for the server and client
-import dynamic from "next/dynamic";
-import { graphTheme } from "../utils/constants";
-const GameControls = dynamic(() => import("./GameControls"), {
-  ssr: false,
-});
-const InteractiveGraph = dynamic(() => import("./InteractiveGraph"), {
-  ssr: false,
-});
+import { appBarHeight, graphTheme } from "../utils/constants";
+import { Paper } from "@mui/material";
+import GameControls from "./GameControls";
+import InteractiveGraph from "./InteractiveGraph";
+import { useWindowSize } from "../utils/customHooks";
+import { getUserDevice } from "../utils/cssUtils";
 
 export interface GraphWithControlsProps {
   graph: LogicalGraph;
@@ -18,14 +16,36 @@ export interface GraphWithControlsProps {
 
 export default function GraphWithControls(props: GraphWithControlsProps) {
   const [graph, setGraph] = useState<LogicalGraph>(props.graph);
+  const gameControls = useRef<HTMLDivElement | null>(null);
+
+  const [width, height] = useWindowSize();
+  const userDevice = getUserDevice(width, height);
+  const margin = parseInt(styles.topMargin);
+  const gap = parseInt(styles.flexGap);
+
+  // The height of the game tools which is relevant for the height of the
+  // interactive graph (which depends on the current screen size)
+  const gameToolHeight =
+    userDevice !== "desktop"
+      ? gameControls.current?.getBoundingClientRect().height ?? 0
+      : 0;
+  const graphHeight = height - appBarHeight - 2 * margin - gameToolHeight - gap;
+
+  // The width of the game tools which is relevant for the height of the
+  // interactive graph (which depends on the current screen size)
+  const gameToolWidth =
+    userDevice === "desktop"
+      ? parseInt(gameToolStyles.containerDesktopWidth) ?? 0
+      : 0;
+  const graphWidth = width - gameToolWidth - 2 * margin - gap;
 
   return (
-    <div>
-      <GameControls graph={graph} theme={graphTheme} />
-      <div style={{ border: "solid 5px black", display: "inline-block" }}>
+    <div className={styles.container}>
+      <GameControls graph={graph} theme={graphTheme} ref={gameControls} />
+      <Paper elevation={10}>
         <InteractiveGraph
-          width={1100}
-          height={800}
+          width={graphWidth}
+          height={graphHeight}
           margin={20}
           nodeSize={30}
           logicalGraph={graph}
@@ -33,7 +53,7 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
           graphTheme={graphTheme}
           emitGraphChange={setGraph}
         />
-      </div>
+      </Paper>
     </div>
   );
 }

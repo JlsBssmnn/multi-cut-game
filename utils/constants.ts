@@ -10,3 +10,5 @@ export const graphTheme = new PartialGraphTheme(
   [100, 100, 100], // neutralEdgeColor
   0.5 // opacity
 );
+
+export const appBarHeight = 64;

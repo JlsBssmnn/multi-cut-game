@@ -15,10 +15,11 @@ import OptimalMulticut from "./GameTools/OptimalMulticut";
 export interface StatsProps {
   graph: LogicalGraph;
   theme: PartialGraphTheme;
+  level?: number;
 }
 
 export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
-  { graph, theme },
+  { graph, theme, level },
   ref
 ) {
   const [optimalSolution, setOptimalSolution] = useState<Solution | null>(null);
@@ -27,10 +28,14 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
   );
 
   async function getOptimalSolution() {
-    const response = await fetch("/api/bestMulticut", {
-      method: "POST",
-      body: JSON.stringify(graph.edges),
-    });
+    if (level !== undefined) {
+      var response = await fetch(`/api/levelSolution?level=${level}`);
+    } else {
+      var response = await fetch("/api/bestMulticut", {
+        method: "POST",
+        body: JSON.stringify(graph.edges),
+      });
+    }
     const solution: Solution = await response.json();
     setOptimalSolution(solution);
     setOptimalMulticut(getGraphFromSolution(graph, solution));

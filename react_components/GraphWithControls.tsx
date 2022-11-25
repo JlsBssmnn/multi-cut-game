@@ -12,6 +12,7 @@ import { getUserDevice } from "../utils/cssUtils";
 
 export interface GraphWithControlsProps {
   graph: LogicalGraph;
+  level?: number;
 }
 
 export default function GraphWithControls(props: GraphWithControlsProps) {
@@ -41,7 +42,12 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
 
   return (
     <div className={styles.container}>
-      <GameControls graph={graph} theme={graphTheme} ref={gameControls} />
+      <GameControls
+        graph={graph}
+        theme={graphTheme}
+        ref={gameControls}
+        level={props.level}
+      />
       <Paper elevation={10}>
         <InteractiveGraph
           width={graphWidth}

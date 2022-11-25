@@ -10,10 +10,16 @@ const GraphWithControls = dynamic(
   }
 );
 
-export default function NonSSRGame({ graph }: { graph: LogicalGraph }) {
+export default function NonSSRGame({
+  graph,
+  level,
+}: {
+  graph: LogicalGraph;
+  level?: number;
+}) {
   return (
     <>
-      <GraphWithControls graph={graph} />
+      <GraphWithControls graph={graph} level={level} />
     </>
   );
 }

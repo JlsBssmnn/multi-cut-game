@@ -5,8 +5,8 @@ import {
   PointerEvent,
   SetStateAction,
   useEffect,
+  useReducer,
   useRef,
-  useState,
 } from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
@@ -17,6 +17,7 @@ import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
 import { copyObject } from "../utils/utils";
+import { Point } from "../types/geometry";
 
 export interface InteractiveGraphProps {
   width: number;
@@ -27,6 +28,50 @@ export interface InteractiveGraphProps {
   edgeThickness: number;
   graphTheme: PartialGraphTheme;
   emitGraphChange: Dispatch<SetStateAction<LogicalGraph>>;
+}
+
+type UpdateActions =
+  | { type: "nodeAt"; payload: { pointer: Point } }
+  | { type: "moveNode"; payload: { pointer: Point } }
+  | { type: "sendAction" }
+  | { type: "undoAction" }
+  | {
+      type: "scaleGraph";
+      payload: {
+        width: number;
+        height: number;
+        nodeSize: number;
+        margin: number;
+      };
+    }
+  | {
+      type: "scaleGraphRelative";
+      payload: {
+        previousDimensions: GraphDimensions;
+        newDimensions: GraphDimensions;
+      };
+    };
+
+function updateGraph(graph: PartialGraph, action: UpdateActions): PartialGraph {
+  switch (action.type) {
+    case "nodeAt":
+      return graph.nodeAt(action.payload.pointer);
+    case "moveNode":
+      return graph.moveNode(action.payload.pointer);
+    case "sendAction":
+      return graph.sendAction();
+    case "undoAction":
+      return graph.undoAction();
+    case "scaleGraph":
+      const { width, height, nodeSize, margin } = action.payload;
+      scaleGraph(graph.nodes, width, height, nodeSize, margin);
+      return copyObject(graph);
+    case "scaleGraphRelative":
+      const { previousDimensions, newDimensions } = action.payload;
+      return graph.scaleGraphRelative(previousDimensions, newDimensions);
+    default:
+      return graph;
+  }
 }
 
 /**
@@ -46,11 +91,15 @@ export default function InteractiveGraph({
   graphTheme,
   emitGraphChange,
 }: InteractiveGraphProps) {
-  const [partialGraph, setPartialGraph] = useState<PartialGraph>(() => {
-    const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
-    partialGraph.emitGraphChange = emitGraphChange;
-    return partialGraph;
-  });
+  const [partialGraph, dispatch] = useReducer<typeof updateGraph, undefined>(
+    updateGraph,
+    undefined,
+    () => {
+      const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
+      partialGraph.emitGraphChange = emitGraphChange;
+      return partialGraph;
+    }
+  );
   const previousDimensions = useRef<GraphDimensions | null>(null);
 
   const renderedGraph = renderGraph(partialGraph, edgeThickness);
@@ -65,25 +114,27 @@ export default function InteractiveGraph({
     if (width <= 0 || height <= 0) {
       return;
     }
-    setPartialGraph((partialGraph) => {
-      const newDimensions: GraphDimensions = {
-        width,
-        height,
-        nodeSize,
-      };
-      if (previousDimensions.current == null) {
-        previousDimensions.current = newDimensions;
-        scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
-        return copyObject(partialGraph);
-      } else {
-        const newGraph = partialGraph.scaleGraphRelative(
-          previousDimensions.current,
-          newDimensions
-        );
-        previousDimensions.current = newDimensions;
-        return newGraph;
-      }
-    });
+    const newDimensions: GraphDimensions = {
+      width,
+      height,
+      nodeSize,
+    };
+    if (previousDimensions.current == null) {
+      previousDimensions.current = newDimensions;
+      dispatch({
+        type: "scaleGraph",
+        payload: { width, height, nodeSize, margin },
+      });
+    } else {
+      dispatch({
+        type: "scaleGraphRelative",
+        payload: {
+          previousDimensions: previousDimensions.current,
+          newDimensions,
+        },
+      });
+      previousDimensions.current = newDimensions;
+    }
   }, [width, height, nodeSize]);
 
   function pointerDown(event: PointerEvent) {
@@ -92,7 +143,7 @@ export default function InteractiveGraph({
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
     };
-    setPartialGraph((partialGraph) => partialGraph.nodeAt(pointerPosition));
+    dispatch({ type: "nodeAt", payload: { pointer: pointerPosition } });
   }
 
   function pointerMove(event: PointerEvent) {
@@ -104,25 +155,16 @@ export default function InteractiveGraph({
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
       };
-      setPartialGraph((partialGraph) => partialGraph.moveNode(pointerPosition));
+      dispatch({ type: "moveNode", payload: { pointer: pointerPosition } });
     }
   }
 
   function pointerUp() {
-    // react for some reason sometimes calls the callback multiple times
-    // with an inconsistent state in partialGraph (dragEvent is not null
-    // but temporary nodes have been removed). These calls are prevented
-    // here, because they would cause an error.
-    let updated = false;
-    setPartialGraph((partialGraph) => {
-      if (updated) return partialGraph;
-      updated = true;
-      return partialGraph.sendAction();
-    });
+    dispatch({ type: "sendAction" });
   }
 
   function undoLastAction() {
-    setPartialGraph((partialGraph) => partialGraph.undoAction());
+    dispatch({ type: "undoAction" });
   }
 
   let validAction = true;

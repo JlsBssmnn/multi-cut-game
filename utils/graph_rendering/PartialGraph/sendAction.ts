@@ -1,4 +1,3 @@
-import { copyObject } from "../../utils";
 import { ClusterDragEvent } from "../DragEvent";
 import PartialGraph from "./PartialGraph";
 
@@ -9,7 +8,7 @@ import PartialGraph from "./PartialGraph";
  * passed to the react setter that was used to instantiate this class.
  */
 export function sendAction(this: PartialGraph) {
-  if (this.dragEvent == null) return this;
+  if (this.dragEvent == null) return;
 
   const action = this.dragEvent.action;
   if (action.name !== "reposition" && !action.valid) {
@@ -22,7 +21,7 @@ export function sendAction(this: PartialGraph) {
     this.edges = lastState.edges;
     this.dragEvent = null;
     this.temporaryCluster = null;
-    return copyObject(this);
+    return;
   }
 
   if (this.dragEvent instanceof ClusterDragEvent) {
@@ -42,11 +41,7 @@ export function sendAction(this: PartialGraph) {
     }
   }
 
-  // necessary to fire the useEffect in the `InteractiveGraph`
-  this.logicalGraph = copyObject(this.logicalGraph);
-
   this.dragEvent = null;
-  return copyObject(this);
 }
 
 export function applyMoveOut(

@@ -16,7 +16,6 @@ import scaleGraph, { GraphDimensions } from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
-import { copyObject } from "../utils/utils";
 import { Point } from "../types/geometry";
 
 export interface InteractiveGraphProps {
@@ -31,6 +30,7 @@ export interface InteractiveGraphProps {
 }
 
 type UpdateActions =
+  | { type: "update" }
   | { type: "nodeAt"; payload: { pointer: Point } }
   | { type: "moveNode"; payload: { pointer: Point } }
   | { type: "sendAction" }
@@ -52,27 +52,7 @@ type UpdateActions =
       };
     };
 
-function updateGraph(graph: PartialGraph, action: UpdateActions): PartialGraph {
-  switch (action.type) {
-    case "nodeAt":
-      return graph.nodeAt(action.payload.pointer);
-    case "moveNode":
-      return graph.moveNode(action.payload.pointer);
-    case "sendAction":
-      return graph.sendAction();
-    case "undoAction":
-      return graph.undoAction();
-    case "scaleGraph":
-      const { width, height, nodeSize, margin } = action.payload;
-      scaleGraph(graph.nodes, width, height, nodeSize, margin);
-      return copyObject(graph);
-    case "scaleGraphRelative":
-      const { previousDimensions, newDimensions } = action.payload;
-      return graph.scaleGraphRelative(previousDimensions, newDimensions);
-    default:
-      return graph;
-  }
-}
+let partialGraph: PartialGraph | undefined;
 
 /**
  * This component displays the given graph and enables interaction with it.
@@ -91,22 +71,45 @@ export default function InteractiveGraph({
   graphTheme,
   emitGraphChange,
 }: InteractiveGraphProps) {
-  const [partialGraph, dispatch] = useReducer<typeof updateGraph, undefined>(
-    updateGraph,
-    undefined,
-    () => {
-      const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
-      partialGraph.emitGraphChange = emitGraphChange;
-      return partialGraph;
-    }
-  );
-  const previousDimensions = useRef<GraphDimensions | null>(null);
-
-  const renderedGraph = renderGraph(partialGraph, edgeThickness);
-
   useEffect(() => {
-    emitGraphChange({ ...partialGraph.logicalGraph });
-  }, [partialGraph.logicalGraph]);
+    partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
+  }, []);
+
+  // This state is just used to trigger a rerender
+  // @ts-ignore
+  const [update, dispatch] = useReducer<typeof updateGraph>(updateGraph, false);
+
+  function updateGraph(state: boolean, action: UpdateActions): boolean {
+    if (!partialGraph) return state;
+    switch (action.type) {
+      case "nodeAt":
+        partialGraph.nodeAt(action.payload.pointer);
+        break;
+      case "moveNode":
+        partialGraph.moveNode(action.payload.pointer);
+        break;
+      case "sendAction":
+        partialGraph.sendAction();
+        break;
+      case "undoAction":
+        partialGraph.undoAction();
+        break;
+      case "scaleGraph":
+        const { width, height, nodeSize, margin } = action.payload;
+        scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
+        break;
+      case "scaleGraphRelative":
+        const { previousDimensions, newDimensions } = action.payload;
+        partialGraph.scaleGraphRelative(previousDimensions, newDimensions);
+        break;
+      case "update":
+        break;
+      default:
+        return state;
+    }
+    return !state;
+  }
+  const previousDimensions = useRef<GraphDimensions | null>(null);
 
   useEffect(() => {
     // as the page renders width and height will have weird
@@ -137,6 +140,9 @@ export default function InteractiveGraph({
     }
   }, [width, height, nodeSize]);
 
+  if (!partialGraph) return null;
+  const renderedGraph = renderGraph(partialGraph, edgeThickness);
+
   function pointerDown(event: PointerEvent) {
     event.preventDefault();
     const pointerPosition = {
@@ -159,12 +165,19 @@ export default function InteractiveGraph({
     }
   }
 
+  // for pointerUp and undoLastAction we must call the PartialGraph-method directly
+  // because setting it in the reducer is asynchronous and thus the emitted logical
+  // graph will not be the changed one
   function pointerUp() {
-    dispatch({ type: "sendAction" });
+    partialGraph?.sendAction();
+    dispatch({ type: "update" });
+    emitGraphChange({ ...partialGraph!.logicalGraph });
   }
 
   function undoLastAction() {
-    dispatch({ type: "undoAction" });
+    partialGraph?.undoAction();
+    dispatch({ type: "update" });
+    emitGraphChange({ ...partialGraph!.logicalGraph });
   }
 
   let validAction = true;

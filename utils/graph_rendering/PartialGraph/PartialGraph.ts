@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import {
   LogicalEdge,
   LogicalGraph,
@@ -72,12 +71,6 @@ export default class PartialGraph {
   logicalGraph: LogicalGraph;
   nodeSize: number;
   theme: PartialGraphTheme;
-
-  /**
-   * A react state setter, which will be called with the new logcial graph
-   * whenever the logical graph changes.
-   */
-  emitGraphChange!: Dispatch<SetStateAction<LogicalGraph>>;
 
   dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
 

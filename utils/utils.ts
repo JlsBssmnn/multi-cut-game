@@ -37,3 +37,16 @@ export function randomInt(low: number, high: number): number {
   if (high <= low) throw new Error("Invalid arguments for randomInt()");
   return Math.floor(Math.random() * (high - low)) + low;
 }
+
+/**
+ * Checks for deep equality of two objects.
+ */
+export function deepEqual(x: any, y: any): boolean {
+  const ok = Object.keys,
+    tx = typeof x,
+    ty = typeof y;
+  return x && y && tx === "object" && tx === ty
+    ? ok(x).length === ok(y).length &&
+        ok(x).every((key) => deepEqual(x[key], y[key]))
+    : x === y;
+}

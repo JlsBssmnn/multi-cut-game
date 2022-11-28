@@ -1,7 +1,7 @@
 import { Point } from "../../../types/geometry";
 import { Node, PartialClusterNode } from "../../../types/graph";
 import { pointInSquare } from "../../calculations/geometry";
-import { copyObject } from "../../utils";
+import { deepEqual } from "../../utils";
 import { ClusterDragEvent, NodeDragEvent } from "../DragEvent";
 import PartialGraph from "./PartialGraph";
 
@@ -10,7 +10,7 @@ import PartialGraph from "./PartialGraph";
  * the offset of the position to the node. The information is stored
  * as a `DragEvent`.
  */
-export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
+export function nodeAt(this: PartialGraph, position: Point) {
   let clusterNode: PartialClusterNode | null = null;
   let node: Node | null = null;
   let clusterNodeID, nodeID;
@@ -47,7 +47,7 @@ export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
 
   if (clusterNodeID == null) {
     this.dragEvent = null;
-    return copyObject(this);
+    return;
   }
 
   const selectedNodeX = nodeID === undefined ? clusterNode!.x : node!.x;
@@ -72,10 +72,15 @@ export function nodeAt(this: PartialGraph, position: Point): PartialGraph {
       relativePosition
     );
   }
-  this.lastStates.push({
+  const lastState = {
     nodes: structuredClone(this.nodes),
     edges: structuredClone(this.edges),
     logicalGraph: structuredClone(this.logicalGraph),
-  });
-  return copyObject(this);
+  };
+  if (
+    this.lastStates.length === 0 ||
+    !deepEqual(this.lastStates.at(-1), lastState)
+  ) {
+    this.lastStates.push(lastState);
+  }
 }

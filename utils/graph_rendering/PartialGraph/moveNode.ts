@@ -1,5 +1,4 @@
 import { Point } from "../../../types/geometry";
-import { copyObject } from "../../utils";
 import { differentActions } from "../Action";
 import { ClusterDragEvent } from "../DragEvent";
 import PartialGraph from "./PartialGraph";
@@ -8,11 +7,8 @@ import PartialGraph from "./PartialGraph";
  * Returns a new instance of `PartiallyRenderedGraph` where the node positions
  * are adjusted to the pointer position depending on the provided `DraggedNode`.
  */
-export function moveNode(
-  this: PartialGraph,
-  pointerPosition: Point
-): PartialGraph {
-  if (this.dragEvent == null) return this;
+export function moveNode(this: PartialGraph, pointerPosition: Point) {
+  if (this.dragEvent == null) return;
 
   const action = this.dragEvent.action;
   const newAction = this.getAction(pointerPosition);
@@ -39,6 +35,4 @@ export function moveNode(
     node.x = pointerPosition.x - pointerOffset.x;
     node.y = pointerPosition.y - pointerOffset.y;
   }
-
-  return copyObject(this);
 }

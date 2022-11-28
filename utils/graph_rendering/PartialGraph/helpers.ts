@@ -326,34 +326,29 @@ export function updateClusterNode(this: PartialGraph, clusterNodeID: number) {
  * Undoes the last action by popping the latest stored state and setting
  * the appropriate properties on the graph. If there is no previous state
  * this function will do nothing.
- * @returns A copy of the changed graph
  */
-export function undoAction(this: PartialGraph): PartialGraph {
+export function undoAction(this: PartialGraph) {
   const lastState = this.lastStates.pop();
-  if (!lastState) return copyObject(this);
+  if (!lastState) return;
 
   this.nodes = lastState.nodes;
   this.edges = lastState.edges;
   this.logicalGraph = lastState.logicalGraph;
   this.dragEvent = null;
   this.temporaryCluster = null;
-  return copyObject(this);
 }
 
 /**
  * Scales the graph and all stored states to the given width, height and nodeSize.
- * @returns A copy of the changed graph
  */
 export function scaleGraphRelative(
   this: PartialGraph,
   previousLayout: GraphDimensions,
   newLayout: GraphDimensions
-): PartialGraph {
+) {
   scaleRelative(this.nodes, previousLayout, newLayout);
   this.lastStates.forEach((state) =>
     scaleRelative(state.nodes, previousLayout, newLayout)
   );
   this.nodeSize = newLayout.nodeSize;
-
-  return copyObject(this);
 }

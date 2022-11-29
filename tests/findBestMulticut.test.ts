@@ -1,4 +1,3 @@
-import { LogicalGraph } from "../types/graph";
 import findBestMulticut from "../utils/server_utils/findBestMulticut";
 
 test("graph1", async () => {

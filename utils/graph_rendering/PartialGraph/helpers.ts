@@ -11,7 +11,6 @@ import {
   scaleLayout,
   scaleRelative,
 } from "../../graph_layout/scaleGraph";
-import { copyObject } from "../../utils";
 import PartialGraph from "./PartialGraph";
 
 /**

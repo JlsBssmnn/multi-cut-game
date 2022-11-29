@@ -9,10 +9,11 @@ import GameControls from "./GameControls";
 import InteractiveGraph from "./InteractiveGraph";
 import { useWindowSize } from "../utils/customHooks";
 import { getUserDevice } from "../utils/cssUtils";
+import { Solution } from "../utils/server_utils/findBestMulticut";
 
 export interface GraphWithControlsProps {
   graph: LogicalGraph;
-  level?: number;
+  solution?: Solution;
 }
 
 export default function GraphWithControls(props: GraphWithControlsProps) {
@@ -46,7 +47,7 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
         graph={graph}
         theme={graphTheme}
         ref={gameControls}
-        level={props.level}
+        solution={props.solution}
       />
       <Paper elevation={10}>
         <InteractiveGraph

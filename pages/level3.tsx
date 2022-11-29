@@ -1,11 +1,11 @@
-import { randomCostGenerator } from "../graphs/edgeCostGenerators";
-import tree from "../graphs/tree";
+import allLevels from "../graphs/fixedLevels/allLevels";
 import NonSSRGame from "../react_components/NonSSRGame";
 
+const level = allLevels.random20;
+export const keyword = level.keyword;
+
 export default function Level3() {
-  return (
-    <>
-      <NonSSRGame graph={randomCostGenerator(tree(27, 3))} />
-    </>
-  );
+  const { graph, solution } = level;
+
+  return <NonSSRGame graph={graph} solution={solution} />;
 }

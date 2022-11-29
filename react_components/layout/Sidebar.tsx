@@ -11,9 +11,16 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 
-const levelCount = 4;
+const levelCount = 6;
 
-const descriptions = ["complete", "grid", "tree", "random"];
+const keywords: string[] = [];
+async function initKeywords() {
+  for (let i = 1; i <= levelCount; i++) {
+    const { keyword } = await import(`../../pages/level${i}`);
+    keywords.push(keyword);
+  }
+}
+initKeywords();
 
 export interface SidebarProps {
   drawerOpen: boolean;
@@ -41,7 +48,7 @@ export default function Sidebar({ drawerOpen, setDrawerOpen }: SidebarProps) {
               <Link href={`/level${i + 1}`}>
                 <ListItemButton>
                   <ListItemText
-                    primary={`- Level ${i + 1} (${descriptions[i]})`}
+                    primary={`- Level ${i + 1} (${keywords[i]})`}
                     primaryTypographyProps={{ fontSize: "1.2rem" }}
                   />
                 </ListItemButton>

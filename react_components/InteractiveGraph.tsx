@@ -11,7 +11,6 @@ import {
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
-import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph, { GraphDimensions } from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
@@ -141,7 +140,6 @@ export default function InteractiveGraph({
   }, [width, height, nodeSize]);
 
   if (!partialGraph) return null;
-  const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();
@@ -200,7 +198,10 @@ export default function InteractiveGraph({
       onPointerUp={pointerUp}
     >
       <GraphVisualization
-        graph={renderedGraph}
+        graph={partialGraph}
+        width={width}
+        height={height}
+        edgeThickness={edgeThickness}
         draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
       />
       {!validAction && (

@@ -1,9 +1,30 @@
 import styles from "../styles/Graph.module.scss";
-import { ClusterNode, Graph, Subgraph } from "../types/graph";
+import {
+  LogicalEdge,
+  Node,
+  PartialClusterNode,
+  PartialSubgraph,
+} from "../types/graph";
+import { computeEdgeThickness } from "../utils/graph_layout/renderEdges";
+import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
+import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
 export interface GraphProps {
-  graph: Graph | Subgraph;
+  graph: PartialGraph;
+  width: number;
+  height: number;
+  edgeThickness: number;
   draggedClusterID?: number;
+}
+
+function getEdgeColor(edge: LogicalEdge, theme: PartialGraphTheme): string {
+  if (edge.value === 0) {
+    return theme.getColor("neutralEdgeColor");
+  } else if (edge.value > 0) {
+    return theme.getColor("positiveEdgeColor");
+  } else {
+    return theme.getColor("negativeEdgeColor");
+  }
 }
 
 /**
@@ -11,49 +32,114 @@ export interface GraphProps {
  */
 export default function GraphVisualization({
   graph,
+  width,
+  height,
+  edgeThickness,
   draggedClusterID,
 }: GraphProps) {
   const { nodes, edges } = graph;
-  let isClusterGraph = false;
-  if (nodes.length > 0) {
-    isClusterGraph = "subgraph" in nodes[0];
-  }
+  const nodeMap = new Map<number, PartialClusterNode>();
+  nodes.forEach((node) => nodeMap.set(node.id, node));
 
   return (
-    <>
-      {edges.map((edge, i) => (
-        <div
-          key={"e" + i}
-          className={styles.edge}
-          style={{ ...edge, zIndex: isClusterGraph ? 1 : 3 }}
-        ></div>
-      ))}
+    <svg width={width} height={height}>
+      {edges.map((edge, i) => {
+        const sourceNode = nodeMap.get(edge.source);
+        const targetNode = nodeMap.get(edge.target);
+        if (!sourceNode || !targetNode) {
+          throw new Error("There is an edge connecting nodes that don't exist");
+        }
+        return (
+          <line
+            key={"e" + i}
+            className={styles.edge}
+            x1={sourceNode.x + sourceNode.size / 2}
+            y1={sourceNode.y + sourceNode.size / 2}
+            x2={targetNode.x + targetNode.size / 2}
+            y2={targetNode.y + targetNode.size / 2}
+            stroke={getEdgeColor(edge, graph.theme)}
+            strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
+            style={{ zIndex: 1 }}
+          ></line>
+        );
+      })}
       {nodes.map((node, i) => (
-        <div
-          key={"n" + i}
-          className={"subgraph" in node ? styles.clusterNode : styles.node}
-          id={(isClusterGraph ? 'cluster' : 'node') + node.id}
-          style={{
-            left: node.x,
-            top: node.y,
-            height: node.size,
-            width: node.size,
-            backgroundColor: node.color,
-            borderColor: isClusterGraph
-              ? (node as ClusterNode).borderColor
-              : undefined,
-            zIndex:
-              node.id === draggedClusterID && isClusterGraph ? 5 : undefined,
-          }}
-        >
-          {isClusterGraph && (
-            <GraphVisualization
-              graph={(node as ClusterNode).subgraph}
+        <>
+          <circle
+            key={"n" + i}
+            className={styles.clusterNode}
+            id={"cluster" + node.id}
+            cx={node.x + node.size / 2}
+            cy={node.y + node.size / 2}
+            r={node.size / 2}
+            fill={node.color}
+            stroke={node.borderColor}
+            style={{
+              zIndex: node.id === draggedClusterID ? 5 : undefined,
+            }}
+          />
+          <svg x={node.x} y={node.y} width={node.size} height={node.size}>
+            <SubgraphVisualization
+              graph={node.subgraph}
+              edgeThickness={edgeThickness}
+              theme={graph.theme}
               key={"g" + i}
             />
-          )}
-        </div>
+          </svg>
+        </>
       ))}
-    </>
+    </svg>
+  );
+}
+
+interface SubgraphVisualizationProps {
+  graph: PartialSubgraph;
+  theme: PartialGraphTheme;
+  edgeThickness: number;
+}
+
+function SubgraphVisualization({
+  graph,
+  theme,
+  edgeThickness,
+}: SubgraphVisualizationProps) {
+  const { nodes, edges } = graph;
+  const nodeMap = new Map<number, Node>();
+  nodes.forEach((node) => nodeMap.set(node.id, node));
+
+  return (
+    <g>
+      {edges.map((edge, i) => {
+        const sourceNode = nodeMap.get(edge.source);
+        const targetNode = nodeMap.get(edge.target);
+        if (!sourceNode || !targetNode) {
+          throw new Error("There is an edge connecting nodes that don't exist");
+        }
+        return (
+          <line
+            key={"e" + i}
+            className={styles.edge}
+            x1={sourceNode.x + sourceNode.size / 2}
+            y1={sourceNode.y + sourceNode.size / 2}
+            x2={targetNode.x + targetNode.size / 2}
+            y2={targetNode.y + targetNode.size / 2}
+            style={{ zIndex: 3 }}
+            stroke={getEdgeColor(edge, theme)}
+            strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
+          ></line>
+        );
+      })}
+      {nodes.map((node, i) => (
+        <circle
+          key={"n" + i}
+          className={styles.node}
+          id={"node" + node.id}
+          cx={node.x + node.size / 2}
+          cy={node.y + node.size / 2}
+          r={node.size / 2}
+          fill={node.color}
+        ></circle>
+      ))}
+    </g>
   );
 }

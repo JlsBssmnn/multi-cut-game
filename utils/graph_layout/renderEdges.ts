@@ -106,7 +106,10 @@ function renderEdges(
  * This function computes the thickness of a rendered edge in pixels
  * depending on it's value by using the provided `edgeThickness` parameter.
  */
-function computeEdgeThickness(edgeThickness: number, value: number): number {
+export function computeEdgeThickness(
+  edgeThickness: number,
+  value: number
+): number {
   if (value === 0) {
     return Math.sqrt(edgeThickness);
   }

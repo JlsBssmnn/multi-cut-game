@@ -1,6 +1,5 @@
 import styles from "../styles/Graph.module.scss";
 import layoutGraph from "../utils/graph_layout/layoutGraph";
-import renderGraph from "../utils/graph_layout/renderEdges";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
 import GraphVisualization from "./GraphVisualization";
 import { InteractiveGraphProps } from "./InteractiveGraph";
@@ -26,7 +25,6 @@ export default function NonInteractiveGraph({
 }: NonInteractiveGraphProps) {
   const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
   scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
-  const renderedGraph = renderGraph(partialGraph, edgeThickness);
 
   return (
     <div
@@ -37,7 +35,10 @@ export default function NonInteractiveGraph({
       }}
     >
       <GraphVisualization
-        graph={renderedGraph}
+        graph={partialGraph}
+        width={width}
+        height={height}
+        edgeThickness={edgeThickness}
         draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
       />
     </div>

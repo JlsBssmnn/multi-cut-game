@@ -1,6 +1,6 @@
 import { Point } from "../../../types/geometry";
 import { Node, PartialClusterNode } from "../../../types/graph";
-import { pointInSquare } from "../../calculations/geometry";
+import { pointInCircle } from "../../calculations/geometry";
 import { deepEqual } from "../../utils";
 import { ClusterDragEvent, NodeDragEvent } from "../DragEvent";
 import PartialGraph from "./PartialGraph";
@@ -19,7 +19,7 @@ export function nodeAt(this: PartialGraph, position: Point) {
   for (let i = 0; i < this.nodes.length; i++) {
     clusterNode = this.nodes[i];
 
-    if (pointInSquare(position, clusterNode, clusterNode.size)) {
+    if (pointInCircle(position, clusterNode, clusterNode.size)) {
       clusterNodeID = clusterNode.id;
       const subgraph = clusterNode.subgraph;
 
@@ -36,7 +36,7 @@ export function nodeAt(this: PartialGraph, position: Point) {
           y: node.y + clusterNode.y,
         };
 
-        if (pointInSquare(position, nodePosition, node.size)) {
+        if (pointInCircle(position, nodePosition, node.size)) {
           nodeID = node.id;
           break;
         }

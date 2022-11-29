@@ -1,8 +1,5 @@
 import { Point } from "../../../../types/geometry";
-import {
-  pointInSquare,
-  squaresIntersect,
-} from "../../../calculations/geometry";
+import { circlesIntersect } from "../../../calculations/geometry";
 import { connectedComponents } from "../../../calculations/graphCalculations";
 import { Action } from "../../Action";
 import { ClusterDragEvent } from "../../DragEvent";
@@ -34,7 +31,7 @@ export function handleClusterMove(
     const otherCluster = this.nodes[i];
     if (
       otherCluster.id !== clusterNodeID &&
-      squaresIntersect(
+      circlesIntersect(
         clusterNode,
         otherCluster,
         clusterNode.size,
@@ -79,7 +76,7 @@ export function handleNodeMove(
 
   // the node is still inside the cluster
   if (
-    squaresIntersect(
+    circlesIntersect(
       absolutePosition,
       originClusterNode,
       this.nodeSize,
@@ -107,7 +104,7 @@ export function handleNodeMove(
     const otherClusterNode = this.nodes[i];
     if (otherClusterNode.id === this.temporaryCluster) continue;
     if (
-      squaresIntersect(
+      circlesIntersect(
         absolutePosition,
         otherClusterNode,
         this.nodeSize,

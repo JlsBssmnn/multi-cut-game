@@ -23,7 +23,11 @@ export default function OptimalCost({ optimalSolution }: OptimalCostProps) {
   }
 
   if (optimalSolution == null) {
-    var element = <LoadingSpinner message="Computing optimal solution" />;
+    var element = (
+      <div className={styles.buttons}>
+        <LoadingSpinner message="Computing optimal solution" />
+      </div>
+    );
   } else {
     if (showOptimalCost) {
       var element = (

@@ -19,9 +19,8 @@ export function moveNode(this: PartialGraph, pointerPosition: Point) {
     this.visualizeAction(this.dragEvent.action, pointerPosition);
   }
 
-  const { clusterNodeID, pointerOffset } = this.dragEvent;
+  const { clusterNode, pointerOffset } = this.dragEvent;
 
-  const clusterNode = this.getClusterNode(clusterNodeID);
   if (
     this.dragEvent instanceof ClusterDragEvent ||
     clusterNode.subgraph.nodes.length === 1
@@ -29,8 +28,7 @@ export function moveNode(this: PartialGraph, pointerPosition: Point) {
     clusterNode.x = pointerPosition.x - pointerOffset.x;
     clusterNode.y = pointerPosition.y - pointerOffset.y;
   } else {
-    const nodeID = this.dragEvent.nodeID;
-    const node = this.getNode(nodeID, clusterNodeID);
+    const { node } = this.dragEvent;
 
     node.x = pointerPosition.x - pointerOffset.x;
     node.y = pointerPosition.y - pointerOffset.y;

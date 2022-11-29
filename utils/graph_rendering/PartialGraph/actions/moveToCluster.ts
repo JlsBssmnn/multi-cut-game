@@ -17,37 +17,41 @@ export function visualizeMoveToCluster(
     );
   }
 
-  const { action, nodeID, relativeNodePosition, originClusterNodeID } =
+  const { action, node, relativeNodePosition, originClusterNode } =
     this.dragEvent;
-  const { destinationClusterID } = action;
+  const { destinationCluster } = action;
 
-  this.removeNode(nodeID);
+  this.removeNode(node);
 
   // add the node to the other cluster and enlarge clusterNode
-  const clusterNode = this.getClusterNode(destinationClusterID);
-  this.changeClusterSize(clusterNode, clusterNode.subgraph.nodes.length + 1);
-  clusterNode.subgraph.nodes.push({
-    id: nodeID,
-    x: clusterNode.x + relativeNodePosition.x,
-    y: clusterNode.y + relativeNodePosition.y,
+  const newNode = {
+    id: node.id,
+    x: destinationCluster.x + relativeNodePosition.x,
+    y: destinationCluster.y + relativeNodePosition.y,
     color: this.theme.getTransparentColor("nodeColor"),
     size: this.nodeSize,
-  });
+    group: destinationCluster.id,
+  };
+  destinationCluster.subgraph.nodes.push(newNode);
+  this.changeClusterSize(
+    destinationCluster,
+    destinationCluster.subgraph.nodes.length
+  );
 
   // add the new edges inside the cluster
-  const newEdges = this.computeSubgraphEdges(nodeID, destinationClusterID);
-  newEdges.forEach((edge) => (edge.opacity = this.theme.opacity));
-  clusterNode.subgraph.edges.push(...newEdges);
+  const newEdges = this.computeSubgraphEdges(node.id, destinationCluster, true);
+  destinationCluster.subgraph.edges.push(...newEdges);
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNodeID, true);
-  this.updateClusterEdges(destinationClusterID, true);
+  this.updateClusterEdges(originClusterNode.id, true);
+  this.updateClusterEdges(destinationCluster.id, true);
 
   // update the drag event
-  this.dragEvent.clusterNodeID = destinationClusterID;
+  this.dragEvent.clusterNode = destinationCluster;
+  this.dragEvent.node = newNode;
   this.dragEvent.pointerOffset = {
-    x: clusterNode.x + relativeNodePosition.x,
-    y: clusterNode.y + relativeNodePosition.y,
+    x: destinationCluster.x + relativeNodePosition.x,
+    y: destinationCluster.y + relativeNodePosition.y,
   };
 }
 
@@ -66,40 +70,45 @@ export function unvisualizeMoveToCluster(
     );
   }
 
-  const { clusterNodeID, nodeID, originClusterNodeID, relativeNodePosition } =
-    this.dragEvent;
+  const {
+    clusterNode: formerCluster,
+    node,
+    originClusterNode,
+    relativeNodePosition,
+  } = this.dragEvent;
 
-  this.removeNode(nodeID);
+  this.removeNode(node);
 
   // move node to it's old cluster
-  const clusterNode = this.getClusterNode(originClusterNodeID);
-  clusterNode.subgraph.nodes.push({
-    id: nodeID,
-    x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
-    y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
+  const newNode = {
+    id: node.id,
+    x: pointerPosition.x - originClusterNode.x - relativeNodePosition.x,
+    y: pointerPosition.y - originClusterNode.y - relativeNodePosition.y,
     color: this.theme.getColor("nodeColor"),
     size: this.nodeSize,
-  });
+    group: originClusterNode.id,
+  };
+  originClusterNode.subgraph.nodes.push(newNode);
 
   // reset cluster size
-  const formerCluster = this.getClusterNode(clusterNodeID);
   this.changeClusterSize(formerCluster, formerCluster.subgraph.nodes.length);
 
   // add back edges in the subgraph
-  clusterNode.subgraph.edges.push(
-    ...this.computeSubgraphEdges(nodeID, originClusterNodeID)
+  originClusterNode.subgraph.edges.push(
+    ...this.computeSubgraphEdges(node.id, originClusterNode, false)
   );
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNodeID, false);
-  this.updateClusterEdges(clusterNodeID, false);
+  this.updateClusterEdges(originClusterNode.id, false);
+  this.updateClusterEdges(formerCluster.id, false);
 
   // update the drag event
-  this.dragEvent.clusterNodeID = originClusterNodeID;
+  this.dragEvent.clusterNode = originClusterNode;
+  this.dragEvent.node = newNode;
   const relativePosition = this.dragEvent.relativeNodePosition;
   this.dragEvent.pointerOffset = {
-    x: clusterNode.x + relativePosition.x,
-    y: clusterNode.y + relativePosition.y,
+    x: originClusterNode.x + relativePosition.x,
+    y: originClusterNode.y + relativePosition.y,
   };
 }
 
@@ -115,6 +124,6 @@ export function commitMoveToCluster(this: PartialGraph) {
     );
   }
   this.makeOpaque();
-  this.updateClusterNode(this.dragEvent.originClusterNodeID);
-  this.updateClusterNode(this.dragEvent.clusterNodeID);
+  this.updateClusterNode(this.dragEvent.originClusterNode.id);
+  this.updateClusterNode(this.dragEvent.clusterNode.id);
 }

@@ -1,4 +1,4 @@
-import { Node, PartialClusterNode } from "../../types/graph";
+import { GeneralNode, PartialClusterNode } from "../../types/graph";
 import { clusterGraphSize, clusterOffset } from "../calculations/geometry";
 
 export interface GraphDimensions {
@@ -42,11 +42,11 @@ export default function scaleGraph(
  * `height`. The `nodeSize` is the size for one node of the graph.
  */
 export function scaleLayout(
-  nodes: Node[],
+  nodes: GeneralNode[],
   width: number,
   height: number,
   margin: number = 0
-): Node[] {
+): void {
   width -= margin * 2;
   height -= margin * 2;
 
@@ -74,8 +74,6 @@ export function scaleLayout(
       node.y = margin;
     }
   });
-
-  return nodes;
 }
 
 /**

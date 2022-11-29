@@ -70,42 +70,36 @@ export function getClusterNodeID(this: PartialGraph, nodeID: number): number {
 }
 
 /**
- * Computes the absolute position of the node that has the given id.
+ * Computes the absolute position of the given node.
  */
-export function getAbsoluteNodePosition(this: PartialGraph, id: number): Point {
-  for (let clusterNode of this.nodes) {
-    const node = clusterNode.subgraph.nodes.find((node) => node.id === id);
-    if (node === undefined) continue;
-    return {
-      x: clusterNode.x + node.x,
-      y: clusterNode.y + node.y,
-    };
+export function getAbsoluteNodePosition(this: PartialGraph, node: Node): Point {
+  const clusterNode = this.nodes.find(
+    (clusterNode) => clusterNode.id === node.group
+  );
+  if (!clusterNode) {
+    throw new Error(`node with id ${node.id} doesn't exist`);
   }
-  throw new Error(`node with id ${id} doesn't exist`);
+  return {
+    x: clusterNode.x + node.x,
+    y: clusterNode.y + node.y,
+  };
 }
 
 /**
- * Removes the node with the given id and all edges that are connect to it.
+ * Removes the given node and all edges that are connect to it.
  * If the node is in a singleton cluster, the entire cluster is removed.
  */
-export function removeNode(this: PartialGraph, nodeID: number) {
-  for (let i = 0; i < this.nodes.length; i++) {
-    const clusterNode = this.nodes[i];
-    const nodes = clusterNode.subgraph.nodes;
+export function removeNode(this: PartialGraph, node: Node) {
+  const clusterNode = this.getClusterNode(node.group);
 
-    for (let j = 0; j < nodes.length; j++) {
-      const node = nodes[j];
-      if (node.id === nodeID) {
-        nodes.splice(j, 1);
-        clusterNode.subgraph.edges = clusterNode.subgraph.edges.filter(
-          (edge) => edge.source !== nodeID && edge.target !== nodeID
-        );
-        if (nodes.length === 0) {
-          this.removeClusterNode(clusterNode.id);
-        }
-        return;
-      }
-    }
+  const nodes = clusterNode.subgraph.nodes;
+  nodes.splice(nodes.indexOf(node), 1);
+
+  clusterNode.subgraph.edges = clusterNode.subgraph.edges.filter(
+    (edge) => edge.source !== node.id && edge.target !== node.id
+  );
+  if (nodes.length === 0) {
+    this.removeClusterNode(clusterNode.id);
   }
 }
 
@@ -172,13 +166,14 @@ export function computeClusterEdges(
 
 /**
  * Computes all edges between the given node and all other nodes in the given cluster.
+ * The edges are made transparent if the parameter is set to `true`.
  */
 export function computeSubgraphEdges(
   this: PartialGraph,
   nodeID: number,
-  clusterNodeID: number
+  clusterNode: PartialClusterNode,
+  transparent: boolean
 ): LogicalEdge[] {
-  const clusterNode = this.getClusterNode(clusterNodeID);
   const nodesInCluster = new Set(
     clusterNode.subgraph.nodes.map((node) => node.id)
   );
@@ -192,11 +187,15 @@ export function computeSubgraphEdges(
 
     const otherNodeID = edge.source !== nodeID ? edge.source : edge.target;
     if (nodesInCluster.has(otherNodeID)) {
-      edges.push({
+      const newEdge: LogicalEdge = {
         source: nodeID,
         target: otherNodeID,
         value: edge.value,
-      });
+      };
+      if (transparent) {
+        newEdge.opacity = this.theme.opacity;
+      }
+      edges.push(newEdge);
     }
     return edges;
   }, [] as LogicalEdge[]);
@@ -306,7 +305,8 @@ export function updateClusterNode(this: PartialGraph, clusterNodeID: number) {
   const renderedCluster = layoutCluster(
     { nodes, edges },
     this.nodeSize,
-    this.theme
+    this.theme,
+    clusterNodeID
   );
 
   const innerRecSize = clusterGraphSize(nodesInCluster.size, this.nodeSize);

@@ -19,6 +19,7 @@ function createPartialGraph(
         y: 0,
         color: "",
         size: 0,
+        group: idStruct.id,
       })),
       edges: [],
     },
@@ -80,18 +81,27 @@ test("remove node", () => {
     { id: 1, nodeIDs: [4, 5, 6, 7] },
     { id: 2, nodeIDs: [8, 9, 10] },
   ]);
-  graph1.removeNode(0);
+  function getNode(id: number) {
+    for (let cluster of graph1.nodes) {
+      for (let node of cluster.subgraph.nodes) {
+        if (node.id === id) return node;
+      }
+    }
+    throw new Error(`Node ${id} not found`);
+  }
+
+  graph1.removeNode(getNode(0));
 
   expect(graph1.nodes.length).toBe(3);
   expect(getNodeIDs(graph1, 0)).toEqual([1, 2, 3]);
 
-  graph1.removeNode(2);
+  graph1.removeNode(getNode(2));
   expect(getNodeIDs(graph1, 0)).toEqual([1, 3]);
 
-  graph1.removeNode(3);
+  graph1.removeNode(getNode(3));
   expect(getNodeIDs(graph1, 0)).toEqual([1]);
 
-  graph1.removeNode(1);
+  graph1.removeNode(getNode(1));
   expect(graph1.nodes.length).toBe(2);
   expect(() => graph1.getClusterNode(0)).toThrowError();
 });

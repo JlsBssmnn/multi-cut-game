@@ -59,16 +59,16 @@ export function nodeAt(this: PartialGraph, position: Point) {
   };
 
   if (nodeID === undefined) {
-    this.dragEvent = new ClusterDragEvent(clusterNodeID, pointerOffset);
+    this.dragEvent = new ClusterDragEvent(clusterNode!, pointerOffset);
   } else {
     const relativePosition = {
       x: position.x - clusterNode!.x - node!.x,
       y: position.y - clusterNode!.y - node!.y,
     };
     this.dragEvent = new NodeDragEvent(
-      clusterNodeID,
+      clusterNode!,
       pointerOffset,
-      nodeID,
+      node!,
       relativePosition
     );
   }

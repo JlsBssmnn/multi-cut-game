@@ -201,7 +201,7 @@ export default function InteractiveGraph({
     >
       <GraphVisualization
         graph={renderedGraph}
-        draggedClusterID={partialGraph.dragEvent?.clusterNodeID}
+        draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
       />
       {!validAction && (
         <div

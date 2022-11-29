@@ -169,7 +169,8 @@ test("layout cluster", () => {
       [255, 255, 255],
       [255, 255, 255],
       0.5
-    )
+    ),
+    1
   );
 
   expect(rendered1.nodes).toHaveLength(4);

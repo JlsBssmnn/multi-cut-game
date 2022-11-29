@@ -17,11 +17,10 @@ export function visualizeJoinClusters(
     );
   }
 
-  const { clusterNodeID } = this.dragEvent;
-  const { destinationClusterID } = this.dragEvent.action;
+  const { clusterNode } = this.dragEvent;
+  const { destinationCluster } = this.dragEvent.action;
 
   // make the dragged cluster transparent
-  const clusterNode = this.getClusterNode(clusterNodeID);
   clusterNode.borderColor =
     this.theme.getTransparentColor("clusterBorderColor");
   clusterNode.color = this.theme.getColor("tempClusterColor");
@@ -42,30 +41,29 @@ export function visualizeJoinClusters(
 
   // enlarge the other cluster (the number of nodes for the first cluster must
   // be divided by 2 because we introduced the white duplicates for each node)
-  const otherClusterNode = this.getClusterNode(destinationClusterID);
   this.changeClusterSize(
-    otherClusterNode,
+    destinationCluster,
     clusterNode.subgraph.nodes.length / 2 +
-      otherClusterNode.subgraph.nodes.length
+      destinationCluster.subgraph.nodes.length
   );
 
   // remove cluster edges
   this.edges = this.edges.filter(
-    (edge) => edge.source !== clusterNodeID && edge.target !== clusterNodeID
+    (edge) => edge.source !== clusterNode.id && edge.target !== clusterNode.id
   );
 
   // change the cluster edges of the destination cluster
   // this is done by computing the additional costs that arise when the nodes
   // of the origin cluster are joined to the destination cluster
-  const newEdges = this.computeClusterEdges(clusterNodeID);
+  const newEdges = this.computeClusterEdges(clusterNode.id);
   this.edges.forEach((edge) => {
     if (
-      edge.source !== destinationClusterID &&
-      edge.target !== destinationClusterID
+      edge.source !== destinationCluster.id &&
+      edge.target !== destinationCluster.id
     )
       return;
     const otherClusterID =
-      edge.source !== destinationClusterID ? edge.source : edge.target;
+      edge.source !== destinationCluster.id ? edge.source : edge.target;
 
     const newValue = newEdges.get(otherClusterID);
     if (newValue === undefined) {
@@ -80,9 +78,9 @@ export function visualizeJoinClusters(
   // cluster where there is no connection between that clusterX
   // and the destination cluster
   Array.from(newEdges.entries()).forEach(([otherClusterID, value]) => {
-    if (otherClusterID === destinationClusterID) return;
+    if (otherClusterID === destinationCluster.id) return;
     this.edges.push({
-      source: destinationClusterID,
+      source: destinationCluster.id,
       target: otherClusterID,
       value,
       opacity: this.theme.opacity,
@@ -105,11 +103,10 @@ export function unvisualizeJoinClusters(
     );
   }
 
-  const { clusterNodeID } = this.dragEvent;
-  const { destinationClusterID } = this.dragEvent.action;
+  const { clusterNode } = this.dragEvent;
+  const { destinationCluster } = this.dragEvent.action;
 
   // make the dragged cluster opaque
-  const clusterNode = this.getClusterNode(clusterNodeID);
   clusterNode.borderColor = this.theme.getColor("clusterBorderColor");
   clusterNode.color = this.theme.getColor("clusterNodeColor");
   clusterNode.subgraph.nodes.forEach(
@@ -126,15 +123,14 @@ export function unvisualizeJoinClusters(
   });
 
   // reset the size of the other cluster
-  const otherClusterNode = this.getClusterNode(destinationClusterID);
   this.changeClusterSize(
-    otherClusterNode,
-    otherClusterNode.subgraph.nodes.length
+    destinationCluster,
+    destinationCluster.subgraph.nodes.length
   );
 
   // update the cluster edges
-  this.updateClusterEdges(clusterNodeID, false);
-  this.updateClusterEdges(destinationClusterID, false);
+  this.updateClusterEdges(clusterNode.id, false);
+  this.updateClusterEdges(destinationCluster.id, false);
 }
 
 export function commitJoinClusters(this: PartialGraph) {
@@ -148,29 +144,26 @@ export function commitJoinClusters(this: PartialGraph) {
 			wasn't represented by the drag event"
     );
   }
-  const { originClusterNodeID, action } = this.dragEvent;
-  const { destinationClusterID } = action;
+  const { originClusterNode, action } = this.dragEvent;
+  const { destinationCluster } = action;
 
-  const smallerID = Math.min(originClusterNodeID, destinationClusterID);
-
-  const orgClusterNode = this.getClusterNode(originClusterNodeID);
-  const destClusterNode = this.getClusterNode(destinationClusterID);
+  const smallerID = Math.min(originClusterNode.id, destinationCluster.id);
 
   // delete the dragged cluster node
-  this.nodes.splice(this.nodes.indexOf(orgClusterNode), 1);
+  this.nodes.splice(this.nodes.indexOf(originClusterNode), 1);
 
   // because the new cluster gets the id of the cluster with the smallest id,
   // change the id of the destination cluster to that minimum
-  if (destClusterNode.id > smallerID) {
+  if (destinationCluster.id > smallerID) {
     this.edges.forEach((edge) => {
-      if (edge.source === destClusterNode.id) {
+      if (edge.source === destinationCluster.id) {
         edge.source = smallerID;
-      } else if (edge.target === destClusterNode.id) {
+      } else if (edge.target === destinationCluster.id) {
         edge.target = smallerID;
       }
     });
   }
-  destClusterNode.id = smallerID;
+  destinationCluster.id = smallerID;
 
   this.updateClusterNode(smallerID);
   this.makeOpaque();

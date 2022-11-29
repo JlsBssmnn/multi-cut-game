@@ -1,5 +1,6 @@
 import {
   Edge,
+  GeneralNode,
   Graph,
   LogicalEdge,
   Node,
@@ -50,7 +51,7 @@ function renderSubgraphEdges(
 }
 
 function renderEdges(
-  nodeMap: Map<number, Node>,
+  nodeMap: Map<number, GeneralNode>,
   edges: LogicalEdge[],
   edgeThickness: number,
   theme: PartialGraphTheme

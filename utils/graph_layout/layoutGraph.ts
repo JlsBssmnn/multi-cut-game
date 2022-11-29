@@ -80,7 +80,8 @@ export function getClusterEdges(graph: LogicalGraph): ClusterEdge[] {
 export function layoutCluster(
   graph: LogicalGraph,
   nodeSize: number,
-  theme: PartialGraphTheme
+  theme: PartialGraphTheme,
+  clusterID: number
 ): PartialSubgraph {
   const forceLink = d3
     .forceLink<D3Node, D3Edge>(graph.edges)
@@ -102,6 +103,7 @@ export function layoutCluster(
     y: obj.y ?? 0,
     color: theme.getColor("nodeColor"),
     size: nodeSize,
+    group: clusterID,
   }));
 
   // The edges point to nodes that got modified by d3 and are now actually
@@ -180,7 +182,12 @@ export default function layoutGraph(
       )
       .map((edge) => ({ ...edge }));
 
-    const renderedCluster = layoutCluster({ nodes, edges }, nodeSize, theme);
+    const renderedCluster = layoutCluster(
+      { nodes, edges },
+      nodeSize,
+      theme,
+      clusterID
+    );
 
     cluster.subgraph = renderedCluster;
   });

@@ -1,3 +1,5 @@
+import { Common } from "./common";
+
 export interface LogicalNode {
   id: number;
   group: number;
@@ -34,7 +36,12 @@ export type ClusterNode = Omit<PartialClusterNode, "subgraph"> & {
   subgraph: Subgraph;
 };
 
-export type Node = Omit<PartialClusterNode, "subgraph" | "borderColor">;
+export interface Node
+  extends Omit<PartialClusterNode, "subgraph" | "borderColor"> {
+  group: number;
+}
+
+export type GeneralNode = Common<PartialClusterNode, Node>;
 
 export interface Edge {
   left: number;

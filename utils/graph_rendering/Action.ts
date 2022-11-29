@@ -1,3 +1,5 @@
+import { PartialClusterNode } from "../../types/graph";
+
 export type ClusterAction = Reposition | JoinClusters;
 export type NodeAction = Reposition | MoveOut | MoveToCluster;
 
@@ -14,13 +16,13 @@ export interface MoveOut {
 
 export interface MoveToCluster {
   name: "moveToCluster";
-  destinationClusterID: number;
+  destinationCluster: PartialClusterNode;
   valid: boolean;
 }
 
 export interface JoinClusters {
   name: "joinClusters";
-  destinationClusterID: number;
+  destinationCluster: PartialClusterNode;
   valid: boolean;
 }
 
@@ -31,8 +33,8 @@ export interface JoinClusters {
  */
 export function differentActions(action1: Action, action2: Action): boolean {
   if (action1.name !== action2.name) return true;
-  if ("destinationClusterID" in action1 && "destinationClusterID" in action2) {
-    return action1.destinationClusterID !== action2.destinationClusterID;
+  if ("destinationCluster" in action1 && "destinationCluster" in action2) {
+    return action1.destinationCluster !== action2.destinationCluster;
   }
   return false;
 }

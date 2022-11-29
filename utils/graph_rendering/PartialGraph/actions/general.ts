@@ -1,4 +1,5 @@
 import { Point } from "../../../../types/geometry";
+import { Node, PartialClusterNode } from "../../../../types/graph";
 import { circlesIntersect } from "../../../calculations/geometry";
 import { connectedComponents } from "../../../calculations/graphCalculations";
 import { Action } from "../../Action";
@@ -14,23 +15,22 @@ export function getAction(this: PartialGraph, pointerPosition: Point): Action {
     throw new Error("Cannot get action if drag event is null");
 
   if (this.dragEvent instanceof ClusterDragEvent) {
-    const { originClusterNodeID } = this.dragEvent;
-    return this.handleClusterMove(originClusterNodeID);
+    const { originClusterNode } = this.dragEvent;
+    return this.handleClusterMove(originClusterNode);
   } else {
-    const { originClusterNodeID, nodeID } = this.dragEvent;
-    return this.handleNodeMove(originClusterNodeID, nodeID);
+    const { originClusterNode, node } = this.dragEvent;
+    return this.handleNodeMove(originClusterNode, node);
   }
 }
 
 export function handleClusterMove(
   this: PartialGraph,
-  clusterNodeID: number
+  clusterNode: PartialClusterNode
 ): Action {
-  const clusterNode = this.getClusterNode(clusterNodeID);
   for (let i = 0; i < this.nodes.length; i++) {
     const otherCluster = this.nodes[i];
     if (
-      otherCluster.id !== clusterNodeID &&
+      otherCluster.id !== clusterNode.id &&
       circlesIntersect(
         clusterNode,
         otherCluster,
@@ -53,7 +53,7 @@ export function handleClusterMove(
       );
       return {
         name: "joinClusters",
-        destinationClusterID: otherCluster.id,
+        destinationCluster: otherCluster,
         valid,
       };
     }
@@ -65,14 +65,11 @@ export function handleClusterMove(
 
 export function handleNodeMove(
   this: PartialGraph,
-  originClusterNodeID: number,
-  nodeID: number
+  originClusterNode: PartialClusterNode,
+  node: Node
 ): Action {
-  // a node is dragged
-  const originClusterNode = this.getClusterNode(originClusterNodeID);
-
   // The absolute position of the node within the entire visualization
-  const absolutePosition = this.getAbsoluteNodePosition(nodeID);
+  const absolutePosition = this.getAbsoluteNodePosition(node);
 
   // the node is still inside the cluster
   if (
@@ -91,10 +88,10 @@ export function handleNodeMove(
   // when this node is removed and check that there is only 1
   const newSubgraph = {
     nodes: originClusterNode.subgraph.nodes
-      .filter((node) => node.id !== nodeID)
-      .map((node) => ({ ...node, group: originClusterNodeID })),
+      .filter((otherNode) => otherNode !== node)
+      .map((node) => ({ ...node, group: originClusterNode.id })),
     edges: originClusterNode.subgraph.edges.filter(
-      (edge) => edge.source !== nodeID && edge.target !== nodeID
+      (edge) => edge.source !== node.id && edge.target !== node.id
     ),
   };
   const validMoveOut = connectedComponents(newSubgraph).length === 1;
@@ -116,12 +113,12 @@ export function handleNodeMove(
       );
       const validInNewCluster = this.logicalGraph.edges.some(
         (edge) =>
-          (edge.source === nodeID && nodesInNewCluster.has(edge.target)) ||
-          (nodesInNewCluster.has(edge.source) && edge.target === nodeID)
+          (edge.source === node.id && nodesInNewCluster.has(edge.target)) ||
+          (nodesInNewCluster.has(edge.source) && edge.target === node.id)
       );
       return {
         name: "moveToCluster",
-        destinationClusterID: otherClusterNode.id,
+        destinationCluster: otherClusterNode,
         valid: validMoveOut && validInNewCluster,
       };
     }

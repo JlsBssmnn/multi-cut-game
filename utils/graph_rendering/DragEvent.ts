@@ -1,26 +1,27 @@
 import { Point } from "../../types/geometry";
+import { Node, PartialClusterNode } from "../../types/graph";
 import { ClusterAction, NodeAction } from "./Action";
 
 export class DragEvent {
   /**
-   * The id of the cluster that is dragged or the id of cluster that
+   * The cluster that is dragged or the cluster that
    * contains the node that is dragged.
    */
-  clusterNodeID: number;
+  clusterNode: PartialClusterNode;
 
   /**
-   * The value of `clusterNodeID` when the event was created.
+   * The value of `clusterNode` when the event was created.
    */
-  originClusterNodeID: number;
+  originClusterNode: PartialClusterNode;
 
   /**
    * The distance from the dragged node's origin to the pointer.
    */
   pointerOffset: Point;
 
-  constructor(clusterNodeID: number, pointerOffset: Point) {
-    this.clusterNodeID = clusterNodeID;
-    this.originClusterNodeID = clusterNodeID;
+  constructor(clusterNode: PartialClusterNode, pointerOffset: Point) {
+    this.clusterNode = clusterNode;
+    this.originClusterNode = clusterNode;
     this.pointerOffset = pointerOffset;
   }
 }
@@ -35,18 +36,16 @@ export class ClusterDragEvent extends DragEvent {
     name: "reposition",
   };
 
-  constructor(clusterNodeID: number, pointerOffset: Point) {
-    super(clusterNodeID, pointerOffset);
+  constructor(clusterNode: PartialClusterNode, pointerOffset: Point) {
+    super(clusterNode, pointerOffset);
   }
 }
 
 export class NodeDragEvent extends DragEvent {
   /**
-   * The id of the node in the cluster that is dragged. If no
-   * node in the cluster but just the cluster is dragged this
-   * is undefined.
+   * The node in the cluster that is dragged. 
    */
-  nodeID: number;
+  node: Node;
 
   /**
    * the relative position of the pointer within the node that is
@@ -62,13 +61,13 @@ export class NodeDragEvent extends DragEvent {
   };
 
   constructor(
-    clusterNodeID: number,
+    clusterNode: PartialClusterNode,
     pointerOffset: Point,
-    nodeID: number,
+    node: Node,
     relativeNodePosition: Point
   ) {
-    super(clusterNodeID, pointerOffset);
-    this.nodeID = nodeID;
+    super(clusterNode, pointerOffset);
+    this.node = node;
     this.relativeNodePosition = relativeNodePosition;
   }
 }

@@ -15,40 +15,43 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     );
   }
 
-  const { originClusterNodeID, nodeID } = this.dragEvent;
+  const { originClusterNode, node } = this.dragEvent;
 
-  this.removeNode(nodeID);
+  this.removeNode(node);
   const maxClusterID = Math.max(...this.nodes.map((node) => node.id));
+  const newClusterID = maxClusterID + 1;
   const offset = clusterOffset(1, this.nodeSize);
 
   // add the new cluster
-  this.nodes.push({
+  const newNode = {
+    id: node.id,
+    x: offset,
+    y: offset,
+    color: this.theme.getTransparentColor("nodeColor"),
+    size: this.nodeSize,
+    group: newClusterID,
+  };
+  const newCluster = {
     color: this.theme.getColor("tempClusterColor"),
-    id: maxClusterID + 1,
+    id: newClusterID,
     size: clusterDiameter(1, this.nodeSize),
     x: pointerPosition.x,
     y: pointerPosition.y,
     borderColor: this.theme.getTransparentColor("clusterBorderColor"),
     subgraph: {
-      nodes: [
-        {
-          id: nodeID,
-          x: offset,
-          y: offset,
-          color: this.theme.getTransparentColor("nodeColor"),
-          size: this.nodeSize,
-        },
-      ],
+      nodes: [newNode],
       edges: [],
     },
-  });
+  };
+  this.nodes.push(newCluster);
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNodeID, true);
-  this.updateClusterEdges(maxClusterID + 1, true);
+  this.updateClusterEdges(originClusterNode.id, true);
+  this.updateClusterEdges(newClusterID, true);
 
   // update the drag event
-  this.dragEvent.clusterNodeID = maxClusterID + 1;
+  this.dragEvent.clusterNode = newCluster;
+  this.dragEvent.node = newNode;
   const relativePosition = this.dragEvent.relativeNodePosition;
   this.dragEvent.pointerOffset = {
     x: offset + relativePosition.x,
@@ -56,7 +59,7 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   };
 
   // store that the new cluster is just temporary
-  this.temporaryCluster = maxClusterID + 1;
+  this.temporaryCluster = newClusterID;
 }
 
 export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
@@ -71,34 +74,36 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     );
   }
 
-  const { nodeID, originClusterNodeID, relativeNodePosition } = this.dragEvent;
+  const { node, originClusterNode, relativeNodePosition } = this.dragEvent;
 
-  this.removeNode(nodeID);
+  this.removeNode(node);
 
   // move node to it's old cluster
-  const clusterNode = this.getClusterNode(originClusterNodeID);
-  clusterNode.subgraph.nodes.push({
-    id: nodeID,
-    x: pointerPosition.x - clusterNode.x - relativeNodePosition.x,
-    y: pointerPosition.y - clusterNode.y - relativeNodePosition.y,
+  const newNode = {
+    id: node.id,
+    x: pointerPosition.x - originClusterNode.x - relativeNodePosition.x,
+    y: pointerPosition.y - originClusterNode.y - relativeNodePosition.y,
     color: this.theme.getColor("nodeColor"),
     size: this.nodeSize,
-  });
+    group: originClusterNode.id,
+  };
+  originClusterNode.subgraph.nodes.push(newNode);
 
   // add back edges in the subgraph
-  clusterNode.subgraph.edges.push(
-    ...this.computeSubgraphEdges(nodeID, originClusterNodeID)
+  originClusterNode.subgraph.edges.push(
+    ...this.computeSubgraphEdges(node.id, originClusterNode, false)
   );
 
   // update the cluster edges of the origin cluster
-  this.updateClusterEdges(originClusterNodeID, false);
+  this.updateClusterEdges(originClusterNode.id, false);
 
   // update the drag event
-  this.dragEvent.clusterNodeID = originClusterNodeID;
+  this.dragEvent.clusterNode = originClusterNode;
+  this.dragEvent.node = newNode;
   const relativePosition = this.dragEvent.relativeNodePosition;
   this.dragEvent.pointerOffset = {
-    x: clusterNode.x + relativePosition.x,
-    y: clusterNode.y + relativePosition.y,
+    x: originClusterNode.x + relativePosition.x,
+    y: originClusterNode.y + relativePosition.y,
   };
 
   // reset temporary cluster
@@ -117,7 +122,7 @@ export function commitMoveOut(this: PartialGraph) {
     );
   }
   this.makeOpaque();
-  this.updateClusterNode(this.dragEvent.originClusterNodeID);
+  this.updateClusterNode(this.dragEvent.originClusterNode.id);
 
   // reset temporary cluster
   this.temporaryCluster = null;

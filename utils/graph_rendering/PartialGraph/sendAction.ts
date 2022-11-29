@@ -25,18 +25,21 @@ export function sendAction(this: PartialGraph) {
   }
 
   if (this.dragEvent instanceof ClusterDragEvent) {
-    const { originClusterNodeID, action } = this.dragEvent;
+    const { originClusterNode, action } = this.dragEvent;
     if (action.name === "joinClusters") {
-      this.applyJoinClusters(originClusterNodeID, action.destinationClusterID);
+      this.applyJoinClusters(
+        originClusterNode.id,
+        action.destinationCluster.id
+      );
       this.commitJoinClusters();
     }
   } else {
-    const { nodeID, action, clusterNodeID } = this.dragEvent;
+    const { node, action, clusterNode } = this.dragEvent;
     if (action.name === "moveOut") {
-      this.applyMoveOut(nodeID, clusterNodeID);
+      this.applyMoveOut(node.id, clusterNode.id);
       this.commitMoveOut();
     } else if (action.name === "moveToCluster") {
-      this.applyMoveToCluster(nodeID, clusterNodeID);
+      this.applyMoveToCluster(node.id, clusterNode.id);
       this.commitMoveToCluster();
     }
   }

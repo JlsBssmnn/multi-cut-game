@@ -38,7 +38,7 @@ export default function NonInteractiveGraph({
     >
       <GraphVisualization
         graph={renderedGraph}
-        draggedClusterID={partialGraph.dragEvent?.clusterNodeID}
+        draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
       />
     </div>
   );

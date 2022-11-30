@@ -17,7 +17,9 @@ export interface GraphWithControlsProps {
 }
 
 export default function GraphWithControls(props: GraphWithControlsProps) {
-  const [graph, setGraph] = useState<LogicalGraph>(props.graph);
+  const [graph, setGraph] = useState<LogicalGraph>(
+    structuredClone(props.graph)
+  );
   const gameControls = useRef<HTMLDivElement | null>(null);
 
   const [width, height] = useWindowSize();

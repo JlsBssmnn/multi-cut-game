@@ -51,7 +51,6 @@ export default function GraphVisualization({
         }
         return (
           <line
-            className={styles.edge}
             key={`ce${edge.source}-${edge.target}`}
             x1={sourceNode.x + sourceNode.size / 2}
             y1={sourceNode.y + sourceNode.size / 2}
@@ -67,7 +66,6 @@ export default function GraphVisualization({
       {nodes.map((node) => (
         <g key={"n" + node.id} id={"clusterG" + node.id}>
           <circle
-            className={styles.clusterNode}
             id={"cluster" + node.id}
             cx={node.x + node.size / 2}
             cy={node.y + node.size / 2}
@@ -119,7 +117,6 @@ function SubgraphVisualization({
         }
         return (
           <line
-            className={styles.edge}
             key={`ne${edge.source}-${edge.target}`}
             x1={sourceNode.x + sourceNode.size / 2}
             y1={sourceNode.y + sourceNode.size / 2}
@@ -134,7 +131,6 @@ function SubgraphVisualization({
       })}
       {nodes.map((node) => (
         <circle
-          className={styles.node}
           key={"n" + node.id}
           id={"node" + node.id}
           cx={node.x + node.size / 2}

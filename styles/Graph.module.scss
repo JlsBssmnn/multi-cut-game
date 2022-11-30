@@ -3,30 +3,6 @@
   overflow: hidden;
 }
 
-.node {
-  background-color: black;
-  border-radius: 50%;
-  position: absolute;
-  z-index: 4;
-}
-
-.clusterNode {
-  box-sizing: content-box;
-  background-color: black;
-  border-radius: 50%;
-  position: absolute;
-  border: 1px solid black;
-  z-index: 2;
-}
-
-.edge {
-  padding: 0px;
-  margin: 0px;
-  line-height: 1px;
-  position: absolute;
-  transform-origin: 0 50%;
-}
-
 .invalidActionNotification {
   $outline: 1px;
   position: absolute;

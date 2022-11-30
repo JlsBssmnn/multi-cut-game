@@ -224,25 +224,42 @@ export function changeClusterSize(
 }
 
 /**
- * Removes all edges involving the given cluster and recomputes
- * their value. The edges are then added either transparent (if the
- * corresponding parameter is true) or opaque.
+ * Recomputes the edges involving the given cluster and updates
+ * their value. The edges with changed value are then added either
+ * transparent (if the corresponding parameter is true) or opaque.
+ * If ignoredClusterID is provided, edges involing this cluster
+ * will not be updated or changed in any way.
  */
 export function updateClusterEdges(
   this: PartialGraph,
   clusterNodeID: number,
-  transparent: boolean
+  transparent: boolean,
+  ignoredClusterID?: number
 ) {
-  this.edges = this.edges.filter(
-    (edge) => edge.source !== clusterNodeID && edge.target !== clusterNodeID
-  );
+  const previousValues = new Map<number, number>();
+  this.edges = this.edges.filter((edge) => {
+    const keep =
+      (edge.source !== clusterNodeID && edge.target !== clusterNodeID) ||
+      edge.source === ignoredClusterID ||
+      edge.target === ignoredClusterID;
+
+    if (keep) return keep;
+
+    const otherClusterID =
+      edge.source !== clusterNodeID ? edge.source : edge.target;
+    previousValues.set(otherClusterID, edge.value);
+    return keep;
+  });
   const updatedEdges = this.computeClusterEdges(clusterNodeID);
   Array.from(updatedEdges.entries()).forEach(([otherClusterID, value]) => {
+    if (otherClusterID === ignoredClusterID) return;
+
+    const t = transparent && value !== previousValues.get(otherClusterID);
     this.edges.push({
       source: clusterNodeID,
       target: otherClusterID,
       value: value,
-      opacity: transparent ? this.theme.opacity : undefined,
+      opacity: t ? this.theme.opacity : undefined,
     });
   });
 }

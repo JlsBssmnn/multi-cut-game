@@ -43,7 +43,7 @@ export function visualizeMoveToCluster(
   destinationCluster.subgraph.edges.push(...newEdges);
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNode.id, true);
+  this.updateClusterEdges(originClusterNode.id, true, destinationCluster.id);
   this.updateClusterEdges(destinationCluster.id, true);
 
   // update the drag event

@@ -46,7 +46,7 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   this.nodes.push(newCluster);
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNode.id, true);
+  this.updateClusterEdges(originClusterNode.id, true, newClusterID);
   this.updateClusterEdges(newClusterID, true);
 
   // update the drag event

@@ -26,25 +26,16 @@ export function visualizeJoinClusters(
   clusterNode.color = this.theme.getColor("tempClusterColor");
 
   clusterNode.subgraph.nodes.forEach((node) => {
-    // duplicate nodes with white color such that you
-    // can't see the edges below the nodes
-    node.color = "white";
-
-    clusterNode.subgraph.nodes.push({
-      ...node,
-      color: this.theme.getTransparentColor("nodeColor"),
-    });
+    node.color = this.theme.getTransparentColor("nodeColor");
   });
   clusterNode.subgraph.edges.forEach(
     (edge) => (edge.opacity = this.theme.opacity)
   );
 
-  // enlarge the other cluster (the number of nodes for the first cluster must
-  // be divided by 2 because we introduced the white duplicates for each node)
+  // enlarge the other cluster
   this.changeClusterSize(
     destinationCluster,
-    clusterNode.subgraph.nodes.length / 2 +
-      destinationCluster.subgraph.nodes.length
+    clusterNode.subgraph.nodes.length + destinationCluster.subgraph.nodes.length
   );
 
   // remove cluster edges
@@ -113,14 +104,6 @@ export function unvisualizeJoinClusters(
     (node) => (node.color = this.theme.getColor("nodeColor"))
   );
   clusterNode.subgraph.edges.forEach((edge) => (edge.opacity = 1));
-
-  // remove duplicate nodes
-  const seenNodes = new Set();
-  clusterNode.subgraph.nodes = clusterNode.subgraph.nodes.filter((node) => {
-    if (seenNodes.has(node.id)) return false;
-    seenNodes.add(node.id);
-    return true;
-  });
 
   // reset the size of the other cluster
   this.changeClusterSize(

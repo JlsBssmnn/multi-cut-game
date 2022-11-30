@@ -43,7 +43,7 @@ export default function GraphVisualization({
 
   return (
     <svg width={width} height={height}>
-      {edges.map((edge, i) => {
+      {edges.map((edge) => {
         const sourceNode = nodeMap.get(edge.source);
         const targetNode = nodeMap.get(edge.target);
         if (!sourceNode || !targetNode) {
@@ -51,8 +51,8 @@ export default function GraphVisualization({
         }
         return (
           <line
-            key={"e" + i}
             className={styles.edge}
+            key={`ce${edge.source}-${edge.target}`}
             x1={sourceNode.x + sourceNode.size / 2}
             y1={sourceNode.y + sourceNode.size / 2}
             x2={targetNode.x + targetNode.size / 2}
@@ -63,10 +63,9 @@ export default function GraphVisualization({
           ></line>
         );
       })}
-      {nodes.map((node, i) => (
-        <>
+      {nodes.map((node) => (
+        <g key={"n" + node.id} id={"clusterG" + node.id}>
           <circle
-            key={"n" + i}
             className={styles.clusterNode}
             id={"cluster" + node.id}
             cx={node.x + node.size / 2}
@@ -83,10 +82,9 @@ export default function GraphVisualization({
               graph={node.subgraph}
               edgeThickness={edgeThickness}
               theme={graph.theme}
-              key={"g" + i}
             />
           </svg>
-        </>
+        </g>
       ))}
     </svg>
   );
@@ -108,8 +106,8 @@ function SubgraphVisualization({
   nodes.forEach((node) => nodeMap.set(node.id, node));
 
   return (
-    <g>
-      {edges.map((edge, i) => {
+    <>
+      {edges.map((edge) => {
         const sourceNode = nodeMap.get(edge.source);
         const targetNode = nodeMap.get(edge.target);
         if (!sourceNode || !targetNode) {
@@ -117,8 +115,8 @@ function SubgraphVisualization({
         }
         return (
           <line
-            key={"e" + i}
             className={styles.edge}
+            key={`ne${edge.source}-${edge.target}`}
             x1={sourceNode.x + sourceNode.size / 2}
             y1={sourceNode.y + sourceNode.size / 2}
             x2={targetNode.x + targetNode.size / 2}
@@ -129,10 +127,10 @@ function SubgraphVisualization({
           ></line>
         );
       })}
-      {nodes.map((node, i) => (
+      {nodes.map((node) => (
         <circle
-          key={"n" + i}
           className={styles.node}
+          key={"n" + node.id}
           id={"node" + node.id}
           cx={node.x + node.size / 2}
           cy={node.y + node.size / 2}
@@ -140,6 +138,6 @@ function SubgraphVisualization({
           fill={node.color}
         ></circle>
       ))}
-    </g>
+    </>
   );
 }

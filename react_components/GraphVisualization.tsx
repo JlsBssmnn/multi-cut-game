@@ -1,11 +1,9 @@
-import styles from "../styles/Graph.module.scss";
 import {
   LogicalEdge,
   Node,
   PartialClusterNode,
   PartialSubgraph,
 } from "../types/graph";
-import { computeEdgeThickness } from "../utils/graph_layout/renderEdges";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
@@ -25,6 +23,20 @@ function getEdgeColor(edge: LogicalEdge, theme: PartialGraphTheme): string {
   } else {
     return theme.getColor("negativeEdgeColor");
   }
+}
+
+/**
+ * This function computes the thickness of a rendered edge in pixels
+ * depending on it's value by using the provided `edgeThickness` parameter.
+ */
+export function computeEdgeThickness(
+  edgeThickness: number,
+  value: number
+): number {
+  if (value === 0) {
+    return Math.sqrt(edgeThickness);
+  }
+  return Math.sqrt(edgeThickness * Math.abs(value));
 }
 
 /**

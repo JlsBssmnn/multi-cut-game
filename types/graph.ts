@@ -32,37 +32,9 @@ export interface PartialSubgraph {
   edges: LogicalEdge[];
 }
 
-export type ClusterNode = Omit<PartialClusterNode, "subgraph"> & {
-  subgraph: Subgraph;
-};
-
 export interface Node
   extends Omit<PartialClusterNode, "subgraph" | "borderColor"> {
   group: number;
 }
 
 export type GeneralNode = Common<PartialClusterNode, Node>;
-
-export interface Edge {
-  left: number;
-  top: number;
-  width: number;
-  transform: string;
-  opacity?: number;
-}
-
-export interface Subgraph {
-  nodes: Node[];
-  edges: Edge[];
-}
-
-/**
- * This represents all the information that is necessary to render a graph.
- * It contains information about things like the position of nodes. It
- * doesn't contain logical information that isn't necessary for rendering the
- * graph, like cluster information.
- */
-export interface Graph {
-  nodes: ClusterNode[];
-  edges: Edge[];
-}

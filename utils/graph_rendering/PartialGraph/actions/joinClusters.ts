@@ -40,7 +40,7 @@ export function visualizeJoinClusters(
 
   // remove cluster edges
   this.edges = this.edges.filter(
-    (edge) => edge.source !== clusterNode.id && edge.target !== clusterNode.id
+    (edge) => edge.source !== clusterNode && edge.target !== clusterNode
   );
 
   // change the cluster edges of the destination cluster
@@ -49,30 +49,30 @@ export function visualizeJoinClusters(
   const newEdges = this.computeClusterEdges(clusterNode.id);
   this.edges.forEach((edge) => {
     if (
-      edge.source !== destinationCluster.id &&
-      edge.target !== destinationCluster.id
+      edge.source !== destinationCluster &&
+      edge.target !== destinationCluster
     )
       return;
-    const otherClusterID =
-      edge.source !== destinationCluster.id ? edge.source : edge.target;
+    const otherCluster =
+      edge.source !== destinationCluster ? edge.source : edge.target;
 
-    const newValue = newEdges.get(otherClusterID);
+    const newValue = newEdges.get(otherCluster);
     if (newValue === undefined) {
       return;
     }
     edge.value += newValue;
     edge.opacity = this.theme.opacity;
-    newEdges.delete(otherClusterID);
+    newEdges.delete(otherCluster);
   });
 
   // add new edges for connections between clusterX to the dragged
   // cluster where there is no connection between that clusterX
   // and the destination cluster
-  Array.from(newEdges.entries()).forEach(([otherClusterID, value]) => {
-    if (otherClusterID === destinationCluster.id) return;
+  Array.from(newEdges.entries()).forEach(([otherCluster, value]) => {
+    if (otherCluster === destinationCluster) return;
     this.edges.push({
-      source: destinationCluster.id,
-      target: otherClusterID,
+      source: destinationCluster,
+      target: otherCluster,
       value,
       opacity: this.theme.opacity,
     });
@@ -112,8 +112,8 @@ export function unvisualizeJoinClusters(
   );
 
   // update the cluster edges
-  this.updateClusterEdges(clusterNode.id, false);
-  this.updateClusterEdges(destinationCluster.id, false);
+  this.updateClusterEdges(clusterNode, false);
+  this.updateClusterEdges(destinationCluster, false);
 }
 
 export function commitJoinClusters(this: PartialGraph) {
@@ -137,15 +137,6 @@ export function commitJoinClusters(this: PartialGraph) {
 
   // because the new cluster gets the id of the cluster with the smallest id,
   // change the id of the destination cluster to that minimum
-  if (destinationCluster.id > smallerID) {
-    this.edges.forEach((edge) => {
-      if (edge.source === destinationCluster.id) {
-        edge.source = smallerID;
-      } else if (edge.target === destinationCluster.id) {
-        edge.target = smallerID;
-      }
-    });
-  }
   destinationCluster.id = smallerID;
 
   this.updateClusterNode(smallerID);

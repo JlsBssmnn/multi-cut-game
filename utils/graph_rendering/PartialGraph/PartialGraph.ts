@@ -1,4 +1,5 @@
 import {
+  ClusterEdge,
   LogicalEdge,
   LogicalGraph,
   PartialClusterNode,
@@ -42,6 +43,7 @@ import {
   updateClusterNode,
   undoAction,
   scaleGraphRelative,
+  copyState,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
@@ -51,6 +53,12 @@ import {
   applyMoveOut,
   sendAction,
 } from "./sendAction";
+
+export interface GraphState {
+  nodes: PartialClusterNode[];
+  edges: ClusterEdge[];
+  logicalGraph: LogicalGraph;
+}
 
 /**
  * This represents a partially rendered graph: The nodes are rendered (contain
@@ -66,7 +74,7 @@ export default class PartialGraph {
   /**
    * The indices of the source and target node that are connected by this edge
    */
-  edges: LogicalEdge[];
+  edges: ClusterEdge[];
 
   logicalGraph: LogicalGraph;
   nodeSize: number;
@@ -85,11 +93,7 @@ export default class PartialGraph {
    * used to reset the graph when the user performs an invalid action or when
    * the user wants to undo an action.
    */
-  lastStates: {
-    nodes: PartialClusterNode[];
-    edges: LogicalEdge[];
-    logicalGraph: LogicalGraph;
-  }[] = [];
+  lastStates: GraphState[] = [];
 
   constructor(
     nodes: PartialClusterNode[],
@@ -99,10 +103,26 @@ export default class PartialGraph {
     theme: PartialGraphTheme
   ) {
     this.nodes = nodes;
-    this.edges = edges;
     this.logicalGraph = logicalGraph;
     this.nodeSize = nodeSize;
     this.theme = theme;
+
+    const nodeMap = new Map<number, PartialClusterNode>();
+    this.nodes.forEach((node) => nodeMap.set(node.id, node));
+    this.edges = edges.map((edge) => {
+      const source = nodeMap.get(edge.source);
+      const target = nodeMap.get(edge.target);
+      if (!source || !target)
+        throw new Error(
+          "Inconsisten graph provided: edges contain" +
+            " nodes that don't exist in the node list"
+        );
+      return {
+        source,
+        target,
+        value: edge.value,
+      };
+    });
   }
 
   // helpers
@@ -120,6 +140,7 @@ export default class PartialGraph {
   updateClusterNode = updateClusterNode;
   undoAction = undoAction;
   scaleGraphRelative = scaleGraphRelative;
+  copyState = copyState;
 
   // the 3 main stages
   nodeAt = nodeAt;

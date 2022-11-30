@@ -1,9 +1,4 @@
-import {
-  LogicalEdge,
-  Node,
-  PartialClusterNode,
-  PartialSubgraph,
-} from "../types/graph";
+import { GeneralEdge, PartialSubgraph } from "../types/graph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
@@ -15,7 +10,7 @@ export interface GraphProps {
   draggedClusterID?: number;
 }
 
-function getEdgeColor(edge: LogicalEdge, theme: PartialGraphTheme): string {
+function getEdgeColor(edge: GeneralEdge, theme: PartialGraphTheme): string {
   if (edge.value === 0) {
     return theme.getColor("neutralEdgeColor");
   } else if (edge.value > 0) {
@@ -50,31 +45,22 @@ export default function GraphVisualization({
   draggedClusterID,
 }: GraphProps) {
   const { nodes, edges } = graph;
-  const nodeMap = new Map<number, PartialClusterNode>();
-  nodes.forEach((node) => nodeMap.set(node.id, node));
 
   return (
     <svg width={width} height={height}>
-      {edges.map((edge) => {
-        const sourceNode = nodeMap.get(edge.source);
-        const targetNode = nodeMap.get(edge.target);
-        if (!sourceNode || !targetNode) {
-          throw new Error("There is an edge connecting nodes that don't exist");
-        }
-        return (
-          <line
-            key={`ce${edge.source}-${edge.target}`}
-            x1={sourceNode.x + sourceNode.size / 2}
-            y1={sourceNode.y + sourceNode.size / 2}
-            x2={targetNode.x + targetNode.size / 2}
-            y2={targetNode.y + targetNode.size / 2}
-            stroke={getEdgeColor(edge, graph.theme)}
-            strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
-            opacity={edge.opacity}
-            style={{ zIndex: 1 }}
-          ></line>
-        );
-      })}
+      {edges.map((edge) => (
+        <line
+          key={`ce${edge.source.id}-${edge.target.id}`}
+          x1={edge.source.x + edge.source.size / 2}
+          y1={edge.source.y + edge.source.size / 2}
+          x2={edge.target.x + edge.target.size / 2}
+          y2={edge.target.y + edge.target.size / 2}
+          stroke={getEdgeColor(edge, graph.theme)}
+          strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
+          opacity={edge.opacity}
+          style={{ zIndex: 1 }}
+        ></line>
+      ))}
       {nodes.map((node) => (
         <g key={"n" + node.id} id={"clusterG" + node.id}>
           <circle
@@ -116,31 +102,22 @@ function SubgraphVisualization({
   edgeThickness,
 }: SubgraphVisualizationProps) {
   const { nodes, edges } = graph;
-  const nodeMap = new Map<number, Node>();
-  nodes.forEach((node) => nodeMap.set(node.id, node));
 
   return (
     <>
-      {edges.map((edge) => {
-        const sourceNode = nodeMap.get(edge.source);
-        const targetNode = nodeMap.get(edge.target);
-        if (!sourceNode || !targetNode) {
-          throw new Error("There is an edge connecting nodes that don't exist");
-        }
-        return (
-          <line
-            key={`ne${edge.source}-${edge.target}`}
-            x1={sourceNode.x + sourceNode.size / 2}
-            y1={sourceNode.y + sourceNode.size / 2}
-            x2={targetNode.x + targetNode.size / 2}
-            y2={targetNode.y + targetNode.size / 2}
-            style={{ zIndex: 3 }}
-            stroke={getEdgeColor(edge, theme)}
-            strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
-            opacity={edge.opacity}
-          ></line>
-        );
-      })}
+      {edges.map((edge) => (
+        <line
+          key={`ne${edge.source.id}-${edge.target.id}`}
+          x1={edge.source.x + edge.source.size / 2}
+          y1={edge.source.y + edge.source.size / 2}
+          x2={edge.target.x + edge.target.size / 2}
+          y2={edge.target.y + edge.target.size / 2}
+          style={{ zIndex: 3 }}
+          stroke={getEdgeColor(edge, theme)}
+          strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
+          opacity={edge.opacity}
+        ></line>
+      ))}
       {nodes.map((node) => (
         <circle
           key={"n" + node.id}

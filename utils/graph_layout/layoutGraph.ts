@@ -4,6 +4,7 @@ import {
   LogicalEdge,
   LogicalGraph,
   LogicalNode,
+  Node,
   PartialClusterNode,
   PartialSubgraph,
 } from "../../types/graph";
@@ -97,7 +98,7 @@ export function layoutCluster(
     .force("center", d3.forceCenter())
     .tick(300);
 
-  const nodes = simulation.nodes().map((obj) => ({
+  const nodes: Node[] = simulation.nodes().map((obj) => ({
     id: obj.id,
     x: obj.x ?? 0,
     y: obj.y ?? 0,
@@ -106,13 +107,24 @@ export function layoutCluster(
     group: clusterID,
   }));
 
+  const nodeMap = new Map<number, Node>();
+  nodes.forEach((node) => nodeMap.set(node.id, node));
   // The edges point to nodes that got modified by d3 and are now actually
   // of a different type.
-  const edges = graph.edges.map((edge) => ({
-    source: (edge.source as unknown as D3Node).id,
-    target: (edge.target as unknown as D3Node).id,
-    value: edge.value,
-  }));
+  const edges = graph.edges.map((edge) => {
+    const source = nodeMap.get((edge.source as unknown as D3Node).id);
+    const target = nodeMap.get((edge.target as unknown as D3Node).id);
+    if (!source || !target)
+      throw new Error(
+        "Inconsisten graph provided: edges contain" +
+          " nodes that don't exist in the node list"
+      );
+    return {
+      source,
+      target,
+      value: edge.value,
+    };
+  });
 
   return {
     nodes,

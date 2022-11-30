@@ -1,5 +1,5 @@
 import { Point } from "../../../types/geometry";
-import { LogicalEdge, Node, PartialClusterNode } from "../../../types/graph";
+import { Edge, Node, PartialClusterNode } from "../../../types/graph";
 import {
   clusterDiameter,
   clusterGraphSize,
@@ -11,7 +11,7 @@ import {
   scaleLayout,
   scaleRelative,
 } from "../../graph_layout/scaleGraph";
-import PartialGraph from "./PartialGraph";
+import PartialGraph, { GraphState } from "./PartialGraph";
 
 /**
  * Returns the clusterNode that has the given id.
@@ -34,9 +34,9 @@ export function getClusterNode(
 export function getNode(
   this: PartialGraph,
   id: number,
-  clusterNodeID?: number
+  clusterNode?: PartialClusterNode
 ): Node {
-  if (clusterNodeID === undefined) {
+  if (clusterNode === undefined) {
     for (let clusterNode of this.nodes) {
       const match = clusterNode.subgraph.nodes.find((node) => node.id === id);
       if (match === undefined) continue;
@@ -44,12 +44,10 @@ export function getNode(
     }
     throw new Error(`node with id ${id} doesn't exist`);
   } else {
-    const node = this.getClusterNode(clusterNodeID)?.subgraph.nodes.find(
-      (node) => node.id === id
-    );
+    const node = clusterNode.subgraph.nodes.find((node) => node.id === id);
     if (!node) {
       throw new Error(
-        `node with id ${id} and clusterNode id ${clusterNodeID} doesn't exist`
+        `node with id ${id} and clusterNode id ${clusterNode.id} doesn't exist`
       );
     }
     return node;
@@ -77,7 +75,7 @@ export function getAbsoluteNodePosition(this: PartialGraph, node: Node): Point {
     (clusterNode) => clusterNode.id === node.group
   );
   if (!clusterNode) {
-    throw new Error(`node with id ${node.id} doesn't exist`);
+    throw new Error(`cluster node with id ${node.id} doesn't exist`);
   }
   return {
     x: clusterNode.x + node.x,
@@ -96,7 +94,7 @@ export function removeNode(this: PartialGraph, node: Node) {
   nodes.splice(nodes.indexOf(node), 1);
 
   clusterNode.subgraph.edges = clusterNode.subgraph.edges.filter(
-    (edge) => edge.source !== node.id && edge.target !== node.id
+    (edge) => edge.source !== node && edge.target !== node
   );
   if (nodes.length === 0) {
     this.removeClusterNode(clusterNode.id);
@@ -111,7 +109,7 @@ export function removeClusterNode(this: PartialGraph, nodeID: number) {
     if (this.nodes[i].id === nodeID) {
       this.nodes.splice(i, 1);
       this.edges = this.edges.filter(
-        (edge) => edge.source !== nodeID && edge.target !== nodeID
+        (edge) => edge.source.id !== nodeID && edge.target.id !== nodeID
       );
       return;
     }
@@ -128,15 +126,15 @@ export function removeClusterNode(this: PartialGraph, nodeID: number) {
 export function computeClusterEdges(
   this: PartialGraph,
   clusterNodeID: number
-): Map<number, number> {
-  const nodeToCluster = new Map<number, number>();
+): Map<PartialClusterNode, number> {
+  const nodeToCluster = new Map<number, PartialClusterNode>();
   this.nodes.forEach((clusterNode) => {
     clusterNode.subgraph.nodes.forEach((node) => {
-      nodeToCluster.set(node.id, clusterNode.id);
+      nodeToCluster.set(node.id, clusterNode);
     });
   });
 
-  return this.logicalGraph.edges.reduce((value, edge) => {
+  return this.logicalGraph.edges.reduce((values, edge) => {
     const sourceCluster = nodeToCluster.get(edge.source);
     const targetCluster = nodeToCluster.get(edge.target);
     if (sourceCluster === undefined || targetCluster === undefined) {
@@ -145,23 +143,21 @@ export function computeClusterEdges(
       );
     }
     if (
-      (sourceCluster !== clusterNodeID && targetCluster !== clusterNodeID) ||
+      (sourceCluster.id !== clusterNodeID &&
+        targetCluster.id !== clusterNodeID) ||
       sourceCluster === targetCluster
     ) {
-      return value;
+      return values;
     }
-    const otherClusterNodeID =
-      sourceCluster === clusterNodeID ? targetCluster : sourceCluster;
-    if (value.has(otherClusterNodeID)) {
-      value.set(
-        otherClusterNodeID,
-        value.get(otherClusterNodeID)! + edge.value
-      );
+    const otherClusterNode =
+      sourceCluster.id === clusterNodeID ? targetCluster : sourceCluster;
+    if (values.has(otherClusterNode)) {
+      values.set(otherClusterNode, values.get(otherClusterNode)! + edge.value);
     } else {
-      value.set(otherClusterNodeID, edge.value);
+      values.set(otherClusterNode, edge.value);
     }
-    return value;
-  }, new Map<number, number>());
+    return values;
+  }, new Map<PartialClusterNode, number>());
 }
 
 /**
@@ -170,26 +166,29 @@ export function computeClusterEdges(
  */
 export function computeSubgraphEdges(
   this: PartialGraph,
-  nodeID: number,
+  node: Node,
   clusterNode: PartialClusterNode,
   transparent: boolean
-): LogicalEdge[] {
-  const nodesInCluster = new Set(
-    clusterNode.subgraph.nodes.map((node) => node.id)
-  );
-
+): Edge[] {
   return this.logicalGraph.edges.reduce((edges, edge) => {
     if (
-      (edge.source !== nodeID && edge.target !== nodeID) ||
+      (edge.source !== node.id && edge.target !== node.id) ||
       edge.source === edge.target
     )
       return edges;
 
-    const otherNodeID = edge.source !== nodeID ? edge.source : edge.target;
-    if (nodesInCluster.has(otherNodeID)) {
-      const newEdge: LogicalEdge = {
-        source: nodeID,
-        target: otherNodeID,
+    const otherNodeID = edge.source !== node.id ? edge.source : edge.target;
+    const otherNode = clusterNode.subgraph.nodes.find(
+      (node) => node.id === otherNodeID
+    );
+    if (!otherNode) {
+      return edges;
+    }
+
+    if (otherNode.group === node.group) {
+      const newEdge: Edge = {
+        source: node,
+        target: otherNode,
         value: edge.value,
       };
       if (transparent) {
@@ -198,7 +197,7 @@ export function computeSubgraphEdges(
       edges.push(newEdge);
     }
     return edges;
-  }, [] as LogicalEdge[]);
+  }, [] as Edge[]);
 }
 
 /**
@@ -232,32 +231,32 @@ export function changeClusterSize(
  */
 export function updateClusterEdges(
   this: PartialGraph,
-  clusterNodeID: number,
+  clusterNode: PartialClusterNode,
   transparent: boolean,
   ignoredClusterID?: number
 ) {
   const previousValues = new Map<number, number>();
   this.edges = this.edges.filter((edge) => {
     const keep =
-      (edge.source !== clusterNodeID && edge.target !== clusterNodeID) ||
-      edge.source === ignoredClusterID ||
-      edge.target === ignoredClusterID;
+      (edge.source !== clusterNode && edge.target !== clusterNode) ||
+      edge.source.id === ignoredClusterID ||
+      edge.target.id === ignoredClusterID;
 
     if (keep) return keep;
 
-    const otherClusterID =
-      edge.source !== clusterNodeID ? edge.source : edge.target;
-    previousValues.set(otherClusterID, edge.value);
+    const otherCluster =
+      edge.source !== clusterNode ? edge.source : edge.target;
+    previousValues.set(otherCluster.id, edge.value);
     return keep;
   });
-  const updatedEdges = this.computeClusterEdges(clusterNodeID);
-  Array.from(updatedEdges.entries()).forEach(([otherClusterID, value]) => {
-    if (otherClusterID === ignoredClusterID) return;
+  const updatedEdges = this.computeClusterEdges(clusterNode.id);
+  Array.from(updatedEdges.entries()).forEach(([otherCluster, value]) => {
+    if (otherCluster.id === ignoredClusterID) return;
 
-    const t = transparent && value !== previousValues.get(otherClusterID);
+    const t = transparent && value !== previousValues.get(otherCluster.id);
     this.edges.push({
-      source: clusterNodeID,
-      target: otherClusterID,
+      source: clusterNode,
+      target: otherCluster,
       value: value,
       opacity: t ? this.theme.opacity : undefined,
     });
@@ -367,4 +366,36 @@ export function scaleGraphRelative(
     scaleRelative(state.nodes, previousLayout, newLayout)
   );
   this.nodeSize = newLayout.nodeSize;
+}
+
+/**
+ * Returns a deep copy of the current nodes, edges and logical graph.
+ */
+export function copyState(this: PartialGraph): GraphState {
+  const edges = this.edges.map((edge) => ({ ...edge }));
+  const oldToNewNode = new Map<PartialClusterNode, PartialClusterNode>();
+
+  const nodes = this.nodes.map((node) => {
+    const newNode = structuredClone(node);
+    oldToNewNode.set(node, newNode);
+    return newNode;
+  });
+
+  edges.forEach((edge) => {
+    const newSource = oldToNewNode.get(edge.source);
+    const newTarget = oldToNewNode.get(edge.target);
+    if (!newSource || !newTarget) {
+      throw new Error(
+        "There is an edge which connects nodes that are not in the node list"
+      );
+    }
+    edge.source = newSource;
+    edge.target = newTarget;
+  });
+
+  return {
+    nodes,
+    edges,
+    logicalGraph: structuredClone(this.logicalGraph),
+  };
 }

@@ -72,11 +72,7 @@ export function nodeAt(this: PartialGraph, position: Point) {
       relativePosition
     );
   }
-  const lastState = {
-    nodes: structuredClone(this.nodes),
-    edges: structuredClone(this.edges),
-    logicalGraph: structuredClone(this.logicalGraph),
-  };
+  const lastState = this.copyState();
   if (
     this.lastStates.length === 0 ||
     !deepEqual(this.lastStates.at(-1), lastState)

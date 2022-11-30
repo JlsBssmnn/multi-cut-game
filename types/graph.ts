@@ -1,15 +1,19 @@
 import { Common } from "./common";
 
+export interface GeneralEdge {
+	source: any;
+	target: any;
+	value: number;
+}
+
 export interface LogicalNode {
   id: number;
   group: number;
 }
 
-export interface LogicalEdge {
+export interface LogicalEdge extends GeneralEdge {
   source: LogicalNode["id"];
   target: LogicalNode["id"];
-  value: number;
-  opacity?: number;
 }
 
 export interface LogicalGraph {
@@ -29,7 +33,7 @@ export type PartialClusterNode = {
 
 export interface PartialSubgraph {
   nodes: Node[];
-  edges: LogicalEdge[];
+  edges: Edge[];
 }
 
 export interface Node
@@ -38,3 +42,15 @@ export interface Node
 }
 
 export type GeneralNode = Common<PartialClusterNode, Node>;
+
+export interface ClusterEdge extends GeneralEdge {
+  source: PartialClusterNode;
+  target: PartialClusterNode;
+  opacity?: number;
+}
+
+export interface Edge extends GeneralEdge {
+  source: Node;
+  target: Node;
+  opacity?: number;
+}

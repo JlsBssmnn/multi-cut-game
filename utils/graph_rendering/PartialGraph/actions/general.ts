@@ -89,10 +89,14 @@ export function handleNodeMove(
   const newSubgraph = {
     nodes: originClusterNode.subgraph.nodes
       .filter((otherNode) => otherNode !== node)
-      .map((node) => ({ ...node, group: originClusterNode.id })),
-    edges: originClusterNode.subgraph.edges.filter(
-      (edge) => edge.source !== node.id && edge.target !== node.id
-    ),
+      .map((node) => ({ id: node.id, group: originClusterNode.id })),
+    edges: originClusterNode.subgraph.edges
+      .filter((edge) => edge.source !== node && edge.target !== node)
+      .map((edge) => ({
+        source: edge.source.id,
+        target: edge.target.id,
+        value: edge.value,
+      })),
   };
   const validMoveOut = connectedComponents(newSubgraph).length === 1;
 

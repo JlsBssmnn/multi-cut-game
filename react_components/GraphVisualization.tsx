@@ -59,6 +59,7 @@ export default function GraphVisualization({
             y2={targetNode.y + targetNode.size / 2}
             stroke={getEdgeColor(edge, graph.theme)}
             strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
+            opacity={edge.opacity}
             style={{ zIndex: 1 }}
           ></line>
         );
@@ -77,15 +78,18 @@ export default function GraphVisualization({
               zIndex: node.id === draggedClusterID ? 5 : undefined,
             }}
           />
-          <svg x={node.x} y={node.y} width={node.size} height={node.size}>
+          <g transform={`translate(${node.x},${node.y})`}>
             <SubgraphVisualization
               graph={node.subgraph}
               edgeThickness={edgeThickness}
               theme={graph.theme}
             />
-          </svg>
+          </g>
         </g>
       ))}
+      {draggedClusterID !== undefined && (
+        <use href={"#clusterG" + draggedClusterID} />
+      )}
     </svg>
   );
 }
@@ -124,6 +128,7 @@ function SubgraphVisualization({
             style={{ zIndex: 3 }}
             stroke={getEdgeColor(edge, theme)}
             strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
+            opacity={edge.opacity}
           ></line>
         );
       })}

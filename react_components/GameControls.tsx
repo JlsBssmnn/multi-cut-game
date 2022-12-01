@@ -6,9 +6,12 @@ import {
   getGraphFromSolution,
   getGraphScore,
 } from "../utils/calculations/graphCalculations";
+import { getUserDevice } from "../utils/cssUtils";
+import { useWindowSize } from "../utils/customHooks";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import { Solution } from "../utils/server_utils/findBestMulticut";
 import GameSuccess from "./GameTools/GameSuccess";
+import GameToolWrapper from "./GameTools/GameToolWrapper";
 import OptimalCost from "./GameTools/OptimalCost";
 import OptimalMulticut from "./GameTools/OptimalMulticut";
 
@@ -26,6 +29,9 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
   const [optimalMulticut, setOptimalMulticut] = useState<LogicalGraph | null>(
     null
   );
+
+  const [width, height] = useWindowSize();
+  const userDevice = getUserDevice(width, height);
 
   async function getOptimalSolution() {
     if (solution == undefined) {
@@ -48,13 +54,15 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
 
   return (
     <Paper elevation={10} className={styles.container} ref={ref}>
-      <div className={styles.currentCost}>
-        Current cost:{" "}
-        <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
-      </div>
-      <OptimalCost optimalSolution={optimalSolution} />
-      <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
-      <GameSuccess currentCost={cost} optimalSolution={optimalSolution} />
+      <GameToolWrapper device={userDevice}>
+        <div className={styles.currentCost}>
+          Current cost:{" "}
+          <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
+        </div>
+        <OptimalCost optimalSolution={optimalSolution} />
+        <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
+        <GameSuccess currentCost={cost} optimalSolution={optimalSolution} />
+      </GameToolWrapper>
     </Paper>
   );
 });

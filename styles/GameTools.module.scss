@@ -1,23 +1,29 @@
 @import "breakpoints";
 
 $containerDesktopWidth: 350px;
+$containerMobileHeight: 62.78125px;
 
 .container {
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px;
 
   @include phone {
-    flex-direction: row;
-    font-size: 1rem;
-    gap: 5px;
+    display: block;
+    overflow-x: auto;
+    width: 90%;
+    padding: 0;
+    height: $containerMobileHeight;
   }
 
   @include tablet {
+    display: flex;
+    padding: 10px;
+    width: 100%;
     flex-direction: row;
     font-size: 1.7rem;
     gap: 30px;
+    height: $containerMobileHeight;
   }
 
   @include desktop {
@@ -29,22 +35,30 @@ $containerDesktopWidth: 350px;
   }
 }
 
+.wrapper {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  font-size: 1rem;
+  gap: 5px;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .currentCost {
   text-align: center;
+  white-space: nowrap;
 }
 
 .optimalCost {
-  justify-self: center;
+  white-space: nowrap;
 }
 
-.buttons {
-  justify-self: center;
-  grid-row: 1 / 3;
-  grid-column: 2;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
+.optimalMulticut {
+  white-space: nowrap;
 }
 
 .loadingSpinner {
@@ -54,6 +68,7 @@ $containerDesktopWidth: 350px;
   gap: 5px;
   padding: 10px;
   font-size: 1rem;
+  white-space: nowrap;
 }
 
 .successMessage {
@@ -64,4 +79,5 @@ $containerDesktopWidth: 350px;
 
 :export {
   containerDesktopWidth: $containerDesktopWidth;
+  containerMobileHeight: $containerMobileHeight;
 }

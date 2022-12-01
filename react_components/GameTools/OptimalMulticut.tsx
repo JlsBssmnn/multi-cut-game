@@ -63,10 +63,11 @@ export default function OptimalMulticut({
   }
 
   return (
-    <div className={styles.buttons}>
+    <div>
       <Button
         variant="contained"
         onClick={() => setShowOptimalMulticut(true)}
+        className={styles.optimalMulticut}
         sx={{
           fontSize: "1.1rem",
         }}

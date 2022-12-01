@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { LogicalGraph } from "../types/graph";
 import styles from "../styles/Game.module.scss";
 import gameToolStyles from "../styles/GameTools.module.scss";
@@ -20,7 +20,6 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
   const [graph, setGraph] = useState<LogicalGraph>(
     structuredClone(props.graph)
   );
-  const gameControls = useRef<HTMLDivElement | null>(null);
 
   const [width, height] = useWindowSize();
   const userDevice = getUserDevice(width, height);
@@ -31,7 +30,7 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
   // interactive graph (which depends on the current screen size)
   const gameToolHeight =
     userDevice !== "desktop"
-      ? gameControls.current?.getBoundingClientRect().height ?? 0
+      ? parseFloat(gameToolStyles.containerMobileHeight) ?? 0
       : 0;
   const graphHeight = height - appBarHeight - 2 * margin - gameToolHeight - gap;
 
@@ -48,7 +47,6 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
       <GameControls
         graph={graph}
         theme={graphTheme}
-        ref={gameControls}
         solution={props.solution}
       />
       <Paper elevation={10}>

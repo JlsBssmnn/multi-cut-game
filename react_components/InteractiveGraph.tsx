@@ -139,7 +139,7 @@ export default function InteractiveGraph({
     }
   }, [width, height, nodeSize]);
 
-  if (!partialGraph) return null;
+  if (!partialGraph || width <= 0 || height <= 0) return null;
 
   function pointerDown(event: PointerEvent) {
     event.preventDefault();

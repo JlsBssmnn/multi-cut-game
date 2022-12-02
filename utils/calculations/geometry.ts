@@ -38,7 +38,7 @@ export function clusterDiameter(
  * @param nodeSize The size of the nodes inside the cluster
  */
 export function clusterOffset(numOfElements: number, nodeSize: number): number {
-  return numOfElements * nodeSize * (Math.sqrt(2) / 2 - 0.5);
+  return clusterGraphSize(numOfElements, nodeSize) * (Math.sqrt(2) / 2 - 0.5);
 }
 
 /**

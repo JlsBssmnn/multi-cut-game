@@ -22,14 +22,14 @@ export default function scaleGraph(
   scaleLayout(clusterNodes, width, height, margin);
 
   clusterNodes.forEach((cluster) => {
-    const clusterNodes = cluster.subgraph.nodes;
+    const nodes = cluster.subgraph.nodes;
 
-    const clusterSize = clusterGraphSize(clusterNodes.length, nodeSize);
-    scaleLayout(clusterNodes, clusterSize, clusterSize);
+    const clusterSize = clusterGraphSize(nodes.length, nodeSize);
+    scaleLayout(nodes, clusterSize, clusterSize);
 
     const offset = clusterOffset(cluster.subgraph.nodes.length, nodeSize);
 
-    clusterNodes.forEach((node) => {
+    nodes.forEach((node) => {
       node.x += offset;
       node.y += offset;
     });
@@ -49,6 +49,13 @@ export function scaleLayout(
 ): void {
   width -= margin * 2;
   height -= margin * 2;
+
+  if (nodes.length === 1) {
+    const node = nodes[0];
+    node.x = width / 2 - node.size / 2 + margin;
+    node.y = height / 2 - node.size / 2 + margin;
+    return;
+  }
 
   // find the minimum and maximum for the x and y coordinates among the nodes
   let minX: number, minY: number, maxX: number, maxY: number;

@@ -15,7 +15,15 @@ export function clusterGraphSize(
   numOfElements: number,
   nodeSize: number
 ): number {
-  return numOfElements * nodeSize;
+  // This is a composite function, as long as numOfElement < 10
+  // it's a linear function which gets weakened over time, after that
+  // it's a sqrt function
+  if (numOfElements < 10) {
+    return numOfElements * nodeSize - ((numOfElements * nodeSize) / 30) ** 2;
+  } else {
+    // the constant (11.419...) ensures a smooth segue between both functions
+    return Math.sqrt(numOfElements * nodeSize) * 11.41933599505248;
+  }
 }
 
 /**

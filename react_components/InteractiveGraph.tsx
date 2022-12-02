@@ -23,7 +23,6 @@ export interface InteractiveGraphProps {
   margin: number;
   nodeSize: number;
   logicalGraph: LogicalGraph;
-  edgeThickness: number;
   graphTheme: PartialGraphTheme;
   emitGraphChange: Dispatch<SetStateAction<LogicalGraph>>;
 }
@@ -66,7 +65,6 @@ export default function InteractiveGraph({
   margin,
   nodeSize,
   logicalGraph,
-  edgeThickness,
   graphTheme,
   emitGraphChange,
 }: InteractiveGraphProps) {
@@ -201,7 +199,6 @@ export default function InteractiveGraph({
         graph={partialGraph}
         width={width}
         height={height}
-        edgeThickness={edgeThickness}
         draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
       />
       {!validAction && (

@@ -8,7 +8,9 @@ export const graphTheme = new PartialGraphTheme(
   [35, 195, 35], // positiveEdgeColor
   [255, 0, 0], // negativeEdgeColor
   [100, 100, 100], // neutralEdgeColor
-  0.5 // opacity
+  0.5, // opacity
+  6 // edgeThickness
 );
 
 export const appBarHeight = 64;
+export const nodeSize = 25;

@@ -21,6 +21,7 @@ export default class PartialGraphTheme {
   neutralEdgeColor: RGBColor;
 
   opacity: number;
+  edgeThickness: number;
 
   constructor(
     nodeColor: RGBColor,
@@ -30,7 +31,8 @@ export default class PartialGraphTheme {
     positiveEdgeColor: RGBColor,
     negativeEdgeColor: RGBColor,
     neutralEdgeColor: RGBColor,
-    opacity: number
+    opacity: number,
+    edgeThickness: number
   ) {
     this.nodeColor = nodeColor;
     this.clusterNodeColor = clusterNodeColor;
@@ -42,6 +44,7 @@ export default class PartialGraphTheme {
     this.neutralEdgeColor = neutralEdgeColor;
 
     this.opacity = opacity;
+    this.edgeThickness = edgeThickness;
   }
 
   getTransparentColor(color: Color): string {

@@ -3,7 +3,7 @@ import { LogicalGraph } from "../types/graph";
 import styles from "../styles/Game.module.scss";
 import gameToolStyles from "../styles/GameTools.module.scss";
 
-import { appBarHeight, graphTheme } from "../utils/constants";
+import { appBarHeight, graphTheme, nodeSize } from "../utils/constants";
 import { Paper } from "@mui/material";
 import GameControls from "./GameControls";
 import InteractiveGraph from "./InteractiveGraph";
@@ -54,9 +54,8 @@ export default function GraphWithControls(props: GraphWithControlsProps) {
           width={graphWidth}
           height={graphHeight}
           margin={20}
-          nodeSize={30}
+          nodeSize={nodeSize}
           logicalGraph={graph}
-          edgeThickness={6}
           graphTheme={graphTheme}
           emitGraphChange={setGraph}
         />

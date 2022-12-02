@@ -20,7 +20,6 @@ export default function NonInteractiveGraph({
   margin,
   nodeSize,
   logicalGraph,
-  edgeThickness,
   graphTheme,
 }: NonInteractiveGraphProps) {
   const partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
@@ -38,7 +37,6 @@ export default function NonInteractiveGraph({
         graph={partialGraph}
         width={width}
         height={height}
-        edgeThickness={edgeThickness}
         draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
       />
     </div>

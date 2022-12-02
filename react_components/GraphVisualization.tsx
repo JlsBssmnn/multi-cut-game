@@ -6,7 +6,6 @@ export interface GraphProps {
   graph: PartialGraph;
   width: number;
   height: number;
-  edgeThickness: number;
   draggedClusterID?: number;
 }
 
@@ -41,10 +40,10 @@ export default function GraphVisualization({
   graph,
   width,
   height,
-  edgeThickness,
   draggedClusterID,
 }: GraphProps) {
   const { nodes, edges } = graph;
+  const edgeThickness = graph.theme.edgeThickness;
 
   return (
     <svg width={width} height={height}>

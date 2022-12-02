@@ -214,7 +214,11 @@ export default function InteractiveGraph({
       )}
       <Grow in={undoPossible}>
         <div className={styles.undoButton}>
-          <Fab onClick={undoLastAction} color="primary">
+          <Fab
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={undoLastAction}
+            color="primary"
+          >
             <UndoIcon />
           </Fab>
         </div>

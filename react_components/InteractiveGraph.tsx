@@ -16,6 +16,7 @@ import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
 import { Point } from "../types/geometry";
+import createPartialGraph from "../utils/graph_rendering/PartialGraph/createPartialGraph";
 
 export interface InteractiveGraphProps {
   width: number;
@@ -69,7 +70,8 @@ export default function InteractiveGraph({
   emitGraphChange,
 }: InteractiveGraphProps) {
   useEffect(() => {
-    partialGraph = layoutGraph(logicalGraph, nodeSize, graphTheme);
+    partialGraph = createPartialGraph(logicalGraph, nodeSize, graphTheme);
+    layoutGraph(partialGraph);
   }, []);
 
   // This state is just used to trigger a rerender

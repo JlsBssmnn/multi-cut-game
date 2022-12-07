@@ -1,3 +1,5 @@
+import { Level } from "./levelTypes";
+
 const keyword = "complete [small]";
 
 const graph = {
@@ -66,4 +68,4 @@ export default {
   graph,
   solution,
   keyword,
-};
+} as Level;

@@ -1,3 +1,5 @@
+import { Level } from "./levelTypes";
+
 const keyword = "tree";
 
 const graph = {
@@ -96,4 +98,4 @@ export default {
   graph,
   solution,
   keyword,
-};
+} as Level;

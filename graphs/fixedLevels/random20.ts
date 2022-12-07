@@ -1,3 +1,5 @@
+import { Level } from "./levelTypes";
+
 const keyword = "random";
 
 const graph = {
@@ -109,4 +111,4 @@ export default {
   graph,
   solution,
   keyword,
-};
+} as Level;

@@ -1,11 +1,9 @@
 import allLevels from "../graphs/fixedLevels/allLevels";
-import NonSSRGame from "../react_components/NonSSRGame";
+import NonSSRLevel from "../react_components/NonSSRLevel";
 
 const level = allLevels.grid6x6;
 export const keyword = level.keyword;
 
 export default function Level6() {
-  const { graph, solution } = level;
-
-  return <NonSSRGame graph={graph} solution={solution} />;
+  return <NonSSRLevel level={level} />;
 }

@@ -1,5 +1,5 @@
 import { Paper } from "@mui/material";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef } from "react";
 import styles from "../styles/GameTools.module.scss";
 import { LogicalGraph } from "../types/graph";
 import {
@@ -18,37 +18,17 @@ import OptimalMulticut from "./GameTools/OptimalMulticut";
 export interface StatsProps {
   graph: LogicalGraph;
   theme: PartialGraphTheme;
-  solution?: Solution;
+  solution: Solution;
 }
 
 export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
   { graph, theme, solution },
   ref
 ) {
-  const [optimalSolution, setOptimalSolution] = useState<Solution | null>(null);
-  const [optimalMulticut, setOptimalMulticut] = useState<LogicalGraph | null>(
-    null
-  );
+  const optimalMulticut = getGraphFromSolution(graph, solution);
 
   const [width, height] = useWindowSize();
   const userDevice = getUserDevice(width, height);
-
-  async function getOptimalSolution() {
-    if (solution == undefined) {
-      const response = await fetch("/api/bestMulticut", {
-        method: "POST",
-        body: JSON.stringify(graph.edges),
-      });
-      var levelSolution: Solution = await response.json();
-    } else {
-      var levelSolution = solution;
-    }
-    setOptimalSolution(levelSolution);
-    setOptimalMulticut(getGraphFromSolution(graph, levelSolution));
-  }
-  useEffect(() => {
-    getOptimalSolution();
-  }, []);
 
   const cost = getGraphScore(graph);
 
@@ -59,9 +39,9 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
           Current cost:{" "}
           <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
         </div>
-        <OptimalCost optimalSolution={optimalSolution} />
+        <OptimalCost optimalSolution={solution} />
         <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
-        <GameSuccess currentCost={cost} optimalSolution={optimalSolution} />
+        <GameSuccess currentCost={cost} optimalSolution={solution} />
       </GameToolWrapper>
     </Paper>
   );

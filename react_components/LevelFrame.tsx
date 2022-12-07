@@ -11,12 +11,12 @@ import { useWindowSize } from "../utils/customHooks";
 import { getUserDevice } from "../utils/cssUtils";
 import { Solution } from "../utils/server_utils/findBestMulticut";
 
-export interface GraphWithControlsProps {
+export interface LevelFrameProps {
   graph: LogicalGraph;
-  solution?: Solution;
+  solution: Solution;
 }
 
-export default function GraphWithControls(props: GraphWithControlsProps) {
+export default function LevelFrame(props: LevelFrameProps) {
   const [graph, setGraph] = useState<LogicalGraph>(
     structuredClone(props.graph)
   );

@@ -1,3 +1,5 @@
+import { Level } from "./levelTypes";
+
 const keyword = "grid [large]";
 
 const graph = {
@@ -173,4 +175,4 @@ export default {
   graph,
   solution,
   keyword,
-};
+} as Level;

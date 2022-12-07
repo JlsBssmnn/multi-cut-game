@@ -1,3 +1,7 @@
+import {
+  gridClusterLayout,
+  gridSubgraphLayout,
+} from "../../utils/graph_layout/gridLayout";
 import { Level } from "./levelTypes";
 
 const keyword = "grid [small]";
@@ -83,4 +87,8 @@ export default {
   graph,
   solution,
   keyword,
+  layout: {
+    clusterLayout: gridClusterLayout,
+    subgraphLayout: gridSubgraphLayout,
+  },
 } as Level;

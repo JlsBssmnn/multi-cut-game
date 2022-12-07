@@ -21,12 +21,15 @@ type D3ClusterEdge = SimulationLinkDatum<D3ClusterNode> & LogicalEdge;
  * A force based layout algorithm implemented with d3-js for laying out
  * a subgraph of a cluster node within a PartialGraph.
  */
-export function forceSubgraphLayout(graph: PartialSubgraph, nodeSize: number): void {
+export function forceSubgraphLayout(
+  graph: PartialGraph,
+  subgraph: PartialSubgraph
+): void {
   const nodeMap = new Map<number, Node>();
-  graph.nodes.forEach((node) => nodeMap.set(node.id, node));
+  subgraph.nodes.forEach((node) => nodeMap.set(node.id, node));
 
-  const d3Nodes = structuredClone(graph.nodes);
-  const d3Edges = graph.edges.map((edge) => ({
+  const d3Nodes = structuredClone(subgraph.nodes);
+  const d3Edges = subgraph.edges.map((edge) => ({
     source: edge.source.id,
     target: edge.target.id,
     value: edge.value,
@@ -42,7 +45,10 @@ export function forceSubgraphLayout(graph: PartialSubgraph, nodeSize: number): v
   const simulation = d3
     .forceSimulation<D3Node>(d3Nodes)
     .force("link", forceLink)
-    .force("charge", d3.forceManyBody().strength(-30).distanceMax(nodeSize))
+    .force(
+      "charge",
+      d3.forceManyBody().strength(-30).distanceMax(graph.nodeSize)
+    )
     .force("center", d3.forceCenter())
     .tick(300);
 

@@ -305,13 +305,14 @@ export function updateClusterNode(
     this.theme,
     clusterNode.id
   );
+  clusterNode.subgraph = newSubgraph;
   const nodeCount = newSubgraph.nodes.length;
 
   // resize the cluster node
   this.changeClusterSize(clusterNode, nodeCount);
 
   // re-layout the subgraph
-  this.layoutAlgorithm(newSubgraph, this.nodeSize);
+  this.layoutAlgorithm(this, newSubgraph);
 
   const innerRecSize = clusterGraphSize(nodeCount, this.nodeSize);
   const offset = clusterOffset(nodeCount, this.nodeSize);
@@ -321,8 +322,6 @@ export function updateClusterNode(
     node.x += offset;
     node.y += offset;
   });
-
-  clusterNode.subgraph = newSubgraph;
 }
 
 /**

@@ -32,7 +32,7 @@ export default function NonInteractiveGraph({
 
   layout.clusterLayout(partialGraph);
   partialGraph.nodes.forEach((cluster) =>
-    layout.subgraphLayout(cluster.subgraph, nodeSize)
+    layout.subgraphLayout(partialGraph, cluster.subgraph)
   );
 
   scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);

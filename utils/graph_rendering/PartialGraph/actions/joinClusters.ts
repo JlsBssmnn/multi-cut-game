@@ -139,6 +139,6 @@ export function commitJoinClusters(this: PartialGraph) {
   // change the id of the destination cluster to that minimum
   destinationCluster.id = smallerID;
 
-  this.updateClusterNode(smallerID);
+  this.updateClusterNode(destinationCluster);
   this.makeOpaque();
 }

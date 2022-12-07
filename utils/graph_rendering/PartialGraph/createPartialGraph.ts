@@ -3,6 +3,7 @@ import {
   LogicalGraph,
   PartialClusterNode,
   Node,
+  PartialSubgraph,
 } from "../../../types/graph";
 import { clusterDiameter } from "../../calculations/geometry";
 import { assertEdgesExists } from "../../graphUtils";
@@ -34,51 +35,66 @@ export function getClusters(
 ): PartialClusterNode[] {
   const clusters = new Set(graph.nodes.map((node) => node.group));
   return Array.from(clusters).map((cluster) => {
-    const logicalNodes = graph.nodes.filter((node) => node.group === cluster);
-    const nodeIDs = new Set(logicalNodes.map((node) => node.id));
-    const edges = graph.edges.filter(
-      (edge) => nodeIDs.has(edge.source) && nodeIDs.has(edge.target)
-    );
-
-    const nodeMap = new Map<number, Node>();
-    const nodes = logicalNodes.map((logicalNode) => {
-      const node = {
-        id: logicalNode.id,
-        x: 0,
-        y: 0,
-        color: theme.getColor("nodeColor"),
-        size: nodeSize,
-        group: cluster,
-      };
-      nodeMap.set(logicalNode.id, node);
-
-      return node;
-    });
-
+    const { nodes, edges } = getSubgraph(graph, nodeSize, theme, cluster);
     return {
       id: cluster,
       x: 0,
       y: 0,
       color: theme.getColor("clusterNodeColor"),
-      size: clusterDiameter(logicalNodes.length, nodeSize),
+      size: clusterDiameter(nodes.length, nodeSize),
       subgraph: {
         nodes,
-        edges: edges.map((edge) => {
-          const source = nodeMap.get(edge.source);
-          const target = nodeMap.get(edge.target);
-          if (!source || !target) {
-            throw new Error("Edge connects non-existing nodes");
-          }
-          return {
-            source: source,
-            target: target,
-            value: edge.value,
-          };
-        }),
+        edges,
       },
       borderColor: theme.getColor("clusterBorderColor"),
     };
   });
+}
+
+export function getSubgraph(
+  graph: LogicalGraph,
+  nodeSize: number,
+  theme: PartialGraphTheme,
+  clusterID: number
+): PartialSubgraph {
+  const logicalNodes = graph.nodes.filter((node) => node.group === clusterID);
+  const nodeIDs = new Set(logicalNodes.map((node) => node.id));
+  const logicalEdges = graph.edges.filter(
+    (edge) => nodeIDs.has(edge.source) && nodeIDs.has(edge.target)
+  );
+
+  const nodeMap = new Map<number, Node>();
+  const nodes = logicalNodes.map((logicalNode) => {
+    const node = {
+      id: logicalNode.id,
+      x: 0,
+      y: 0,
+      color: theme.getColor("nodeColor"),
+      size: nodeSize,
+      group: clusterID,
+    };
+    nodeMap.set(logicalNode.id, node);
+
+    return node;
+  });
+
+  const edges = logicalEdges.map((edge) => {
+    const source = nodeMap.get(edge.source);
+    const target = nodeMap.get(edge.target);
+    if (!source || !target) {
+      throw new Error("Edge connects non-existing nodes");
+    }
+    return {
+      source: source,
+      target: target,
+      value: edge.value,
+    };
+  });
+
+  return {
+    nodes,
+    edges,
+  };
 }
 
 /**

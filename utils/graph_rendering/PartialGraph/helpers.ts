@@ -11,6 +11,7 @@ import {
   scaleLayout,
   scaleRelative,
 } from "../../graph_layout/scaleGraph";
+import { getSubgraph } from "./createPartialGraph";
 import PartialGraph, { GraphState } from "./PartialGraph";
 
 /**
@@ -295,46 +296,34 @@ export function makeOpaque(this: PartialGraph) {
  * which is currently held by the logical graph. This includes resizing the
  * node, updating the subgraph as well as layout the subgraph again.
  */
-export function updateClusterNode(this: PartialGraph, clusterNodeID: number) {
-  const nodesInCluster = new Set();
-  this.logicalGraph.nodes.forEach((node) => {
-    if (node.group === clusterNodeID) {
-      nodesInCluster.add(node.id);
-    }
-  });
-  const clusterNode = this.getClusterNode(clusterNodeID);
-
-  // resize the cluster node
-  this.changeClusterSize(clusterNode, nodesInCluster.size);
-
-  // re-layout the subgraph
-  const nodes = this.logicalGraph.nodes
-    .filter((node) => node.group === clusterNodeID)
-    .map((node) => ({ ...node }));
-  const edges = this.logicalGraph.edges
-    .filter(
-      (edge) =>
-        nodesInCluster.has(edge.source) && nodesInCluster.has(edge.target)
-    )
-    .map((edge) => ({ ...edge }));
-
-  const renderedCluster = layoutCluster(
-    { nodes, edges },
+export function updateClusterNode(
+  this: PartialGraph,
+  clusterNode: PartialClusterNode
+) {
+  const newSubgraph = getSubgraph(
+    this.logicalGraph,
     this.nodeSize,
     this.theme,
-    clusterNodeID
+    clusterNode.id
   );
+  const nodeCount = newSubgraph.nodes.length;
 
-  const innerRecSize = clusterGraphSize(nodesInCluster.size, this.nodeSize);
-  const offset = clusterOffset(nodesInCluster.size, this.nodeSize);
+  // resize the cluster node
+  this.changeClusterSize(clusterNode, nodeCount);
 
-  scaleLayout(renderedCluster.nodes, innerRecSize, innerRecSize);
-  renderedCluster.nodes.forEach((node) => {
+  // re-layout the subgraph
+  layoutCluster(newSubgraph, this.nodeSize);
+
+  const innerRecSize = clusterGraphSize(nodeCount, this.nodeSize);
+  const offset = clusterOffset(nodeCount, this.nodeSize);
+
+  scaleLayout(newSubgraph.nodes, innerRecSize, innerRecSize);
+  newSubgraph.nodes.forEach((node) => {
     node.x += offset;
     node.y += offset;
   });
 
-  clusterNode.subgraph = renderedCluster;
+  clusterNode.subgraph = newSubgraph;
 }
 
 /**

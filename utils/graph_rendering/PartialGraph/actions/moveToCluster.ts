@@ -39,7 +39,7 @@ export function visualizeMoveToCluster(
   );
 
   // add the new edges inside the cluster
-  const newEdges = this.computeSubgraphEdges(node, destinationCluster, true);
+  const newEdges = this.computeSubgraphEdges(newNode, destinationCluster, true);
   destinationCluster.subgraph.edges.push(...newEdges);
 
   // update the cluster edges
@@ -124,6 +124,6 @@ export function commitMoveToCluster(this: PartialGraph) {
     );
   }
   this.makeOpaque();
-  this.updateClusterNode(this.dragEvent.originClusterNode.id);
-  this.updateClusterNode(this.dragEvent.clusterNode.id);
+  this.updateClusterNode(this.dragEvent.originClusterNode);
+  this.updateClusterNode(this.dragEvent.clusterNode);
 }

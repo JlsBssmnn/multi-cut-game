@@ -3,8 +3,8 @@ import { LogicalNode, LogicalEdge, LogicalGraph } from "../types/graph";
 import {
   getClusterEdges,
   getClusters,
-  layoutCluster,
-} from "../utils/graph_layout/layoutGraph";
+  forceSubgraphLayout,
+} from "../utils/graph_layout/forceLayout";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
 const nodes1: LogicalNode[] = [
@@ -157,7 +157,7 @@ test("layout cluster", () => {
       { source: 3, target: 5, value: 1 },
     ],
   };
-  const rendered1 = layoutCluster(
+  const rendered1 = forceSubgraphLayout(
     graph1,
     10,
     new PartialGraphTheme(

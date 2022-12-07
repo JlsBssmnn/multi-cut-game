@@ -17,7 +17,11 @@ type D3Edge = SimulationLinkDatum<D3Node> & LogicalEdge;
 type D3ClusterNode = SimulationNodeDatum & PartialClusterNode;
 type D3ClusterEdge = SimulationLinkDatum<D3ClusterNode> & LogicalEdge;
 
-export function layoutCluster(graph: PartialSubgraph, nodeSize: number): void {
+/**
+ * A force based layout algorithm implemented with d3-js for laying out
+ * a subgraph of a cluster node within a PartialGraph.
+ */
+export function forceSubgraphLayout(graph: PartialSubgraph, nodeSize: number): void {
   const nodeMap = new Map<number, Node>();
   graph.nodes.forEach((node) => nodeMap.set(node.id, node));
 
@@ -50,9 +54,10 @@ export function layoutCluster(graph: PartialSubgraph, nodeSize: number): void {
 }
 
 /**
- * A force based layout algorithm implemented with d3-js.
+ * A force based layout algorithm implemented with d3-js for laying out
+ * the cluster nodes of a PartialGraph.
  */
-export default function layoutGraph(graph: PartialGraph): void {
+export function forceClusterLayout(graph: PartialGraph): void {
   const clusterNodeMap = new Map<number, PartialClusterNode>();
   graph.nodes.forEach((node) => clusterNodeMap.set(node.id, node));
 
@@ -81,9 +86,5 @@ export default function layoutGraph(graph: PartialGraph): void {
     const [clusterNode] = assertEdgesExists(clusterNodeMap.get(d3Node.id));
     clusterNode.x = d3Node.x;
     clusterNode.y = d3Node.y;
-  });
-
-  graph.nodes.forEach((cluster) => {
-    layoutCluster(cluster.subgraph, graph.nodeSize);
   });
 }

@@ -10,7 +10,7 @@ import {
 } from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
-import layoutGraph from "../utils/graph_layout/layoutGraph";
+import { forceClusterLayout } from "../utils/graph_layout/forceLayout";
 import scaleGraph, { GraphDimensions } from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
@@ -71,7 +71,7 @@ export default function InteractiveGraph({
 }: InteractiveGraphProps) {
   useEffect(() => {
     partialGraph = createPartialGraph(logicalGraph, nodeSize, graphTheme);
-    layoutGraph(partialGraph);
+    forceClusterLayout(partialGraph);
   }, []);
 
   // This state is just used to trigger a rerender

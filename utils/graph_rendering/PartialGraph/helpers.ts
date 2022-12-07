@@ -5,7 +5,7 @@ import {
   clusterGraphSize,
   clusterOffset,
 } from "../../calculations/geometry";
-import { layoutCluster } from "../../graph_layout/layoutGraph";
+import { forceSubgraphLayout } from "../../graph_layout/forceLayout";
 import {
   GraphDimensions,
   scaleLayout,
@@ -312,7 +312,7 @@ export function updateClusterNode(
   this.changeClusterSize(clusterNode, nodeCount);
 
   // re-layout the subgraph
-  layoutCluster(newSubgraph, this.nodeSize);
+  forceSubgraphLayout(newSubgraph, this.nodeSize);
 
   const innerRecSize = clusterGraphSize(nodeCount, this.nodeSize);
   const offset = clusterOffset(nodeCount, this.nodeSize);

@@ -10,10 +10,12 @@ import InteractiveGraph from "./InteractiveGraph";
 import { useWindowSize } from "../utils/customHooks";
 import { getUserDevice } from "../utils/cssUtils";
 import { Solution } from "../utils/server_utils/findBestMulticut";
+import { Layout } from "../utils/graph_layout/LayoutAlgorithms";
 
 export interface LevelFrameProps {
   graph: LogicalGraph;
   solution: Solution;
+  layout: Layout;
 }
 
 export default function LevelFrame(props: LevelFrameProps) {
@@ -48,6 +50,7 @@ export default function LevelFrame(props: LevelFrameProps) {
         graph={graph}
         theme={graphTheme}
         solution={props.solution}
+        layout={props.layout}
       />
       <Paper elevation={10}>
         <InteractiveGraph
@@ -58,6 +61,7 @@ export default function LevelFrame(props: LevelFrameProps) {
           logicalGraph={graph}
           graphTheme={graphTheme}
           emitGraphChange={setGraph}
+          layout={props.layout}
         />
       </Paper>
     </div>

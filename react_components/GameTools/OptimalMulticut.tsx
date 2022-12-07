@@ -15,15 +15,18 @@ import PartialGraphTheme from "../../utils/graph_rendering/PartialGraphTheme";
 import { getUserDevice } from "../../utils/cssUtils";
 import { useWindowSize } from "../../utils/customHooks";
 import { nodeSize } from "../../utils/constants";
+import { Layout } from "../../utils/graph_layout/LayoutAlgorithms";
 
 export interface OptimalMulticutProps {
   optimalMulticut: LogicalGraph | null;
   theme: PartialGraphTheme;
+  layout: Layout;
 }
 
 export default function OptimalMulticut({
   optimalMulticut,
   theme,
+  layout,
 }: OptimalMulticutProps) {
   const [showOptimalMulticut, setShowOptimalMulticut] =
     useState<boolean>(false);
@@ -101,6 +104,7 @@ export default function OptimalMulticut({
             nodeSize={responsiveNodeSize}
             logicalGraph={optimalMulticut}
             graphTheme={theme}
+            layout={layout}
           />
         </DialogContent>
       </Dialog>

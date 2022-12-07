@@ -10,11 +10,13 @@ export type SubgraphLayoutAlgorithm = (
 
 export type LayoutAlgorithmName = "forceLayout";
 
+export type Layout = {
+  clusterLayout: ClusterLayoutAlgorithm;
+  subgraphLayout: SubgraphLayoutAlgorithm;
+};
+
 type LayoutAlgorithmsType = {
-  [key in LayoutAlgorithmName]: {
-    clusterLayout: ClusterLayoutAlgorithm;
-    subgraphLayout: SubgraphLayoutAlgorithm;
-  };
+  [key in LayoutAlgorithmName]: Layout;
 };
 
 export const LayoutAlgorithms: LayoutAlgorithmsType = {

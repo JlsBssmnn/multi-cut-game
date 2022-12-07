@@ -8,6 +8,7 @@ import {
 } from "../utils/calculations/graphCalculations";
 import { getUserDevice } from "../utils/cssUtils";
 import { useWindowSize } from "../utils/customHooks";
+import { Layout } from "../utils/graph_layout/LayoutAlgorithms";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import { Solution } from "../utils/server_utils/findBestMulticut";
 import GameSuccess from "./GameTools/GameSuccess";
@@ -19,10 +20,11 @@ export interface StatsProps {
   graph: LogicalGraph;
   theme: PartialGraphTheme;
   solution: Solution;
+  layout: Layout;
 }
 
 export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
-  { graph, theme, solution },
+  { graph, theme, solution, layout },
   ref
 ) {
   const optimalMulticut = getGraphFromSolution(graph, solution);
@@ -40,7 +42,11 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
           <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
         </div>
         <OptimalCost optimalSolution={solution} />
-        <OptimalMulticut optimalMulticut={optimalMulticut} theme={theme} />
+        <OptimalMulticut
+          optimalMulticut={optimalMulticut}
+          theme={theme}
+          layout={layout}
+        />
         <GameSuccess currentCost={cost} optimalSolution={solution} />
       </GameToolWrapper>
     </Paper>

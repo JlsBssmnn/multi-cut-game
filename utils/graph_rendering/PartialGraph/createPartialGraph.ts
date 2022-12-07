@@ -7,6 +7,7 @@ import {
 } from "../../../types/graph";
 import { clusterDiameter } from "../../calculations/geometry";
 import { assertEdgesExists } from "../../graphUtils";
+import { SubgraphLayoutAlgorithm } from "../../graph_layout/LayoutAlgorithms";
 import PartialGraphTheme from "../PartialGraphTheme";
 import PartialGraph from "./PartialGraph";
 
@@ -17,12 +18,20 @@ import PartialGraph from "./PartialGraph";
 export default function createPartialGraph(
   graph: LogicalGraph,
   nodeSize: number,
-  theme: PartialGraphTheme
+  theme: PartialGraphTheme,
+  subgraphLayout: SubgraphLayoutAlgorithm
 ): PartialGraph {
   const clusterNodes = getClusters(graph, nodeSize, theme);
   const clusterEdges: LogicalEdge[] = getClusterEdges(graph);
 
-  return new PartialGraph(clusterNodes, clusterEdges, graph, nodeSize, theme);
+  return new PartialGraph(
+    clusterNodes,
+    clusterEdges,
+    graph,
+    nodeSize,
+    theme,
+    subgraphLayout
+  );
 }
 
 /**

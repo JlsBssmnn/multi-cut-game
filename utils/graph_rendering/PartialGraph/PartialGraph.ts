@@ -4,6 +4,7 @@ import {
   LogicalGraph,
   PartialClusterNode,
 } from "../../../types/graph";
+import { SubgraphLayoutAlgorithm } from "../../graph_layout/LayoutAlgorithms";
 import { ClusterDragEvent, NodeDragEvent } from "../DragEvent";
 import PartialGraphTheme from "../PartialGraphTheme";
 import {
@@ -79,6 +80,7 @@ export default class PartialGraph {
   logicalGraph: LogicalGraph;
   nodeSize: number;
   theme: PartialGraphTheme;
+  layoutAlgorithm: SubgraphLayoutAlgorithm;
 
   dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
 
@@ -100,12 +102,14 @@ export default class PartialGraph {
     edges: LogicalEdge[],
     logicalGraph: LogicalGraph,
     nodeSize: number,
-    theme: PartialGraphTheme
+    theme: PartialGraphTheme,
+    layoutAlgorithm: SubgraphLayoutAlgorithm
   ) {
     this.nodes = nodes;
     this.logicalGraph = logicalGraph;
     this.nodeSize = nodeSize;
     this.theme = theme;
+    this.layoutAlgorithm = layoutAlgorithm;
 
     const nodeMap = new Map<number, PartialClusterNode>();
     this.nodes.forEach((node) => nodeMap.set(node.id, node));

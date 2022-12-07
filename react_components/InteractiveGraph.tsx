@@ -10,13 +10,13 @@ import {
 } from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
-import { forceClusterLayout } from "../utils/graph_layout/forceLayout";
 import scaleGraph, { GraphDimensions } from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
 import { Point } from "../types/geometry";
 import createPartialGraph from "../utils/graph_rendering/PartialGraph/createPartialGraph";
+import { Layout } from "../utils/graph_layout/LayoutAlgorithms";
 
 export interface InteractiveGraphProps {
   width: number;
@@ -26,6 +26,7 @@ export interface InteractiveGraphProps {
   logicalGraph: LogicalGraph;
   graphTheme: PartialGraphTheme;
   emitGraphChange: Dispatch<SetStateAction<LogicalGraph>>;
+  layout: Layout;
 }
 
 type UpdateActions =
@@ -68,10 +69,16 @@ export default function InteractiveGraph({
   logicalGraph,
   graphTheme,
   emitGraphChange,
+  layout,
 }: InteractiveGraphProps) {
   useEffect(() => {
-    partialGraph = createPartialGraph(logicalGraph, nodeSize, graphTheme);
-    forceClusterLayout(partialGraph);
+    partialGraph = createPartialGraph(
+      logicalGraph,
+      nodeSize,
+      graphTheme,
+      layout.subgraphLayout
+    );
+    layout.clusterLayout(partialGraph);
   }, []);
 
   // This state is just used to trigger a rerender

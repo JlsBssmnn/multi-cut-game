@@ -1,8 +1,4 @@
 import styles from "../styles/Graph.module.scss";
-import {
-  forceClusterLayout,
-  forceSubgraphLayout,
-} from "../utils/graph_layout/forceLayout";
 import scaleGraph from "../utils/graph_layout/scaleGraph";
 import createPartialGraph from "../utils/graph_rendering/PartialGraph/createPartialGraph";
 import GraphVisualization from "./GraphVisualization";
@@ -25,12 +21,18 @@ export default function NonInteractiveGraph({
   nodeSize,
   logicalGraph,
   graphTheme,
+  layout,
 }: NonInteractiveGraphProps) {
-  const partialGraph = createPartialGraph(logicalGraph, nodeSize, graphTheme);
+  const partialGraph = createPartialGraph(
+    logicalGraph,
+    nodeSize,
+    graphTheme,
+    layout.subgraphLayout
+  );
 
-  forceClusterLayout(partialGraph);
+  layout.clusterLayout(partialGraph);
   partialGraph.nodes.forEach((cluster) =>
-    forceSubgraphLayout(cluster.subgraph, nodeSize)
+    layout.subgraphLayout(cluster.subgraph, nodeSize)
   );
 
   scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);

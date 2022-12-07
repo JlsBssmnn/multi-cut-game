@@ -14,6 +14,7 @@ import { LogicalGraph } from "../../types/graph";
 import PartialGraphTheme from "../../utils/graph_rendering/PartialGraphTheme";
 import { getUserDevice } from "../../utils/cssUtils";
 import { useWindowSize } from "../../utils/customHooks";
+import { nodeSize } from "../../utils/constants";
 
 export interface OptimalMulticutProps {
   optimalMulticut: LogicalGraph | null;
@@ -56,10 +57,10 @@ export default function OptimalMulticut({
 
   if (userDevice === "phone") {
     var showButtonText = "Best Solution";
-    var nodeSize = 15;
+    var responsiveNodeSize = nodeSize - 5;
   } else {
     var showButtonText = "Show optimal solution";
-    var nodeSize = 30;
+    var responsiveNodeSize = nodeSize;
   }
 
   return (
@@ -97,9 +98,8 @@ export default function OptimalMulticut({
             width={dialogContentWidth}
             height={dialogContentHeight}
             margin={5}
-            nodeSize={nodeSize}
+            nodeSize={responsiveNodeSize}
             logicalGraph={optimalMulticut}
-            edgeThickness={6}
             graphTheme={theme}
           />
         </DialogContent>

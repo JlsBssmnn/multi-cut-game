@@ -27,7 +27,7 @@ export default function NonInteractiveGraph({
     logicalGraph,
     nodeSize,
     graphTheme,
-    layout.subgraphLayout
+    layout
   );
 
   layout.clusterLayout(partialGraph);
@@ -35,7 +35,7 @@ export default function NonInteractiveGraph({
     layout.subgraphLayout(partialGraph, cluster.subgraph)
   );
 
-  scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
+  scaleGraph(partialGraph, width, height, margin);
 
   return (
     <div

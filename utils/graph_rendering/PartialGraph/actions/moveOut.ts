@@ -20,13 +20,12 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   this.removeNode(node);
   const maxClusterID = Math.max(...this.nodes.map((node) => node.id));
   const newClusterID = maxClusterID + 1;
-  const offset = clusterOffset(1, this.nodeSize);
 
   // add the new cluster
   const newNode = {
     id: node.id,
-    x: offset,
-    y: offset,
+    x: 0,
+    y: 0,
     color: this.theme.getTransparentColor("nodeColor"),
     size: this.nodeSize,
     group: newClusterID,
@@ -34,7 +33,7 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   const newCluster = {
     color: this.theme.getColor("tempClusterColor"),
     id: newClusterID,
-    size: clusterDiameter(1, this.nodeSize),
+    size: 0,
     x: pointerPosition.x,
     y: pointerPosition.y,
     borderColor: this.theme.getTransparentColor("clusterBorderColor"),
@@ -43,6 +42,13 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
       edges: [],
     },
   };
+  const subgraphSize = this.computeSubgraphSize(this, newCluster.subgraph);
+  const offset = clusterOffset(subgraphSize);
+  const diameter = clusterDiameter(subgraphSize);
+
+  newNode.x = offset;
+  newNode.y = offset;
+  newCluster.size = diameter;
   this.nodes.push(newCluster);
 
   // update the cluster edges

@@ -76,7 +76,7 @@ export default function InteractiveGraph({
       logicalGraph,
       nodeSize,
       graphTheme,
-      layout.subgraphLayout
+      layout
     );
     layout.clusterLayout(partialGraph);
   }, []);
@@ -101,8 +101,8 @@ export default function InteractiveGraph({
         partialGraph.undoAction();
         break;
       case "scaleGraph":
-        const { width, height, nodeSize, margin } = action.payload;
-        scaleGraph(partialGraph.nodes, width, height, nodeSize, margin);
+        const { width, height, margin } = action.payload;
+        scaleGraph(partialGraph, width, height, margin);
         break;
       case "scaleGraphRelative":
         const { previousDimensions, newDimensions } = action.payload;

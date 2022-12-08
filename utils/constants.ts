@@ -14,3 +14,6 @@ export const graphTheme = new PartialGraphTheme(
 
 export const appBarHeight = 64;
 export const nodeSize = 25;
+
+// how much percent of the nodeSize is gonna be the distance between the nodes
+export const gridLayoutSpacing = 1;

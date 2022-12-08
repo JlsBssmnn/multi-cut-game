@@ -7,7 +7,7 @@ import {
 } from "../../../types/graph";
 import { clusterDiameter } from "../../calculations/geometry";
 import { assertEdgesExists } from "../../graphUtils";
-import { SubgraphLayoutAlgorithm } from "../../graph_layout/LayoutAlgorithms";
+import { Layout } from "../../graph_layout/LayoutAlgorithms";
 import PartialGraphTheme from "../PartialGraphTheme";
 import PartialGraph from "./PartialGraph";
 
@@ -19,19 +19,28 @@ export default function createPartialGraph(
   graph: LogicalGraph,
   nodeSize: number,
   theme: PartialGraphTheme,
-  subgraphLayout: SubgraphLayoutAlgorithm
+  layout: Layout
 ): PartialGraph {
   const clusterNodes = getClusters(graph, nodeSize, theme);
   const clusterEdges: LogicalEdge[] = getClusterEdges(graph);
 
-  return new PartialGraph(
+  const partialGraph = new PartialGraph(
     clusterNodes,
     clusterEdges,
     graph,
     nodeSize,
     theme,
-    subgraphLayout
+    layout
   );
+
+  partialGraph.nodes.forEach(
+    (clusterNode) =>
+      (clusterNode.size = clusterDiameter(
+        layout.computeSubgraphSize(partialGraph, clusterNode.subgraph)
+      ))
+  );
+
+  return partialGraph;
 }
 
 /**
@@ -50,7 +59,7 @@ export function getClusters(
       x: 0,
       y: 0,
       color: theme.getColor("clusterNodeColor"),
-      size: clusterDiameter(nodes.length, nodeSize),
+      size: 0,
       subgraph: {
         nodes,
         edges,

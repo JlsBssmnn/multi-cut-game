@@ -1,5 +1,6 @@
 import { GeneralNode, PartialClusterNode } from "../../types/graph";
-import { clusterGraphSize, clusterOffset } from "../calculations/geometry";
+import { clusterOffset } from "../calculations/geometry";
+import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
 
 export interface GraphDimensions {
   width: number;
@@ -13,21 +14,20 @@ export interface GraphDimensions {
  * clusters and change their offset, s.t. they are within their cluster nodes.
  */
 export default function scaleGraph(
-  clusterNodes: PartialClusterNode[],
+  graph: PartialGraph,
   width: number,
   height: number,
-  nodeSize: number,
   margin: number = 0
 ) {
-  scaleLayout(clusterNodes, width, height, margin);
+  scaleLayout(graph.nodes, width, height, margin);
 
-  clusterNodes.forEach((cluster) => {
+  graph.nodes.forEach((cluster) => {
     const nodes = cluster.subgraph.nodes;
 
-    const clusterSize = clusterGraphSize(nodes.length, nodeSize);
+    const clusterSize = graph.computeSubgraphSize(graph, cluster.subgraph);
     scaleLayout(nodes, clusterSize, clusterSize);
 
-    const offset = clusterOffset(cluster.subgraph.nodes.length, nodeSize);
+    const offset = clusterOffset(clusterSize);
 
     nodes.forEach((node) => {
       node.x += offset;

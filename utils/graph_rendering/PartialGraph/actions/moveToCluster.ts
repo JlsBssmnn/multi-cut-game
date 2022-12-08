@@ -33,10 +33,7 @@ export function visualizeMoveToCluster(
     group: destinationCluster.id,
   };
   destinationCluster.subgraph.nodes.push(newNode);
-  this.changeClusterSize(
-    destinationCluster,
-    destinationCluster.subgraph.nodes.length
-  );
+  this.changeClusterSize(destinationCluster);
 
   // add the new edges inside the cluster
   const newEdges = this.computeSubgraphEdges(newNode, destinationCluster, true);
@@ -91,7 +88,7 @@ export function unvisualizeMoveToCluster(
   originClusterNode.subgraph.nodes.push(newNode);
 
   // reset cluster size
-  this.changeClusterSize(formerCluster, formerCluster.subgraph.nodes.length);
+  this.changeClusterSize(formerCluster);
 
   // add back edges in the subgraph
   originClusterNode.subgraph.edges.push(

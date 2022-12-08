@@ -1,7 +1,4 @@
-import {
-  gridClusterLayout,
-  gridSubgraphLayout,
-} from "../../utils/graph_layout/gridLayout";
+import { LayoutAlgorithms } from "../../utils/graph_layout/LayoutAlgorithms";
 import { Level } from "./levelTypes";
 
 const keyword = "grid [large]";
@@ -179,8 +176,5 @@ export default {
   graph,
   solution,
   keyword,
-  layout: {
-    clusterLayout: gridClusterLayout,
-    subgraphLayout: gridSubgraphLayout,
-  },
+  layout: LayoutAlgorithms.grid,
 } as Level;

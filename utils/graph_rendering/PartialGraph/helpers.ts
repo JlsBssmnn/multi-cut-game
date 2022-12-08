@@ -1,10 +1,11 @@
 import { Point } from "../../../types/geometry";
-import { Edge, Node, PartialClusterNode } from "../../../types/graph";
 import {
-  clusterDiameter,
-  clusterGraphSize,
-  clusterOffset,
-} from "../../calculations/geometry";
+  Edge,
+  Node,
+  PartialClusterNode,
+  PartialSubgraph,
+} from "../../../types/graph";
+import { clusterDiameter, clusterOffset } from "../../calculations/geometry";
 import {
   GraphDimensions,
   scaleLayout,
@@ -203,13 +204,18 @@ export function computeSubgraphEdges(
 /**
  * Changes the size of the given cluster node such that there is enough
  * space to fit in the given number of nodes
+ * @param clusterNode The clusterNode wich will be updated
+ * @param sizeReference If provided the new size of the cluster node will
+ * be determined depending on this subgraph
  */
 export function changeClusterSize(
   this: PartialGraph,
   clusterNode: PartialClusterNode,
-  numOfNodes: number
+  sizeReference?: PartialSubgraph
 ) {
-  const newSize = clusterDiameter(numOfNodes, this.nodeSize);
+  const newSize = clusterDiameter(
+    this.computeSubgraphSize(this, sizeReference ?? clusterNode.subgraph)
+  );
   const positionChange = (clusterNode.size - newSize) / 2;
 
   clusterNode.size = newSize;
@@ -306,18 +312,17 @@ export function updateClusterNode(
     clusterNode.id
   );
   clusterNode.subgraph = newSubgraph;
-  const nodeCount = newSubgraph.nodes.length;
 
   // resize the cluster node
-  this.changeClusterSize(clusterNode, nodeCount);
+  this.changeClusterSize(clusterNode);
 
   // re-layout the subgraph
   this.layoutAlgorithm(this, newSubgraph);
 
-  const innerRecSize = clusterGraphSize(nodeCount, this.nodeSize);
-  const offset = clusterOffset(nodeCount, this.nodeSize);
+  const subgraphSize = this.computeSubgraphSize(this, clusterNode.subgraph);
+  const offset = clusterOffset(subgraphSize);
 
-  scaleLayout(newSubgraph.nodes, innerRecSize, innerRecSize);
+  scaleLayout(newSubgraph.nodes, subgraphSize, subgraphSize);
   newSubgraph.nodes.forEach((node) => {
     node.x += offset;
     node.y += offset;

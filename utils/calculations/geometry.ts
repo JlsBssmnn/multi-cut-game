@@ -1,4 +1,6 @@
 import { Point } from "../../types/geometry";
+import { PartialSubgraph } from "../../types/graph";
+import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
 
 /**
  * Returns the length from the coordinate-origin to the given point.
@@ -11,10 +13,12 @@ export function vectorLength(point: Point): number {
  * Computes the length of the square inside the cluster node
  * which holds the subgraph of that cluster.
  */
-export function clusterGraphSize(
-  numOfElements: number,
-  nodeSize: number
+export function getSubgraphSize(
+  graph: PartialGraph,
+  subgraph: PartialSubgraph
 ): number {
+  const nodeSize = graph.nodeSize;
+  const numOfElements = subgraph.nodes.length;
   // This is a composite function, as long as numOfElement < 10
   // it's a linear function which gets weakened over time, after that
   // it's a sqrt function
@@ -28,25 +32,19 @@ export function clusterGraphSize(
 
 /**
  * Computes the diameter of a cluster node.
- * @param numOfElements The number of elements in that cluster
- * @param nodeSize The size of the nodes inside the cluster
+ * @param subgraphSize The size of the subgraph of the cluster node
  */
-export function clusterDiameter(
-  numOfElements: number,
-  nodeSize: number
-): number {
-  const rectangleLen = clusterGraphSize(numOfElements, nodeSize);
-  return 2 * Math.sqrt(2 * (rectangleLen / 2) ** 2);
+export function clusterDiameter(subgraphSize: number): number {
+  return 2 * Math.sqrt(2 * (subgraphSize / 2) ** 2);
 }
 
 /**
- * Computes the distance from the origin of the cluster div
- * to the logical square that lies within that div.
- * @param numOfElements The number of elements in that cluster
- * @param nodeSize The size of the nodes inside the cluster
+ * Computes the distance from the origin of the cluster node
+ * to the logical square that lies within that node.
+ * @param subgraphSize The size of the subgraph within the cluster node
  */
-export function clusterOffset(numOfElements: number, nodeSize: number): number {
-  return clusterGraphSize(numOfElements, nodeSize) * (Math.sqrt(2) / 2 - 0.5);
+export function clusterOffset(subgraphSize: number): number {
+  return subgraphSize * (Math.sqrt(2) / 2 - 0.5);
 }
 
 /**

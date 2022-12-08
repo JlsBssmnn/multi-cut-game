@@ -1,4 +1,5 @@
 import { Point } from "../../../../types/geometry";
+import { PartialSubgraph, Node } from "../../../../types/graph";
 import { NodeDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
 
@@ -32,11 +33,30 @@ export function visualizeJoinClusters(
     (edge) => (edge.opacity = this.theme.opacity)
   );
 
+  // create a subgraph that represents the join
+  const joinPreview: PartialSubgraph = {
+    nodes: [
+      ...clusterNode.subgraph.nodes,
+      ...destinationCluster.subgraph.nodes,
+    ],
+    edges: [],
+  };
+  const joinPreviewMap = new Map<number, Node>();
+  joinPreview.nodes.forEach((node) => joinPreviewMap.set(node.id, node));
+
+  joinPreview.edges = this.logicalGraph.edges
+    .filter(
+      (edge) =>
+        joinPreviewMap.has(edge.source) && joinPreviewMap.has(edge.target)
+    )
+    .map((edge) => ({
+      source: joinPreviewMap.get(edge.source)!,
+      target: joinPreviewMap.get(edge.target)!,
+      value: edge.value,
+    }));
+
   // enlarge the other cluster
-  this.changeClusterSize(
-    destinationCluster,
-    clusterNode.subgraph.nodes.length + destinationCluster.subgraph.nodes.length
-  );
+  this.changeClusterSize(destinationCluster, joinPreview);
 
   // remove cluster edges
   this.edges = this.edges.filter(
@@ -106,10 +126,7 @@ export function unvisualizeJoinClusters(
   clusterNode.subgraph.edges.forEach((edge) => (edge.opacity = 1));
 
   // reset the size of the other cluster
-  this.changeClusterSize(
-    destinationCluster,
-    destinationCluster.subgraph.nodes.length
-  );
+  this.changeClusterSize(destinationCluster);
 
   // update the cluster edges
   this.updateClusterEdges(clusterNode, false);

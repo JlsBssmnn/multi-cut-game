@@ -15,14 +15,7 @@ export interface NonSSRLevelProps {
 export default function NonSSRLevel({ level }: NonSSRLevelProps) {
   const { graph, solution } = level;
 
-  const layout = {
-    clusterLayout: level.layout?.clusterLayout
-      ? level.layout.clusterLayout
-      : LayoutAlgorithms.forceLayout.clusterLayout,
-    subgraphLayout: level.layout?.subgraphLayout
-      ? level.layout.subgraphLayout
-      : LayoutAlgorithms.forceLayout.subgraphLayout,
-  };
+  const layout = level.layout ?? LayoutAlgorithms.forceLayout;
 
   return <LevelFrame graph={graph} solution={solution} layout={layout} />;
 }

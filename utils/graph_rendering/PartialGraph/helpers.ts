@@ -214,7 +214,7 @@ export function changeClusterSize(
   sizeReference?: PartialSubgraph
 ) {
   const newSize = clusterDiameter(
-    this.computeSubgraphSize(this, sizeReference ?? clusterNode.subgraph)
+    this.layout.computeSubgraphSize(this, sizeReference ?? clusterNode.subgraph)
   );
   const positionChange = (clusterNode.size - newSize) / 2;
 
@@ -317,12 +317,15 @@ export function updateClusterNode(
   this.changeClusterSize(clusterNode);
 
   // re-layout the subgraph
-  this.layoutAlgorithm(this, newSubgraph);
+  this.layout.subgraphLayout(this, newSubgraph);
 
-  const subgraphSize = this.computeSubgraphSize(this, clusterNode.subgraph);
+  const subgraphSize = this.layout.computeSubgraphSize(
+    this,
+    clusterNode.subgraph
+  );
   const offset = clusterOffset(subgraphSize);
 
-  scaleLayout(newSubgraph.nodes, subgraphSize, subgraphSize);
+  this.layout.scaleSubgraph(newSubgraph.nodes, subgraphSize, subgraphSize, 0);
   newSubgraph.nodes.forEach((node) => {
     node.x += offset;
     node.y += offset;
@@ -390,4 +393,29 @@ export function copyState(this: PartialGraph): GraphState {
     edges,
     logicalGraph: structuredClone(this.logicalGraph),
   };
+}
+
+/**
+ * Lays out all the nodes (cluster nodes and nodes in the subgraph) and scales them
+ * properly.
+ */
+export function scaleWholeGraph(
+  this: PartialGraph,
+  width: number,
+  height: number,
+  margin: number
+): void {
+  this.layout.clusterLayout(this);
+  scaleLayout(this.nodes, width, height, margin);
+
+  this.nodes.forEach((cluster) => {
+    this.layout.subgraphLayout(this, cluster.subgraph);
+    const size = this.layout.computeSubgraphSize(this, cluster.subgraph);
+    const offset = clusterOffset(size);
+    this.layout.scaleSubgraph(cluster.subgraph.nodes, size, size, 0);
+    cluster.subgraph.nodes.forEach((node) => {
+      node.x += offset;
+      node.y += offset;
+    });
+  });
 }

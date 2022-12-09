@@ -10,7 +10,7 @@ import {
 } from "react";
 import styles from "../styles/Graph.module.scss";
 import { LogicalGraph } from "../types/graph";
-import scaleGraph, { GraphDimensions } from "../utils/graph_layout/scaleGraph";
+import { GraphDimensions } from "../utils/graph_layout/scaleGraph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 import GraphVisualization from "./GraphVisualization";
@@ -102,7 +102,7 @@ export default function InteractiveGraph({
         break;
       case "scaleGraph":
         const { width, height, margin } = action.payload;
-        scaleGraph(partialGraph, width, height, margin);
+        partialGraph.scaleWholeGraph(width, height, margin);
         break;
       case "scaleGraphRelative":
         const { previousDimensions, newDimensions } = action.payload;

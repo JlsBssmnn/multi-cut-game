@@ -1,12 +1,14 @@
-import { PartialSubgraph } from "../../types/graph";
+import { GeneralNode, PartialSubgraph } from "../../types/graph";
 import { getSubgraphSize } from "../calculations/geometry";
 import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
+import { scaleGridLayout } from "../graph_scaling/gridScaling";
 import { forceClusterLayout, forceSubgraphLayout } from "./forceLayout";
 import {
   computeSubgraphSize,
   gridClusterLayout,
   gridSubgraphLayout,
 } from "./gridLayout";
+import { scaleLayout } from "./scaleGraph";
 
 export type ClusterLayoutAlgorithm = (graph: PartialGraph) => void;
 export type SubgraphLayoutAlgorithm = (
@@ -17,6 +19,12 @@ export type ComputeSubgraphSize = (
   graph: PartialGraph,
   subgraph: PartialSubgraph
 ) => number;
+export type ScaleSubgraph = (
+  nodes: GeneralNode[],
+  width: number,
+  height: number,
+  margin: number
+) => void;
 
 export type LayoutAlgorithmName = "forceLayout" | "grid";
 
@@ -24,6 +32,7 @@ export type Layout = {
   clusterLayout: ClusterLayoutAlgorithm;
   subgraphLayout: SubgraphLayoutAlgorithm;
   computeSubgraphSize: ComputeSubgraphSize;
+  scaleSubgraph: ScaleSubgraph;
 };
 
 type LayoutAlgorithmsType = {
@@ -35,10 +44,12 @@ export const LayoutAlgorithms: LayoutAlgorithmsType = {
     clusterLayout: forceClusterLayout,
     subgraphLayout: forceSubgraphLayout,
     computeSubgraphSize: getSubgraphSize,
+    scaleSubgraph: scaleLayout,
   },
   grid: {
     clusterLayout: gridClusterLayout,
     subgraphLayout: gridSubgraphLayout,
     computeSubgraphSize: computeSubgraphSize,
+    scaleSubgraph: scaleGridLayout,
   },
 };

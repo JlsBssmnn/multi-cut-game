@@ -4,11 +4,7 @@ import {
   LogicalGraph,
   PartialClusterNode,
 } from "../../../types/graph";
-import {
-  ComputeSubgraphSize,
-  Layout,
-  SubgraphLayoutAlgorithm,
-} from "../../graph_layout/LayoutAlgorithms";
+import { Layout } from "../../graph_layout/LayoutAlgorithms";
 import { ClusterDragEvent, NodeDragEvent } from "../DragEvent";
 import PartialGraphTheme from "../PartialGraphTheme";
 import {
@@ -49,6 +45,7 @@ import {
   undoAction,
   scaleGraphRelative,
   copyState,
+  scaleWholeGraph,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
@@ -84,8 +81,7 @@ export default class PartialGraph {
   logicalGraph: LogicalGraph;
   nodeSize: number;
   theme: PartialGraphTheme;
-  layoutAlgorithm: SubgraphLayoutAlgorithm;
-  computeSubgraphSize: ComputeSubgraphSize;
+  layout: Layout;
 
   dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
 
@@ -114,8 +110,7 @@ export default class PartialGraph {
     this.logicalGraph = logicalGraph;
     this.nodeSize = nodeSize;
     this.theme = theme;
-    this.layoutAlgorithm = layout.subgraphLayout;
-    this.computeSubgraphSize = layout.computeSubgraphSize;
+    this.layout = layout;
 
     const nodeMap = new Map<number, PartialClusterNode>();
     this.nodes.forEach((node) => nodeMap.set(node.id, node));
@@ -151,6 +146,7 @@ export default class PartialGraph {
   undoAction = undoAction;
   scaleGraphRelative = scaleGraphRelative;
   copyState = copyState;
+  scaleWholeGraph = scaleWholeGraph;
 
   // the 3 main stages
   nodeAt = nodeAt;

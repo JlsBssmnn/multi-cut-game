@@ -42,7 +42,10 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
       edges: [],
     },
   };
-  const subgraphSize = this.computeSubgraphSize(this, newCluster.subgraph);
+  const subgraphSize = this.layout.computeSubgraphSize(
+    this,
+    newCluster.subgraph
+  );
   const offset = clusterOffset(subgraphSize);
   const diameter = clusterDiameter(subgraphSize);
 

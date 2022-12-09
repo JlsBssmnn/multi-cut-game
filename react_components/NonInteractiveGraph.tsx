@@ -1,5 +1,4 @@
 import styles from "../styles/Graph.module.scss";
-import scaleGraph from "../utils/graph_layout/scaleGraph";
 import createPartialGraph from "../utils/graph_rendering/PartialGraph/createPartialGraph";
 import GraphVisualization from "./GraphVisualization";
 import { InteractiveGraphProps } from "./InteractiveGraph";
@@ -30,12 +29,7 @@ export default function NonInteractiveGraph({
     layout
   );
 
-  layout.clusterLayout(partialGraph);
-  partialGraph.nodes.forEach((cluster) =>
-    layout.subgraphLayout(partialGraph, cluster.subgraph)
-  );
-
-  scaleGraph(partialGraph, width, height, margin);
+  partialGraph.scaleWholeGraph(width, height, margin);
 
   return (
     <div

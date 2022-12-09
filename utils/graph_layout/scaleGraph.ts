@@ -1,6 +1,4 @@
 import { GeneralNode, PartialClusterNode } from "../../types/graph";
-import { clusterOffset } from "../calculations/geometry";
-import PartialGraph from "../graph_rendering/PartialGraph/PartialGraph";
 
 export interface GraphDimensions {
   width: number;
@@ -9,37 +7,9 @@ export interface GraphDimensions {
 }
 
 /**
- * This function takes the nodes of a partially rendered graph and scales all the cluster
- * nodes to fill the given width and height. Furthermore it'll scale the subgraphs of the
- * clusters and change their offset, s.t. they are within their cluster nodes.
- */
-export default function scaleGraph(
-  graph: PartialGraph,
-  width: number,
-  height: number,
-  margin: number = 0
-) {
-  scaleLayout(graph.nodes, width, height, margin);
-
-  graph.nodes.forEach((cluster) => {
-    const nodes = cluster.subgraph.nodes;
-
-    const clusterSize = graph.computeSubgraphSize(graph, cluster.subgraph);
-    scaleLayout(nodes, clusterSize, clusterSize);
-
-    const offset = clusterOffset(clusterSize);
-
-    nodes.forEach((node) => {
-      node.x += offset;
-      node.y += offset;
-    });
-  });
-}
-
-/**
- * This function takes a set of node positions and scales them, s.t.
- * the nodes completely fill out the dimensions given by `width` and
- * `height`. The `nodeSize` is the size for one node of the graph.
+ * This function takes a set of nodes (cluster nodes or normal nodes)
+ * and scales them, s.t. the nodes completely fill out the dimensions
+ * given by `width` and `height`.
  */
 export function scaleLayout(
   nodes: GeneralNode[],

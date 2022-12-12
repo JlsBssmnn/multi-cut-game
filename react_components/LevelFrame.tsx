@@ -3,7 +3,12 @@ import { LogicalGraph } from "../types/graph";
 import styles from "../styles/Game.module.scss";
 import gameToolStyles from "../styles/GameTools.module.scss";
 
-import { appBarHeight, graphTheme, nodeSize } from "../utils/constants";
+import {
+  appBarHeight,
+  graphMargin,
+  graphTheme,
+  nodeSize,
+} from "../utils/constants";
 import { Paper } from "@mui/material";
 import GameControls from "./GameControls";
 import InteractiveGraph from "./InteractiveGraph";
@@ -56,7 +61,7 @@ export default function LevelFrame(props: LevelFrameProps) {
         <InteractiveGraph
           width={graphWidth}
           height={graphHeight}
-          margin={20}
+          margin={graphMargin}
           nodeSize={nodeSize}
           logicalGraph={graph}
           graphTheme={graphTheme}

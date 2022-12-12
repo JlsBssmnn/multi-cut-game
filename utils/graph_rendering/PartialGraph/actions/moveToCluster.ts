@@ -40,8 +40,7 @@ export function visualizeMoveToCluster(
   destinationCluster.subgraph.edges.push(...newEdges);
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNode, true, destinationCluster.id);
-  this.updateClusterEdges(destinationCluster, true);
+  this.updateClusterEdges([originClusterNode, destinationCluster], true);
 
   // update the drag event
   this.dragEvent.clusterNode = destinationCluster;
@@ -96,8 +95,7 @@ export function unvisualizeMoveToCluster(
   );
 
   // update the cluster edges
-  this.updateClusterEdges(originClusterNode, false);
-  this.updateClusterEdges(formerCluster, false);
+  this.updateClusterEdges([originClusterNode, formerCluster], false);
 
   // update the drag event
   this.dragEvent.clusterNode = originClusterNode;

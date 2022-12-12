@@ -229,44 +229,53 @@ export function changeClusterSize(
 }
 
 /**
- * Recomputes the edges involving the given cluster and updates
- * their value. The edges with changed value are then added either
- * transparent (if the corresponding parameter is true) or opaque.
- * If ignoredClusterID is provided, edges involving this cluster
- * will not be updated or changed in any way.
+ * Recomputes the edges involving the given clusters and updates their value.
+ * The edges with changed values (relative to before this call) are then added
+ * either transparent (if the corresponding parameter is true) or opaque
  */
 export function updateClusterEdges(
   this: PartialGraph,
-  clusterNode: PartialClusterNode,
-  transparent: boolean,
-  ignoredClusterID?: number
+  clusterNodes: PartialClusterNode[],
+  transparent: boolean
 ) {
-  const previousValues = new Map<number, number>();
-  this.edges = this.edges.filter((edge) => {
-    const keep =
-      (edge.source !== clusterNode && edge.target !== clusterNode) ||
-      edge.source.id === ignoredClusterID ||
-      edge.target.id === ignoredClusterID;
-
-    if (keep) return keep;
-
-    const otherCluster =
-      edge.source !== clusterNode ? edge.source : edge.target;
-    previousValues.set(otherCluster.id, edge.value);
-    return keep;
-  });
-  const updatedEdges = this.computeClusterEdges(clusterNode.id);
-  Array.from(updatedEdges.entries()).forEach(([otherCluster, value]) => {
-    if (otherCluster.id === ignoredClusterID) return;
-
-    const t = transparent && value !== previousValues.get(otherCluster.id);
-    this.edges.push({
-      source: clusterNode,
-      target: otherCluster,
-      value: value,
-      opacity: t ? this.theme.opacity : undefined,
+  function updateEdges(
+    this: PartialGraph,
+    clusterNode: PartialClusterNode,
+    previousValues: Map<number, number>,
+    transparent: boolean
+  ) {
+    this.edges = this.edges.filter(
+      (edge) => edge.source !== clusterNode && edge.target !== clusterNode
+    );
+    const updatedEdges = this.computeClusterEdges(clusterNode.id);
+    Array.from(updatedEdges.entries()).forEach(([otherCluster, value]) => {
+      const t = transparent && value !== previousValues.get(otherCluster.id);
+      this.edges.push({
+        source: clusterNode,
+        target: otherCluster,
+        value: value,
+        opacity: t ? this.theme.opacity : undefined,
+      });
     });
-  });
+  }
+  const boundUpdateEdges = updateEdges.bind(this);
+  const previousValues: Map<number, number>[] = new Array(clusterNodes.length);
+
+  for (let i = 0; i < clusterNodes.length; i++) {
+    previousValues[i] = new Map<number, number>();
+    this.edges.forEach((edge) => {
+      if (edge.source !== clusterNodes[i] && edge.target !== clusterNodes[i])
+        return;
+
+      const otherCluster =
+        edge.source !== clusterNodes[i] ? edge.source : edge.target;
+      previousValues[i].set(otherCluster.id, edge.value);
+    });
+  }
+
+  for (let i = 0; i < clusterNodes.length; i++) {
+    boundUpdateEdges(clusterNodes[i], previousValues[i], transparent);
+  }
 }
 
 /**

@@ -129,8 +129,7 @@ export function unvisualizeJoinClusters(
   this.changeClusterSize(destinationCluster);
 
   // update the cluster edges
-  this.updateClusterEdges(clusterNode, false);
-  this.updateClusterEdges(destinationCluster, false);
+  this.updateClusterEdges([clusterNode, destinationCluster], false);
 }
 
 export function commitJoinClusters(this: PartialGraph) {

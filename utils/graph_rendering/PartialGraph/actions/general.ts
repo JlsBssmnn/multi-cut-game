@@ -1,7 +1,6 @@
 import { Point } from "../../../../types/geometry";
 import { Node, PartialClusterNode } from "../../../../types/graph";
 import { circlesIntersect } from "../../../calculations/geometry";
-import { connectedComponents } from "../../../calculations/graphCalculations";
 import { Action } from "../../Action";
 import { ClusterDragEvent } from "../../DragEvent";
 import PartialGraph from "../PartialGraph";
@@ -73,6 +72,7 @@ export function handleNodeMove(
 
   // the node is still inside the cluster
   if (
+    this.temporarySplitClusters.length === 0 &&
     circlesIntersect(
       absolutePosition,
       originClusterNode,
@@ -83,22 +83,6 @@ export function handleNodeMove(
     return {
       name: "reposition",
     };
-
-  // get connected components of the subgraph of the dragged node
-  // when this node is removed and check that there is only 1
-  const newSubgraph = {
-    nodes: originClusterNode.subgraph.nodes
-      .filter((otherNode) => otherNode !== node)
-      .map((node) => ({ id: node.id, group: originClusterNode.id })),
-    edges: originClusterNode.subgraph.edges
-      .filter((edge) => edge.source !== node && edge.target !== node)
-      .map((edge) => ({
-        source: edge.source.id,
-        target: edge.target.id,
-        value: edge.value,
-      })),
-  };
-  const validMoveOut = connectedComponents(newSubgraph).length === 1;
 
   // check for collision with clusters
   for (let i = 0; i < this.nodes.length; i++) {
@@ -112,6 +96,11 @@ export function handleNodeMove(
         otherClusterNode.size
       )
     ) {
+      if (this.temporarySplitClusters.includes(otherClusterNode)) {
+        return {
+          name: "reposition",
+        };
+      }
       const nodesInNewCluster = new Set(
         otherClusterNode.subgraph.nodes.map((node) => node.id)
       );
@@ -123,7 +112,7 @@ export function handleNodeMove(
       return {
         name: "moveToCluster",
         destinationCluster: otherClusterNode,
-        valid: validMoveOut && validInNewCluster,
+        valid: validInNewCluster,
       };
     }
   }
@@ -131,7 +120,7 @@ export function handleNodeMove(
   // move the node into a singleton
   return {
     name: "moveOut",
-    valid: validMoveOut,
+    valid: true,
   };
 }
 

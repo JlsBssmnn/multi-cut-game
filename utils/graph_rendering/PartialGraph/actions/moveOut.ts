@@ -54,8 +54,16 @@ export function visualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
   newCluster.size = diameter;
   this.nodes.push(newCluster);
 
-  // update the cluster edges
-  this.updateClusterEdges([originClusterNode, newCluster], true);
+  // split the origin cluster into parts if the removed node was a
+  // connecting piece
+  this.splitCluster(originClusterNode, newClusterID + 1);
+
+  // update the cluster edges if cluster wasn't split
+  if (this.temporarySplitClusters.length === 0) {
+    this.updateClusterEdges([originClusterNode, newCluster], true);
+  } else {
+    this.updateClusterEdges([...this.temporarySplitClusters, newCluster], true);
+  }
 
   // update the drag event
   this.dragEvent.clusterNode = newCluster;
@@ -96,18 +104,14 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     group: originClusterNode.id,
   };
   originClusterNode.subgraph.nodes.push(newNode);
-
-  // add back edges in the subgraph
-  originClusterNode.subgraph.edges.push(
-    ...this.computeSubgraphEdges(newNode, originClusterNode, false)
-  );
+  this.restoreOriginClusterNode();
 
   // update the cluster edges of the origin cluster
   this.updateClusterEdges([originClusterNode], false);
 
-  // update the drag event
+  // update the drag event (the node attribute was updated by
+  // restoreOriginClusterNode())
   this.dragEvent.clusterNode = originClusterNode;
-  this.dragEvent.node = newNode;
   const relativePosition = this.dragEvent.relativeNodePosition;
   this.dragEvent.pointerOffset = {
     x: originClusterNode.x + relativePosition.x,

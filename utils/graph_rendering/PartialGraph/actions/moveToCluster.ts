@@ -39,8 +39,22 @@ export function visualizeMoveToCluster(
   const newEdges = this.computeSubgraphEdges(newNode, destinationCluster, true);
   destinationCluster.subgraph.edges.push(...newEdges);
 
+  // split the origin cluster into parts if the removed node was a
+  // connecting piece
+  this.splitCluster(
+    originClusterNode,
+    Math.max(...this.nodes.map((node) => node.id)) + 1
+  );
+
   // update the cluster edges
-  this.updateClusterEdges([originClusterNode, destinationCluster], true);
+  if (this.temporarySplitClusters.length === 0) {
+    this.updateClusterEdges([originClusterNode, destinationCluster], true);
+  } else {
+    this.updateClusterEdges(
+      [...this.temporarySplitClusters, destinationCluster],
+      true
+    );
+  }
 
   // update the drag event
   this.dragEvent.clusterNode = destinationCluster;
@@ -85,21 +99,16 @@ export function unvisualizeMoveToCluster(
     group: originClusterNode.id,
   };
   originClusterNode.subgraph.nodes.push(newNode);
+  this.restoreOriginClusterNode();
 
   // reset cluster size
   this.changeClusterSize(formerCluster);
-
-  // add back edges in the subgraph
-  originClusterNode.subgraph.edges.push(
-    ...this.computeSubgraphEdges(node, originClusterNode, false)
-  );
 
   // update the cluster edges
   this.updateClusterEdges([originClusterNode, formerCluster], false);
 
   // update the drag event
   this.dragEvent.clusterNode = originClusterNode;
-  this.dragEvent.node = newNode;
   const relativePosition = this.dragEvent.relativeNodePosition;
   this.dragEvent.pointerOffset = {
     x: originClusterNode.x + relativePosition.x,

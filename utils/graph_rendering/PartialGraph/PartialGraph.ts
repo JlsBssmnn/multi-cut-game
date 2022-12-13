@@ -7,6 +7,7 @@ import {
 import { Layout } from "../../graph_layout/LayoutAlgorithms";
 import { ClusterDragEvent, NodeDragEvent } from "../DragEvent";
 import PartialGraphTheme from "../PartialGraphTheme";
+import { restoreOriginClusterNode, splitCluster } from "./actions/common";
 import {
   getAction,
   handleClusterMove,
@@ -92,6 +93,12 @@ export default class PartialGraph {
   temporaryCluster: number | null = null;
 
   /**
+   * Holds a list of clusterNodes that were created because a connecting node was
+   * moved outside of a cluster and thus split it into multiple parts.
+   */
+  temporarySplitClusters: PartialClusterNode[] = [];
+
+  /**
    * A history of valid states throughout the playthrough of the game. This is
    * used to reset the graph when the user performs an invalid action or when
    * the user wants to undo an action.
@@ -147,6 +154,9 @@ export default class PartialGraph {
   scaleGraphRelative = scaleGraphRelative;
   copyState = copyState;
   scaleWholeGraph = scaleWholeGraph;
+
+  splitCluster = splitCluster;
+  restoreOriginClusterNode = restoreOriginClusterNode;
 
   // the 3 main stages
   nodeAt = nodeAt;

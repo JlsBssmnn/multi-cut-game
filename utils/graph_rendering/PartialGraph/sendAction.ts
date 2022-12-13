@@ -59,6 +59,23 @@ export function applyMoveOut(
     );
   }
   node.group = newClusterID;
+
+  // if the cluster was split, update the groups of all involved nodes
+  if (this.temporarySplitClusters.length > 0) {
+    this.temporarySplitClusters.forEach((cluster) => {
+      cluster.subgraph.nodes.forEach((node) => {
+        const logicalNode = this.logicalGraph.nodes.find(
+          (lNode) => lNode.id == node.id
+        );
+        if (logicalNode === undefined) {
+          throw new Error(
+            `Tried to move out node with id ${nodeID}, but the node doesn't exist`
+          );
+        }
+        logicalNode.group = cluster.id;
+      });
+    });
+  }
 }
 
 export function applyMoveToCluster(
@@ -72,6 +89,23 @@ export function applyMoveToCluster(
 										node doesn't exist`);
   }
   node.group = group;
+
+  // if the cluster was split, update the groups of all involved nodes
+  if (this.temporarySplitClusters.length > 0) {
+    this.temporarySplitClusters.forEach((cluster) => {
+      cluster.subgraph.nodes.forEach((node) => {
+        const logicalNode = this.logicalGraph.nodes.find(
+          (lNode) => lNode.id == node.id
+        );
+        if (logicalNode === undefined) {
+          throw new Error(
+            `Tried to move out node with id ${nodeID}, but the node doesn't exist`
+          );
+        }
+        logicalNode.group = cluster.id;
+      });
+    });
+  }
 }
 
 export function applyJoinClusters(

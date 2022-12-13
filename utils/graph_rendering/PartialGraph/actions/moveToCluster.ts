@@ -128,6 +128,12 @@ export function commitMoveToCluster(this: PartialGraph) {
     );
   }
   this.makeOpaque();
-  this.updateClusterNode(this.dragEvent.originClusterNode);
+
+  if (this.temporarySplitClusters.length > 0) {
+    this.temporarySplitClusters = [];
+  } else {
+    this.updateClusterNode(this.dragEvent.originClusterNode);
+  }
+
   this.updateClusterNode(this.dragEvent.clusterNode);
 }

@@ -134,7 +134,12 @@ export function commitMoveOut(this: PartialGraph) {
     );
   }
   this.makeOpaque();
-  this.updateClusterNode(this.dragEvent.originClusterNode);
+
+  if (this.temporarySplitClusters.length > 0) {
+    this.temporarySplitClusters = [];
+  } else {
+    this.updateClusterNode(this.dragEvent.originClusterNode);
+  }
 
   // reset temporary cluster
   this.temporaryCluster = null;

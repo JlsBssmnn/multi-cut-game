@@ -99,7 +99,7 @@ export function unvisualizeMoveToCluster(
     group: originClusterNode.id,
   };
   originClusterNode.subgraph.nodes.push(newNode);
-  this.restoreOriginClusterNode();
+  this.restoreOriginClusterNode(newNode);
 
   // reset cluster size
   this.changeClusterSize(formerCluster);

@@ -1,4 +1,4 @@
-import { PartialClusterNode } from "../../../../types/graph";
+import { Node, PartialClusterNode } from "../../../../types/graph";
 import { clusterDiameter, clusterOffset } from "../../../calculations/geometry";
 import { connectedComponents } from "../../../calculations/graphCalculations";
 import { NodeDragEvent } from "../../DragEvent";
@@ -114,9 +114,10 @@ export function splitCluster(
 /**
  * Removes all temporary split cluster nodes and merges their content
  * back to the origin cluster node. It also lays out the content of that
- * cluster again.
+ * cluster again. The given node is the node which was moved back into
+ * the origin cluster.
  */
-export function restoreOriginClusterNode(this: PartialGraph) {
+export function restoreOriginClusterNode(this: PartialGraph, node: Node) {
   if (!this.dragEvent) {
     throw new Error("Cannot restore origin cluster node if drag event is null");
   }
@@ -132,7 +133,7 @@ export function restoreOriginClusterNode(this: PartialGraph) {
         1
       );
     });
-    // remove the edges involing any split cluster
+    // remove the edges involving any split cluster
     this.edges = this.edges.filter(
       (edge) =>
         !this.temporarySplitClusters.includes(edge.source) &&
@@ -140,15 +141,24 @@ export function restoreOriginClusterNode(this: PartialGraph) {
     );
 
     this.nodes.push(clusterNode);
+    this.updateClusterNode(clusterNode);
+  } else {
+    clusterNode.subgraph.edges.push(
+      ...this.computeSubgraphEdges(node, clusterNode, false)
+    );
   }
-
-  this.updateClusterNode(clusterNode);
 
   if (this.dragEvent instanceof NodeDragEvent) {
     const dragEventNode = this.dragEvent.node;
-    this.dragEvent.node = clusterNode.subgraph.nodes.find(
+    const newNode = clusterNode.subgraph.nodes.find(
       (node) => node.id === dragEventNode.id
-    )!;
+    );
+    if (!newNode) {
+      throw new Error(
+        "Dragged node was lost during restoration of origin cluster node"
+      );
+    }
+    this.dragEvent.node = newNode;
   }
 
   this.temporarySplitClusters = [];

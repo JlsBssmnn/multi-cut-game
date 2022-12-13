@@ -104,7 +104,7 @@ export function unvisualizeMoveOut(this: PartialGraph, pointerPosition: Point) {
     group: originClusterNode.id,
   };
   originClusterNode.subgraph.nodes.push(newNode);
-  this.restoreOriginClusterNode();
+  this.restoreOriginClusterNode(newNode);
 
   // update the cluster edges of the origin cluster
   this.updateClusterEdges([originClusterNode], false);

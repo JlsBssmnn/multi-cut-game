@@ -77,7 +77,7 @@ export function getAbsoluteNodePosition(this: PartialGraph, node: Node): Point {
   );
   if (!clusterNode) {
     throw new Error(
-      `cluster node with id ${node.id} doesn't exist, but node with` +
+      `cluster node with id ${node.group} doesn't exist, but node with` +
         ` id ${node.id} belongs to it`
     );
   }

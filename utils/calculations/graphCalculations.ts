@@ -1,5 +1,5 @@
 import { LogicalGraph, LogicalNode } from "../../types/graph";
-import { Solution } from "../server_utils/findBestMulticut";
+import { MulticutDecisions, Solution } from "../server_utils/findBestMulticut";
 
 /**
  * Computes the total cost for the clustering of the given
@@ -110,4 +110,28 @@ export function connectedComponents(graph: LogicalGraph): LogicalNode[][] {
   });
 
   return components;
+}
+
+/**
+ * Takes a logical graph and outputs the decisions made for every edge, that is
+ * whether the edge is cut (1) or not cut (0).
+ */
+export function getDecisionsFromGraph(graph: LogicalGraph): MulticutDecisions {
+  const nodeToGroup = new Map<number, number>();
+  graph.nodes.forEach((node) => nodeToGroup.set(node.id, node.group));
+
+  const decisions: MulticutDecisions = {};
+
+  graph.edges.forEach((edge) => {
+    let { source, target } = edge;
+    if (source > target) {
+      [source, target] = [target, source];
+    }
+    const decision = Number(
+      nodeToGroup.get(source) !== nodeToGroup.get(target)
+    );
+    decisions[`${source}-${target}`] = decision;
+  });
+
+  return decisions;
 }

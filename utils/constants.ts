@@ -18,3 +18,5 @@ export const graphMargin = 40;
 
 // how much percent of the nodeSize is gonna be the distance between the nodes
 export const gridLayoutSpacing = 1;
+
+export const hintDuration = 3000;

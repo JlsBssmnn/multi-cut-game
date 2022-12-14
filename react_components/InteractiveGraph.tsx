@@ -4,6 +4,7 @@ import {
   Dispatch,
   PointerEvent,
   SetStateAction,
+  useContext,
   useEffect,
   useReducer,
   useRef,
@@ -17,6 +18,8 @@ import GraphVisualization from "./GraphVisualization";
 import { Point } from "../types/geometry";
 import createPartialGraph from "../utils/graph_rendering/PartialGraph/createPartialGraph";
 import { Layout } from "../utils/graph_layout/LayoutAlgorithms";
+import { highlightedEdgeContext } from "./LevelFrame";
+import { hintDuration } from "../utils/constants";
 
 export interface InteractiveGraphProps {
   width: number;
@@ -54,6 +57,9 @@ type UpdateActions =
 
 let partialGraph: PartialGraph | undefined;
 
+let hintTimeout: NodeJS.Timeout;
+let lastHint: string;
+
 /**
  * This component displays the given graph and enables interaction with it.
  * This mean that nodes can be dragged via the pointer and thus nodes can
@@ -80,6 +86,21 @@ export default function InteractiveGraph({
     );
     layout.clusterLayout(partialGraph);
   }, []);
+
+  const context = useContext(highlightedEdgeContext);
+  let highlightedEdge;
+  if (context && context.highlightedEdge !== "") {
+    highlightedEdge = context.highlightedEdge;
+
+    if (highlightedEdge !== lastHint) {
+      clearTimeout(hintTimeout);
+      hintTimeout = setTimeout(() => {
+        context.setHighlightedEdge("");
+        lastHint = "";
+      }, hintDuration);
+    }
+    lastHint = highlightedEdge;
+  }
 
   // This state is just used to trigger a rerender
   // @ts-ignore
@@ -209,6 +230,7 @@ export default function InteractiveGraph({
         width={width}
         height={height}
         draggedClusterID={partialGraph.dragEvent?.clusterNode.id}
+        highlightedEdge={highlightedEdge}
       />
       {!validAction && (
         <div

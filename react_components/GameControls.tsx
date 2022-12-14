@@ -15,6 +15,7 @@ import GameSuccess from "./GameTools/GameSuccess";
 import GameToolWrapper from "./GameTools/GameToolWrapper";
 import OptimalCost from "./GameTools/OptimalCost";
 import OptimalMulticut from "./GameTools/OptimalMulticut";
+import ShowHint from "./GameTools/ShowHint";
 
 export interface StatsProps {
   graph: LogicalGraph;
@@ -42,6 +43,7 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
           <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
         </div>
         <OptimalCost optimalSolution={solution} />
+        <ShowHint graph={graph} optimalSolution={solution} />
         <OptimalMulticut
           optimalMulticut={optimalMulticut}
           theme={theme}

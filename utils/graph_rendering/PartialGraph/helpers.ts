@@ -1,6 +1,7 @@
 import { Point } from "../../../types/geometry";
 import {
   Edge,
+  GeneralEdge,
   Node,
   PartialClusterNode,
   PartialSubgraph,
@@ -430,4 +431,42 @@ export function scaleWholeGraph(
       node.y += offset;
     });
   });
+}
+
+/**
+ * Returns the edge that corresponds to the given hint (the edge which connctets
+ * the 2 nodes in the string).
+ */
+export function getHintedEdge(
+  this: PartialGraph,
+  hint: string
+): GeneralEdge | null {
+  const source = this.getNode(parseInt(hint.substring(0, hint.indexOf("-"))));
+  const target = this.getNode(parseInt(hint.substring(hint.indexOf("-") + 1)));
+
+  if (source.group === target.group) {
+    const cluster = this.getClusterNode(source.group);
+    for (let edge of cluster.subgraph.edges) {
+      if (
+        (edge.source === source && edge.target === target) ||
+        (edge.source === target && edge.target === source)
+      ) {
+        return edge;
+      }
+    }
+  } else {
+    const sourceCluster = this.getClusterNode(source.group);
+    const targetCluster = this.getClusterNode(target.group);
+
+    for (let edge of this.edges) {
+      if (
+        (edge.source === sourceCluster && edge.target === targetCluster) ||
+        (edge.source === targetCluster && edge.target === sourceCluster)
+      ) {
+        return edge;
+      }
+    }
+  }
+
+  return null;
 }

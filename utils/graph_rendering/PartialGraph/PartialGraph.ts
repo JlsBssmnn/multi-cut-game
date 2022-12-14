@@ -47,6 +47,7 @@ import {
   scaleGraphRelative,
   copyState,
   scaleWholeGraph,
+  getHintedEdge,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
@@ -154,6 +155,7 @@ export default class PartialGraph {
   scaleGraphRelative = scaleGraphRelative;
   copyState = copyState;
   scaleWholeGraph = scaleWholeGraph;
+  getHintedEdge = getHintedEdge;
 
   splitCluster = splitCluster;
   restoreOriginClusterNode = restoreOriginClusterNode;

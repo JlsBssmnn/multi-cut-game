@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createContext, Dispatch, useState } from "react";
 import { LogicalGraph } from "../types/graph";
 import styles from "../styles/Game.module.scss";
 import gameToolStyles from "../styles/GameTools.module.scss";
@@ -23,10 +23,18 @@ export interface LevelFrameProps {
   layout: Layout;
 }
 
+interface HighlightedEdgeContextState {
+  highlightedEdge: string;
+  setHighlightedEdge: Dispatch<any>;
+}
+export const highlightedEdgeContext =
+  createContext<HighlightedEdgeContextState | null>(null);
+
 export default function LevelFrame(props: LevelFrameProps) {
   const [graph, setGraph] = useState<LogicalGraph>(
     structuredClone(props.graph)
   );
+  const [highlightedEdge, setHighlightedEdge] = useState<string>("");
 
   const [width, height] = useWindowSize();
   const userDevice = getUserDevice(width, height);
@@ -50,25 +58,29 @@ export default function LevelFrame(props: LevelFrameProps) {
   const graphWidth = width - gameToolWidth - 2 * margin - gap;
 
   return (
-    <div className={styles.container}>
-      <GameControls
-        graph={graph}
-        theme={graphTheme}
-        solution={props.solution}
-        layout={props.layout}
-      />
-      <Paper elevation={10}>
-        <InteractiveGraph
-          width={graphWidth}
-          height={graphHeight}
-          margin={graphMargin}
-          nodeSize={nodeSize}
-          logicalGraph={graph}
-          graphTheme={graphTheme}
-          emitGraphChange={setGraph}
+    <highlightedEdgeContext.Provider
+      value={{ highlightedEdge, setHighlightedEdge }}
+    >
+      <div className={styles.container}>
+        <GameControls
+          graph={graph}
+          theme={graphTheme}
+          solution={props.solution}
           layout={props.layout}
         />
-      </Paper>
-    </div>
+        <Paper elevation={10}>
+          <InteractiveGraph
+            width={graphWidth}
+            height={graphHeight}
+            margin={graphMargin}
+            nodeSize={nodeSize}
+            logicalGraph={graph}
+            graphTheme={graphTheme}
+            emitGraphChange={setGraph}
+            layout={props.layout}
+          />
+        </Paper>
+      </div>
+    </highlightedEdgeContext.Provider>
   );
 }

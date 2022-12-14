@@ -1,11 +1,13 @@
 import { LogicalEdge } from "../../types/graph";
 import GLPK, { GLPK as GLPKType, LP } from "glpk.js";
 
+export interface MulticutDecisions {
+  [key: string]: number;
+}
+
 export interface Solution {
   cost: number;
-  decisions: {
-    [key: string]: number;
-  };
+  decisions: MulticutDecisions;
 }
 
 /**

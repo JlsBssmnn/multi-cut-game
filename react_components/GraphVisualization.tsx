@@ -1,12 +1,14 @@
 import { GeneralEdge, PartialSubgraph } from "../types/graph";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
 import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
+import styles from "../styles/Graph.module.scss";
 
 export interface GraphProps {
   graph: PartialGraph;
   width: number;
   height: number;
   draggedClusterID?: number;
+  highlightedEdge?: string;
 }
 
 function getEdgeColor(edge: GeneralEdge, theme: PartialGraphTheme): string {
@@ -41,9 +43,15 @@ export default function GraphVisualization({
   width,
   height,
   draggedClusterID,
+  highlightedEdge,
 }: GraphProps) {
   const { nodes, edges } = graph;
   const edgeThickness = graph.theme.edgeThickness;
+
+  let hintEdge: GeneralEdge | null;
+  if (highlightedEdge) {
+    hintEdge = graph.getHintedEdge(highlightedEdge);
+  }
 
   return (
     <svg width={width} height={height}>
@@ -58,6 +66,7 @@ export default function GraphVisualization({
           strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
           opacity={edge.opacity}
           style={{ zIndex: 1 }}
+          className={edge === hintEdge ? styles.blinkingEdge : ""}
         ></line>
       ))}
       {nodes.map((node) => (
@@ -78,6 +87,7 @@ export default function GraphVisualization({
               graph={node.subgraph}
               edgeThickness={edgeThickness}
               theme={graph.theme}
+              hintEdge={hintEdge}
             />
           </g>
         </g>
@@ -93,12 +103,14 @@ interface SubgraphVisualizationProps {
   graph: PartialSubgraph;
   theme: PartialGraphTheme;
   edgeThickness: number;
+  hintEdge: GeneralEdge | null;
 }
 
 function SubgraphVisualization({
   graph,
   theme,
   edgeThickness,
+  hintEdge,
 }: SubgraphVisualizationProps) {
   const { nodes, edges } = graph;
 
@@ -115,6 +127,7 @@ function SubgraphVisualization({
           stroke={getEdgeColor(edge, theme)}
           strokeWidth={computeEdgeThickness(edgeThickness, edge.value)}
           opacity={edge.opacity}
+          className={edge === hintEdge ? styles.blinkingEdge : ""}
         ></line>
       ))}
       {nodes.map((node) => (

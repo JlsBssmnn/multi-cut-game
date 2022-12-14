@@ -36,7 +36,7 @@ export default function ShowHint({ graph, optimalSolution }: ShowHintProps) {
 
   return (
     <Button
-      className={styles.optimalCost}
+      className={styles.gameToolButton}
       variant="contained"
       sx={{ fontSize: "1.1rem" }}
       onClick={sendHint}

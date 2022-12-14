@@ -23,16 +23,12 @@ export default function OptimalCost({ optimalSolution }: OptimalCostProps) {
   }
 
   if (optimalSolution == null) {
-    var element = (
-      <div className={styles.buttons}>
-        <LoadingSpinner message="Computing optimal solution" />
-      </div>
-    );
+    var element = <LoadingSpinner message="Computing optimal solution" />;
   } else {
     if (showOptimalCost) {
       var element = (
         <Button
-          className={styles.optimalCost}
+          className={styles.gameToolButton}
           variant="outlined"
           sx={{
             fontSize: "1.1rem",
@@ -45,7 +41,7 @@ export default function OptimalCost({ optimalSolution }: OptimalCostProps) {
     } else {
       var element = (
         <Button
-          className={styles.optimalCost}
+          className={styles.gameToolButton}
           variant="contained"
           sx={{
             fontSize: "1.1rem",

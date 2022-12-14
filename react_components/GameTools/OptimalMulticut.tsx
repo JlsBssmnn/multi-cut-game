@@ -49,11 +49,7 @@ export default function OptimalMulticut({
   }
 
   if (optimalMulticut == null) {
-    return (
-      <div className={styles.buttons}>
-        <LoadingSpinner message="Computing optimal solution" />
-      </div>
-    );
+    return <LoadingSpinner message="Computing optimal solution" />;
   }
 
   const userDevice = getUserDevice(width, height);
@@ -67,11 +63,11 @@ export default function OptimalMulticut({
   }
 
   return (
-    <div>
+    <>
       <Button
         variant="contained"
         onClick={() => setShowOptimalMulticut(true)}
-        className={styles.optimalMulticut}
+        className={styles.gameToolButton}
         sx={{
           fontSize: "1.1rem",
         }}
@@ -108,6 +104,6 @@ export default function OptimalMulticut({
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

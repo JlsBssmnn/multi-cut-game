@@ -75,7 +75,7 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
     props.setLayout(
       generatorAlgorithm === "grid"
         ? LayoutAlgorithms.grid
-        : LayoutAlgorithms.forceLayout
+        : LayoutAlgorithms.force
     );
 
     switch (generatorAlgorithm) {
@@ -114,7 +114,12 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
     }
     var dataStr =
       "data:text/json;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(props.graph));
+      encodeURIComponent(
+        JSON.stringify({
+          graph: props.graph,
+          layout: generatorAlgorithm === "grid" ? "grid" : "force",
+        })
+      );
     downloadElement.current.setAttribute("href", dataStr);
     downloadElement.current.setAttribute("download", "level.json");
     downloadElement.current.click();

@@ -26,7 +26,7 @@ export type ScaleSubgraph = (
   margin: number
 ) => void;
 
-export type LayoutAlgorithmName = "forceLayout" | "grid";
+export type LayoutAlgorithmName = "force" | "grid";
 
 export type Layout = {
   clusterLayout: ClusterLayoutAlgorithm;
@@ -40,7 +40,7 @@ type LayoutAlgorithmsType = {
 };
 
 export const LayoutAlgorithms: LayoutAlgorithmsType = {
-  forceLayout: {
+  force: {
     clusterLayout: forceClusterLayout,
     subgraphLayout: forceSubgraphLayout,
     computeSubgraphSize: getSubgraphSize,

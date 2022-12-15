@@ -12,7 +12,7 @@ export default function LevelGenerator() {
     nodes: [],
     edges: [],
   });
-  const [layout, setLayout] = useState<Layout>(LayoutAlgorithms.forceLayout);
+  const [layout, setLayout] = useState<Layout>(LayoutAlgorithms.force);
   const [solution, setSolution] = useState<Solution | undefined>();
 
   return (

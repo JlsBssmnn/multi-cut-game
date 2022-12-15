@@ -11,6 +11,7 @@ import {
   ListSubheader,
 } from "@mui/material";
 import EngineeringIcon from "@mui/icons-material/Engineering";
+import InputIcon from "@mui/icons-material/Input";
 import Link from "next/link";
 
 const levelCount = 6;
@@ -69,6 +70,19 @@ export default function Sidebar({ drawerOpen, setDrawerOpen }: SidebarProps) {
                 </ListItemIcon>
                 <ListItemText
                   primary={"Level Generation"}
+                  primaryTypographyProps={{ fontSize: "1.2rem" }}
+                />
+              </ListItemButton>
+            </Link>
+          </ListItem>
+          <ListItem disablePadding>
+            <Link href={`/levelImport`}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <InputIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Level Import"}
                   primaryTypographyProps={{ fontSize: "1.2rem" }}
                 />
               </ListItemButton>

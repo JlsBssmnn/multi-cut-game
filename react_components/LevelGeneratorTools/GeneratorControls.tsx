@@ -108,7 +108,7 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
     props.setSolution(undefined);
   }
 
-  function downloadCurrentGraph() {
+  function downloadLevel() {
     if (!downloadElement.current) {
       return;
     }
@@ -118,6 +118,7 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
         JSON.stringify({
           graph: props.graph,
           layout: generatorAlgorithm === "grid" ? "grid" : "force",
+          ...(props.solution && { solution: props.solution }),
         })
       );
     downloadElement.current.setAttribute("href", dataStr);
@@ -134,18 +135,6 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
     const solution = await response.json();
     props.setSolution(solution);
     setComputingSolution(false);
-  }
-
-  function downloadSolution() {
-    if (!downloadElement.current || !props.solution) {
-      return;
-    }
-    var dataStr =
-      "data:text/json;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(props.solution));
-    downloadElement.current.setAttribute("href", dataStr);
-    downloadElement.current.setAttribute("download", "solution.json");
-    downloadElement.current.click();
   }
 
   function resetGraph() {
@@ -247,7 +236,7 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
         <Button
           variant="contained"
           startIcon={<DownloadIcon />}
-          onClick={downloadCurrentGraph}
+          onClick={downloadLevel}
         >
           Download Level
         </Button>
@@ -268,20 +257,8 @@ export default function GeneratorControls(props: GeneratorControlsProps) {
         </Button>
         <Button
           variant="contained"
-          startIcon={<DownloadIcon />}
-          disabled={!props.solution}
-          onClick={downloadSolution}
-        >
-          Download Solution
-        </Button>
-      </Box>
-      <Box margin="auto" gap="5px" padding="0 10px 10px 10px">
-        <Button
-          variant="contained"
           color="error"
           startIcon={<RestartAltIcon />}
-          sx={{ width: "100%" }}
-          style={{ width: "100%" }}
           onClick={resetGraph}
         >
           Reset graph

@@ -2,7 +2,7 @@ import Ajv from "ajv";
 
 const ajv = new Ajv();
 
-const graphAndLayout = {
+const levelSchema = {
   type: "object",
   properties: {
     graph: {
@@ -35,24 +35,22 @@ const graphAndLayout = {
       required: ["nodes", "edges"],
     },
     layout: { type: "string", enum: ["grid", "force"] },
+    solution: {
+      type: "object",
+      properties: {
+        cost: { type: "number" },
+        decisions: {
+          type: "object",
+          patternProperties: {
+            "^[0-9]+-[0-9]+$": { type: "integer" },
+          },
+          additionalProperties: false,
+        },
+      },
+      required: ["cost", "decisions"],
+    },
   },
   required: ["graph", "layout"],
 };
 
-const solution = {
-  type: "object",
-  properties: {
-    cost: { type: "number" },
-    decisions: {
-      type: "object",
-      patternProperties: {
-        "^[0-9]+-[0-9]+$": { type: "integer" },
-      },
-      additionalProperties: false,
-    },
-  },
-  required: ["cost", "decisions"],
-};
-
-export const validateGraphAndLayout = ajv.compile(graphAndLayout);
-export const validateSolution = ajv.compile(solution);
+export const validateLevel = ajv.compile(levelSchema);

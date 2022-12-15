@@ -1,4 +1,4 @@
-import { createContext, Dispatch, useState } from "react";
+import { createContext, Dispatch, useEffect, useState } from "react";
 import { LogicalGraph } from "../types/graph";
 import styles from "../styles/Game.module.scss";
 import gameToolStyles from "../styles/GameTools.module.scss";
@@ -11,7 +11,7 @@ import {
 } from "../utils/constants";
 import { Paper } from "@mui/material";
 import GameControls from "./GameControls";
-import InteractiveGraph from "./InteractiveGraph";
+import InteractiveGraphV2 from "./InteractiveGraphV2";
 import { useWindowSize } from "../utils/customHooks";
 import { getUserDevice } from "../utils/cssUtils";
 import { Solution } from "../utils/server_utils/findBestMulticut";
@@ -34,12 +34,18 @@ export default function LevelFrame(props: LevelFrameProps) {
   const [graph, setGraph] = useState<LogicalGraph>(
     structuredClone(props.graph)
   );
+  const [graphKey, setGraphKey] = useState<number>(0);
   const [highlightedEdge, setHighlightedEdge] = useState<string>("");
 
   const [width, height] = useWindowSize();
   const userDevice = getUserDevice(width, height);
   const margin = parseInt(styles.topMargin);
   const gap = parseInt(styles.flexGap);
+
+  useEffect(() => {
+    setGraph(structuredClone(props.graph));
+    setGraphKey((key) => ++key % 100);
+  }, [props.graph]);
 
   // The height of the game tools which is relevant for the height of the
   // interactive graph (which depends on the current screen size)
@@ -69,7 +75,8 @@ export default function LevelFrame(props: LevelFrameProps) {
           layout={props.layout}
         />
         <Paper elevation={10}>
-          <InteractiveGraph
+          <InteractiveGraphV2
+            key={graphKey}
             width={graphWidth}
             height={graphHeight}
             margin={graphMargin}

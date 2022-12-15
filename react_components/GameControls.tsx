@@ -20,7 +20,7 @@ import ShowHint from "./GameTools/ShowHint";
 export interface StatsProps {
   graph: LogicalGraph;
   theme: PartialGraphTheme;
-  solution: Solution;
+  solution: Solution | null;
   layout: Layout;
 }
 
@@ -28,7 +28,9 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
   { graph, theme, solution, layout },
   ref
 ) {
-  const optimalMulticut = getGraphFromSolution(graph, solution);
+  const optimalMulticut = solution
+    ? getGraphFromSolution(graph, solution)
+    : null;
 
   const [width, height] = useWindowSize();
   const userDevice = getUserDevice(width, height);

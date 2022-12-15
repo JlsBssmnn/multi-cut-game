@@ -19,7 +19,7 @@ import { Layout } from "../utils/graph_layout/LayoutAlgorithms";
 
 export interface LevelFrameProps {
   graph: LogicalGraph;
-  solution: Solution;
+  solution: Solution | null;
   layout: Layout;
 }
 

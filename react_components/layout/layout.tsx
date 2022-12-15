@@ -13,10 +13,12 @@ export interface LayoutProps {
 export default function Layout({ children, title }: LayoutProps) {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
-  const match = title.match(/\d/);
-  if (match && match.index !== undefined) {
-    title = title.slice(0, match.index) + " " + title.slice(match.index);
-  }
+  const matches = title.matchAll(/(\d|[A-Z])/g);
+  Array.from(matches).forEach((match) => {
+    if (match.index !== undefined && match.index !== 0) {
+      title = title.slice(0, match.index) + " " + title.slice(match.index);
+    }
+  });
 
   return (
     <>

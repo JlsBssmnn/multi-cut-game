@@ -1,0 +1,74 @@
+$flexGap: 10px;
+$margin: 10px;
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $flexGap;
+  margin: $margin;
+}
+
+$generatorControlsWidth: 450px;
+
+.generatorControls {
+  width: $generatorControlsWidth;
+}
+
+.heading {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.controlContainer {
+  display: grid;
+  grid-template-columns: 5fr 2fr 4fr;
+  align-items: center;
+  padding: 10px;
+  column-gap: 10px;
+}
+
+.control {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+$containerMobileHeight: 62.78125px;
+
+.gameActionsContainer {
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+
+  display: flex;
+  padding: 10px;
+  width: 100%;
+  flex-direction: row;
+  font-size: 1.7rem;
+  gap: 30px;
+  height: $containerMobileHeight;
+}
+
+.previewFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $flexGap;
+}
+
+.largerFont {
+  font-size: 1.3rem;
+}
+
+:export {
+  margin: $margin;
+  flexGap: $flexGap;
+  generatorControlsWidth: $generatorControlsWidth;
+}

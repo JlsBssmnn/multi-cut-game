@@ -46,12 +46,9 @@ $containerMobileHeight: 62.78125px;
   justify-content: center;
   padding: 10px;
 
-  display: flex;
-  padding: 10px;
-  width: 100%;
-  flex-direction: row;
-  font-size: 1.7rem;
-  gap: 30px;
+  display: block;
+  overflow-x: auto;
+  padding: 0;
   height: $containerMobileHeight;
 }
 

@@ -19,6 +19,8 @@ export interface PreviewGameControlsProps {
   theme: PartialGraphTheme;
   solution?: Solution;
   layout: Layout;
+  width: number;
+  height: number;
 }
 
 export default function PreviewGameControls({
@@ -26,27 +28,35 @@ export default function PreviewGameControls({
   theme,
   solution,
   layout,
+  width,
+  height,
 }: PreviewGameControlsProps) {
   const cost = getGraphScore(graph);
 
   return (
-    <Paper elevation={10} className={styles.gameActionsContainer}>
-      <div className={gameToolStyles.currentCost}>
-        Current cost:{" "}
-        <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
+    <Paper
+      elevation={10}
+      className={styles.gameActionsContainer}
+      sx={{ width, height }}
+    >
+      <div className={gameToolStyles.wrapper} style={{ fontSize: "1.5rem" }}>
+        <div className={gameToolStyles.currentCost}>
+          Current cost:{" "}
+          <span style={{ color: cost > 0 ? "red" : "green" }}>{cost}</span>
+        </div>
+        {solution && (
+          <>
+            <OptimalCost optimalSolution={solution} />
+            <ShowHint graph={graph} optimalSolution={solution} />
+            <OptimalMulticut
+              optimalMulticut={getGraphFromSolution(graph, solution)}
+              theme={theme}
+              layout={layout}
+            />
+            <GameSuccess currentCost={cost} optimalSolution={solution} />
+          </>
+        )}
       </div>
-      {solution && (
-        <>
-          <OptimalCost optimalSolution={solution} />
-          <ShowHint graph={graph} optimalSolution={solution} />
-          <OptimalMulticut
-            optimalMulticut={getGraphFromSolution(graph, solution)}
-            theme={theme}
-            layout={layout}
-          />
-          <GameSuccess currentCost={cost} optimalSolution={solution} />
-        </>
-      )}
     </Paper>
   );
 }

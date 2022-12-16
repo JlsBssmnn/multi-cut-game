@@ -56,6 +56,8 @@ export default function LevelPreviewFrame(props: LevelPreviewFrameProps) {
           theme={graphTheme}
           solution={props.solution}
           layout={props.layout}
+          width={graphWidth}
+          height={graphHeight}
         />
         <Paper elevation={10} sx={{ width: graphWidth, height: graphHeight }}>
           {props.graph.nodes.length > 0 && (

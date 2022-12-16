@@ -199,6 +199,14 @@ export default function InteractiveGraph({
     emitGraphChange({ ...partialGraph!.logicalGraph });
   }
 
+  function pointerOut(e: PointerEvent<HTMLDivElement>) {
+    // undo last action if event comes from mouse, on mobile
+    // this event is also triggered on pointer up
+    if (e.pointerType === "mouse" && e.buttons === 1) {
+      undoLastAction();
+    }
+  }
+
   function undoLastAction() {
     partialGraph?.undoAction();
     dispatch({ type: "update" });
@@ -223,6 +231,7 @@ export default function InteractiveGraph({
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
+      onPointerOut={pointerOut}
     >
       <GraphVisualization
         graph={partialGraph}

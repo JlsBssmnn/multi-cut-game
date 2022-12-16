@@ -28,21 +28,22 @@ export function scaleLayout(
   }
 
   // find the minimum and maximum for the x and y coordinates among the nodes
-  let minX: number, minY: number, maxX: number, maxY: number;
-  (minX = minY = Infinity), (maxX = maxY = -Infinity);
+  let minX: number, minY: number, maxX: number, maxY: number, minSize: number;
+  (minX = minY = minSize = Infinity), (maxX = maxY = -Infinity);
   for (let node of nodes) {
     if (node.x < minX) minX = node.x;
     if (node.x > maxX) maxX = node.x;
     if (node.y < minY) minY = node.y;
     if (node.y > maxY) maxY = node.y;
+    if (node.size < minSize) minSize = node.size;
   }
   maxX -= minX;
   maxY -= minY;
 
   // scale the nodes positions, s.t. they fill the given width and height
   nodes.forEach((node) => {
-    node.x = (width - node.size) * ((node.x - minX) / maxX) + margin;
-    node.y = (height - node.size) * ((node.y - minY) / maxY) + margin;
+    node.x = (width - minSize) * ((node.x - minX) / maxX) + margin;
+    node.y = (height - minSize) * ((node.y - minY) / maxY) + margin;
 
     if (Number.isNaN(node.x)) {
       node.x = margin;

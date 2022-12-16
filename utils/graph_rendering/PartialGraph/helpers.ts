@@ -7,11 +7,7 @@ import {
   PartialSubgraph,
 } from "../../../types/graph";
 import { clusterDiameter, clusterOffset } from "../../calculations/geometry";
-import {
-  GraphDimensions,
-  scaleLayout,
-  scaleRelative,
-} from "../../graph_layout/scaleGraph";
+import { GraphDimensions, scaleLayout } from "../../graph_layout/scaleGraph";
 import { getSubgraph } from "./createPartialGraph";
 import PartialGraph, { GraphState } from "./PartialGraph";
 
@@ -366,12 +362,12 @@ export function undoAction(this: PartialGraph) {
  */
 export function scaleGraphRelative(
   this: PartialGraph,
-  previousLayout: GraphDimensions,
-  newLayout: GraphDimensions
+  newLayout: GraphDimensions,
+  margin: number
 ) {
-  scaleRelative(this.nodes, previousLayout, newLayout);
+  scaleLayout(this.nodes, newLayout.width, newLayout.height, margin);
   this.lastStates.forEach((state) =>
-    scaleRelative(state.nodes, previousLayout, newLayout)
+    scaleLayout(state.nodes, newLayout.width, newLayout.height, margin)
   );
   this.nodeSize = newLayout.nodeSize;
 }

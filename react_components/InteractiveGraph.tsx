@@ -50,7 +50,6 @@ type UpdateActions =
   | {
       type: "scaleGraphRelative";
       payload: {
-        previousDimensions: GraphDimensions;
         newDimensions: GraphDimensions;
       };
     };
@@ -121,14 +120,16 @@ export default function InteractiveGraph({
       case "undoAction":
         partialGraph.undoAction();
         break;
-      case "scaleGraph":
+      case "scaleGraph": {
         const { width, height, margin } = action.payload;
         partialGraph.scaleWholeGraph(width, height, margin);
         break;
-      case "scaleGraphRelative":
-        const { previousDimensions, newDimensions } = action.payload;
-        partialGraph.scaleGraphRelative(previousDimensions, newDimensions);
+      }
+      case "scaleGraphRelative": {
+        const { newDimensions } = action.payload;
+        partialGraph.scaleGraphRelative(newDimensions, margin);
         break;
+      }
       case "update":
         break;
       default:
@@ -136,7 +137,7 @@ export default function InteractiveGraph({
     }
     return !state;
   }
-  const previousDimensions = useRef<GraphDimensions | null>(null);
+  const graphScaled = useRef<boolean>(false);
 
   useEffect(() => {
     // as the page renders width and height will have weird
@@ -149,8 +150,8 @@ export default function InteractiveGraph({
       height,
       nodeSize,
     };
-    if (previousDimensions.current == null) {
-      previousDimensions.current = newDimensions;
+    if (!graphScaled.current) {
+      graphScaled.current = true;
       dispatch({
         type: "scaleGraph",
         payload: { width, height, nodeSize, margin },
@@ -159,11 +160,9 @@ export default function InteractiveGraph({
       dispatch({
         type: "scaleGraphRelative",
         payload: {
-          previousDimensions: previousDimensions.current,
           newDimensions,
         },
       });
-      previousDimensions.current = newDimensions;
     }
   }, [width, height, nodeSize]);
 

@@ -13,7 +13,7 @@ import {
 import InputIcon from "@mui/icons-material/Input";
 import CloseIcon from "@mui/icons-material/Close";
 import PublishIcon from "@mui/icons-material/Publish";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, DragEvent, SetStateAction, useRef, useState } from "react";
 import { Box } from "@mui/system";
 import { Level } from "../../graphs/fixedLevels/levelTypes";
 import { LayoutAlgorithms } from "../../utils/graph_layout/LayoutAlgorithms";
@@ -30,6 +30,15 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
   const [levelFile, setLevelFile] = useState<File>();
 
   const levelUploadInput = useRef<HTMLInputElement>(null);
+
+  function dropFile(e: DragEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    if (!levelUploadInput.current || e.dataTransfer.files.length < 1) {
+      return;
+    }
+    levelUploadInput.current.files = e.dataTransfer.files;
+    setLevelFile(e.dataTransfer.files[0]);
+  }
 
   function getResultAsString(result?: FileReader["result"]): string {
     if (!result || result instanceof ArrayBuffer) return "";
@@ -104,6 +113,11 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
               variant="contained"
               startIcon={<PublishIcon />}
               onClick={() => levelUploadInput.current?.click()}
+              onDrop={dropFile}
+              onDragOver={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
             >
               Import level
             </Button>

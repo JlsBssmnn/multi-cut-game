@@ -32,15 +32,13 @@ export default function randomGraph(
 
   const components = connectedComponents(graph);
   for (let i = 0; i < components.length - 1; i++) {
-    for (let j = i + 1; j < components.length; j++) {
-      const sourceComponent = components[i];
-      const sourceNode = sourceComponent[randomInt(0, sourceComponent.length)];
+    const sourceComponent = components[i];
+    const sourceNode = sourceComponent[randomInt(0, sourceComponent.length)];
 
-      const targetComponent = components[j];
-      const targetNode = targetComponent[randomInt(0, targetComponent.length)];
+    const targetComponent = components[i + 1];
+    const targetNode = targetComponent[randomInt(0, targetComponent.length)];
 
-      edges.push({ source: sourceNode.id, target: targetNode.id, value: 0 });
-    }
+    edges.push({ source: sourceNode.id, target: targetNode.id, value: 0 });
   }
   return graph;
 }

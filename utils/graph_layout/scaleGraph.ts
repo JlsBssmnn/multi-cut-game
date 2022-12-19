@@ -28,22 +28,25 @@ export function scaleLayout(
   }
 
   // find the minimum and maximum for the x and y coordinates among the nodes
-  let minX: number, minY: number, maxX: number, maxY: number, minSize: number;
-  (minX = minY = minSize = Infinity), (maxX = maxY = -Infinity);
+  let minX: number, minY: number, maxX: number, maxY: number;
+  (minX = minY = Infinity), (maxX = maxY = -Infinity);
   for (let node of nodes) {
     if (node.x < minX) minX = node.x;
-    if (node.x > maxX) maxX = node.x;
+    if (node.x + node.size > maxX) maxX = node.x + node.size;
     if (node.y < minY) minY = node.y;
-    if (node.y > maxY) maxY = node.y;
-    if (node.size < minSize) minSize = node.size;
+    if (node.y + node.size > maxY) maxY = node.y + node.size;
   }
-  maxX -= minX;
-  maxY -= minY;
+  // maxX -= minX;
+  // maxY -= minY;
+  const stretchX = maxX - minX;
+  const stretchY = maxY - minY;
 
   // scale the nodes positions, s.t. they fill the given width and height
   nodes.forEach((node) => {
-    node.x = (width - minSize) * ((node.x - minX) / maxX) + margin;
-    node.y = (height - minSize) * ((node.y - minY) / maxY) + margin;
+    const stretchRatioX = (node.x - minX) / (stretchX - node.size);
+    const stretchRatioY = (node.y - minY) / (stretchY - node.size);
+    node.x = (width - node.size) * stretchRatioX + margin;
+    node.y = (height - node.size) * stretchRatioY + margin;
 
     if (Number.isNaN(node.x)) {
       node.x = margin;

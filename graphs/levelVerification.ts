@@ -1,6 +1,15 @@
 import Ajv from "ajv";
+import { LogicalGraph } from "../types/graph";
+import { LayoutAlgorithmName } from "../utils/graph_layout/LayoutAlgorithms";
+import { Solution } from "../utils/server_utils/findBestMulticut";
 
 const ajv = new Ajv();
+
+export interface LevelFile {
+	graph: LogicalGraph;
+	layout: LayoutAlgorithmName;
+	solution?: Solution;
+}
 
 const levelSchema = {
   type: "object",

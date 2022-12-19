@@ -17,7 +17,8 @@ import { Dispatch, DragEvent, SetStateAction, useRef, useState } from "react";
 import { Box } from "@mui/system";
 import { Level } from "../../graphs/fixedLevels/levelTypes";
 import { LayoutAlgorithms } from "../../utils/graph_layout/LayoutAlgorithms";
-import { validateLevel } from "../../graphs/levelVerification";
+import { LevelFile, validateLevel } from "../../graphs/levelVerification";
+import { isCorrectSolution } from "../../utils/calculations/graphCalculations";
 
 interface ImportButtonProps {
   setLevel: Dispatch<SetStateAction<Level | undefined>>;
@@ -55,12 +56,30 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
     if (!levelFile) return;
     const reader = new FileReader();
     reader.readAsText(levelFile);
+
+    // file is read, to avoid conflicts by reading again it must be reset
+    levelUploadInput.current && (levelUploadInput.current.value = "");
+    setLevelFile(undefined);
+
     reader.onload = (e) => {
-      let importedLevel;
+      let importedLevel: LevelFile;
       try {
         importedLevel = JSON.parse(getResultAsString(e.target?.result));
       } catch {
         setSnackText("Provided file is not JSON!");
+        setSnackOpen(true);
+        return;
+      }
+
+      if (!validateLevel(importedLevel)) {
+        setSnackText("Input file has wrong format!");
+        setSnackOpen(true);
+        return;
+      } else if (
+        importedLevel.solution &&
+        !isCorrectSolution(importedLevel.graph, importedLevel.solution)
+      ) {
+        setSnackText("Solution is incorrect for the given graph!");
         setSnackOpen(true);
         return;
       }
@@ -76,13 +95,8 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
             importedLevel.layout as keyof typeof LayoutAlgorithms
           ],
       };
-      if (validateLevel(importedLevel)) {
-        setLevel(level);
-        setDialogOpen(false);
-      } else {
-        setSnackText("Input file has wrong format!");
-        setSnackOpen(true);
-      }
+      setLevel(level);
+      setDialogOpen(false);
     };
   }
 

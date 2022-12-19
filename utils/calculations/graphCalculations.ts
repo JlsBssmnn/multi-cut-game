@@ -135,3 +135,31 @@ export function getDecisionsFromGraph(graph: LogicalGraph): MulticutDecisions {
 
   return decisions;
 }
+
+/**
+	* Computes whether the given solution can be a solution for the given graph.
+	* It checks if all nodes in the solution are present and if they are actually
+	* connected by the graph.
+	*/
+export function isCorrectSolution(graph: LogicalGraph, solution: Solution): boolean {
+	if (solution.cost > 0) return false;
+
+	const edgeSet = new Set<string>(
+		graph.edges.map(edge => {
+			let {source, target} = edge;
+			if (source > target) {
+				[source, target] = [target, source];
+			}
+			return `${source}-${target}`;
+		})
+	);
+
+	return Object.keys(solution.decisions).every(decision => {
+		if (edgeSet.has(decision)) return true;
+
+		const source = decision.substring(0, decision.indexOf('-'));
+		const target = decision.substring(decision.indexOf('-') + 1);
+
+		return edgeSet.has(`${target}-${source}`);
+	})
+}

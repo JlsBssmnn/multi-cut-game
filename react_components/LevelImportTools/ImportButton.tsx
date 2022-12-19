@@ -25,6 +25,7 @@ interface ImportButtonProps {
 
 export default function ImportButton({ setLevel }: ImportButtonProps) {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [snackText, setSnackText] = useState<string>("");
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
 
   const [levelFile, setLevelFile] = useState<File>();
@@ -34,6 +35,10 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
   function dropFile(e: DragEvent<HTMLButtonElement>) {
     e.preventDefault();
     if (!levelUploadInput.current || e.dataTransfer.files.length < 1) {
+      return;
+    } else if (e.dataTransfer.files[0].type !== "application/json") {
+      setSnackText("You must upload a JSON file!");
+      setSnackOpen(true);
       return;
     }
     levelUploadInput.current.files = e.dataTransfer.files;
@@ -51,7 +56,14 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
     const reader = new FileReader();
     reader.readAsText(levelFile);
     reader.onload = (e) => {
-      const importedLevel = JSON.parse(getResultAsString(e.target?.result));
+      let importedLevel;
+      try {
+        importedLevel = JSON.parse(getResultAsString(e.target?.result));
+      } catch {
+        setSnackText("Provided file is not JSON!");
+        setSnackOpen(true);
+        return;
+      }
       const level = {
         graph: importedLevel.graph,
         solution: importedLevel.solution ?? {
@@ -68,6 +80,7 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
         setLevel(level);
         setDialogOpen(false);
       } else {
+        setSnackText("Input file has wrong format!");
         setSnackOpen(true);
       }
     };
@@ -145,7 +158,7 @@ export default function ImportButton({ setLevel }: ImportButtonProps) {
           severity="error"
           sx={{ width: "100%" }}
         >
-          Input files have a wrong format!
+          {snackText}
         </Alert>
       </Snackbar>
     </>

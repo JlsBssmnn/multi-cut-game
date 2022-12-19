@@ -46,6 +46,10 @@ export function forceSubgraphLayout(
     .forceSimulation<D3Node>(d3Nodes)
     .force("link", forceLink)
     .force(
+      "collision",
+      d3.forceCollide((node) => node.size)
+    )
+    .force(
       "charge",
       d3.forceManyBody().strength(-30).distanceMax(graph.nodeSize)
     )
@@ -54,8 +58,8 @@ export function forceSubgraphLayout(
 
   simulation.nodes().forEach((d3Node) => {
     const [node] = assertEdgesExists(nodeMap.get(d3Node.id));
-    node.x = d3Node.x;
-    node.y = d3Node.y;
+    node.x = d3Node.x - d3Node.size / 2;
+    node.y = d3Node.y - d3Node.size / 2;
   });
 }
 
@@ -84,13 +88,17 @@ export function forceClusterLayout(graph: PartialGraph): void {
   const simulation = d3
     .forceSimulation<D3ClusterNode>(clusters)
     .force("link", forceLink)
+    .force(
+      "collision",
+      d3.forceCollide((node) => node.size)
+    )
     .force("charge", d3.forceManyBody().strength(-30))
     .force("center", d3.forceCenter())
     .tick(300);
 
   simulation.nodes().forEach((d3Node) => {
     const [clusterNode] = assertEdgesExists(clusterNodeMap.get(d3Node.id));
-    clusterNode.x = d3Node.x;
-    clusterNode.y = d3Node.y;
+    clusterNode.x = d3Node.x - d3Node.size / 2;
+    clusterNode.y = d3Node.y - d3Node.size / 2;
   });
 }

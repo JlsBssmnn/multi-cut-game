@@ -16,6 +16,7 @@ import { getUserDevice } from "../../utils/cssUtils";
 import { useWindowSize } from "../../utils/customHooks";
 import { nodeSize } from "../../utils/constants";
 import { Layout } from "../../utils/graph_layout/LayoutAlgorithms";
+import { forceClusterLayout } from "../../utils/graph_layout/forceLayout";
 
 export interface OptimalMulticutProps {
   optimalMulticut: LogicalGraph | null;
@@ -100,7 +101,7 @@ export default function OptimalMulticut({
             nodeSize={responsiveNodeSize}
             logicalGraph={optimalMulticut}
             graphTheme={theme}
-            layout={layout}
+            layout={{ ...layout, clusterLayout: forceClusterLayout }}
           />
         </DialogContent>
       </Dialog>

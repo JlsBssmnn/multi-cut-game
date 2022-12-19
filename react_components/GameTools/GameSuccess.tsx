@@ -1,28 +1,21 @@
 import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
-import { useState } from "react";
-import { Solution } from "../../utils/server_utils/findBestMulticut";
+import { Dispatch, SetStateAction, useState } from "react";
 import Confetti from "react-confetti";
 import styles from "../../styles/GameTools.module.scss";
 
 export interface GameSuccessProps {
-  currentCost: number;
-  optimalSolution: Solution | null;
+  shouldOpen: boolean;
+  setDialogShown: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function GameSuccess({
-  currentCost,
-  optimalSolution,
+  shouldOpen,
+  setDialogShown,
 }: GameSuccessProps) {
-  const [dialogShown, setDialogShown] = useState<boolean>(false);
   const [dialog, setDialog] = useState<HTMLDivElement | null>(null);
 
-  const open =
-    !dialogShown &&
-    optimalSolution != null &&
-    currentCost === optimalSolution.cost;
-
   return (
-    <Dialog open={open} maxWidth="lg">
+    <Dialog open={shouldOpen} maxWidth="lg">
       <div ref={(newRef) => setDialog(newRef)}>
         <DialogContent>
           <div className={styles.successMessage}>

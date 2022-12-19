@@ -1,5 +1,5 @@
 import { Paper } from "@mui/material";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import styles from "../styles/GameTools.module.scss";
 import { LogicalGraph } from "../types/graph";
 import {
@@ -28,6 +28,8 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
   { graph, theme, solution, layout },
   ref
 ) {
+  const [gameSuccessShown, setGameSuccessShown] = useState<boolean>(false);
+
   const optimalMulticut = solution
     ? getGraphFromSolution(graph, solution)
     : null;
@@ -51,7 +53,12 @@ export default forwardRef<HTMLDivElement, StatsProps>(function GameControls(
           theme={theme}
           layout={layout}
         />
-        <GameSuccess currentCost={cost} optimalSolution={solution} />
+        <GameSuccess
+          setDialogShown={setGameSuccessShown}
+          shouldOpen={
+            !gameSuccessShown && solution != null && solution.cost === cost
+          }
+        />
       </GameToolWrapper>
     </Paper>
   );

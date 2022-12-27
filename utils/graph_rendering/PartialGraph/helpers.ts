@@ -473,12 +473,14 @@ export function getHintedEdge(
 }
 
 /**
- * Checks if the given cluster intersects with any other cluster. If so, it tries
- * to move the other cluster away s.t. they don't overlap anymore.
+ * Checks if the given cluster intersects with any other cluster in the `nodesToCheck` array.
+ * If so, it tries to move the other cluster away s.t. they don't overlap anymore. If the
+ * `nodesToCheck` array is not provided it defaults to all cluster nodes in the graph.
  */
 export function fixClusterOverlap(
   this: PartialGraph,
-  clusterNode: PartialClusterNode
+  clusterNode: PartialClusterNode,
+  nodesToCheck?: PartialClusterNode[]
 ): void {
   const radius = clusterNode.size / 2;
   const clusterNodePosition = {
@@ -487,7 +489,7 @@ export function fixClusterOverlap(
   };
   const space = this.nodeSize * clusterRepositioningSpacing;
 
-  this.nodes.forEach((otherCluster) => {
+  (nodesToCheck ?? this.nodes).forEach((otherCluster) => {
     if (otherCluster === clusterNode) return;
 
     const otherRadius = otherCluster.size / 2;

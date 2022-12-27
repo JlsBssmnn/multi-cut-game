@@ -136,6 +136,9 @@ export function commitMoveOut(this: PartialGraph) {
   this.makeOpaque();
 
   if (this.temporarySplitClusters.length > 0) {
+    this.temporarySplitClusters.forEach((clusterNode) =>
+      this.fixClusterOverlap(clusterNode)
+    );
     this.temporarySplitClusters = [];
   } else {
     this.updateClusterNode(this.dragEvent.originClusterNode);

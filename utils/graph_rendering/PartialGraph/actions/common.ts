@@ -109,6 +109,10 @@ export function splitCluster(
   this.removeClusterNode(clusterNode.id);
   this.nodes.push(...splitClusters);
   this.temporarySplitClusters = splitClusters;
+
+  this.temporarySplitClusters.forEach((tempCluster) =>
+    this.fixClusterOverlap(tempCluster, this.temporarySplitClusters)
+  );
 }
 
 /**

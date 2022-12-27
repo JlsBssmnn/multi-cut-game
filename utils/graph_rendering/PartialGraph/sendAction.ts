@@ -44,6 +44,7 @@ export function sendAction(this: PartialGraph) {
     }
   }
 
+  this.nodes.sort((cluster1, cluster2) => cluster1.size - cluster2.size);
   this.dragEvent = null;
 }
 

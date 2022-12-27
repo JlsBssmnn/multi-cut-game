@@ -69,7 +69,7 @@ export default function GraphVisualization({
           className={edge === hintEdge ? styles.blinkingEdge : ""}
         ></line>
       ))}
-      {nodes.map((node) => (
+      {[...nodes].reverse().map((node) => (
         <g key={"n" + node.id} id={"clusterG" + node.id}>
           <circle
             id={"cluster" + node.id}

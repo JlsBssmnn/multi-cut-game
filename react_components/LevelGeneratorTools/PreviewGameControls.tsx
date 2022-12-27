@@ -13,7 +13,7 @@ import OptimalCost from "../GameTools/OptimalCost";
 import ShowHint from "../GameTools/ShowHint";
 import OptimalMulticut from "../GameTools/OptimalMulticut";
 import GameSuccess from "../GameTools/GameSuccess";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 export interface PreviewGameControlsProps {
   graph: LogicalGraph;
@@ -22,6 +22,8 @@ export interface PreviewGameControlsProps {
   layout: Layout;
   width: number;
   height: number;
+  gameSuccessShown: boolean;
+  setGameSuccessShown: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function PreviewGameControls({
@@ -31,8 +33,9 @@ export default function PreviewGameControls({
   layout,
   width,
   height,
+  gameSuccessShown,
+  setGameSuccessShown,
 }: PreviewGameControlsProps) {
-  const [gameSuccessShown, setGameSuccessShown] = useState<boolean>(false);
   const cost = getGraphScore(graph);
 
   return (

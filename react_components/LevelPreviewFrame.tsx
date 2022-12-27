@@ -30,10 +30,12 @@ export default function LevelPreviewFrame(props: LevelPreviewFrameProps) {
   const [graph, setGraph] = useState<LogicalGraph>(
     JSON.parse(JSON.stringify(props.graph))
   );
+  const [gameSuccessShown, setGameSuccessShown] = useState<boolean>(false);
 
   useEffect(() => {
     setGraph(JSON.parse(JSON.stringify(props.graph)));
     setGraphKey((prev) => prev + 1);
+    setGameSuccessShown(false);
   }, [props.graph]);
 
   const [width, height] = useWindowSize();
@@ -58,6 +60,8 @@ export default function LevelPreviewFrame(props: LevelPreviewFrameProps) {
           layout={props.layout}
           width={graphWidth}
           height={graphHeight}
+          gameSuccessShown={gameSuccessShown}
+          setGameSuccessShown={setGameSuccessShown}
         />
         <Paper elevation={10} sx={{ width: graphWidth, height: graphHeight }}>
           {props.graph.nodes.length > 0 && (

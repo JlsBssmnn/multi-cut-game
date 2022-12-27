@@ -370,6 +370,9 @@ export function scaleGraphRelative(
   newLayout: GraphDimensions,
   margin: number
 ) {
+  this.width = newLayout.width;
+  this.height = newLayout.height;
+
   scaleLayout(this.nodes, newLayout.width, newLayout.height, margin);
   this.lastStates.forEach((state) =>
     scaleLayout(state.nodes, newLayout.width, newLayout.height, margin)
@@ -419,6 +422,9 @@ export function scaleWholeGraph(
   height: number,
   margin: number
 ): void {
+  this.width = width;
+  this.height = height;
+
   this.layout.clusterLayout(this);
   scaleLayout(this.nodes, width, height, margin);
 
@@ -505,7 +511,13 @@ export function fixClusterOverlap(
 
     const scaleFactor = distanceToMove / diffLength;
 
-    otherCluster.x += diff.x * scaleFactor;
-    otherCluster.y += diff.y * scaleFactor;
+    otherCluster.x = Math.min(
+      Math.max(otherCluster.x + diff.x * scaleFactor, -otherRadius),
+      this.width - otherRadius
+    );
+    otherCluster.y = Math.min(
+      Math.max(otherCluster.y + diff.y * scaleFactor, -otherRadius),
+      this.height - otherRadius
+    );
   });
 }

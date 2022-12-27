@@ -86,6 +86,9 @@ export default class PartialGraph {
   theme: PartialGraphTheme;
   layout: Layout;
 
+  width: number = 0;
+  height: number = 0;
+
   dragEvent: ClusterDragEvent | NodeDragEvent | null = null;
 
   /**

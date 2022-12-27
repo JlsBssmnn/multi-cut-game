@@ -157,4 +157,5 @@ export function commitJoinClusters(this: PartialGraph) {
 
   this.updateClusterNode(destinationCluster);
   this.makeOpaque();
+  this.fixClusterOverlap(destinationCluster);
 }

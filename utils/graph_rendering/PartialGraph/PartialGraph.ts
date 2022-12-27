@@ -48,6 +48,7 @@ import {
   copyState,
   scaleWholeGraph,
   getHintedEdge,
+  fixClusterOverlap,
 } from "./helpers";
 import { moveNode } from "./moveNode";
 import { nodeAt } from "./nodeAt";
@@ -156,6 +157,7 @@ export default class PartialGraph {
   copyState = copyState;
   scaleWholeGraph = scaleWholeGraph;
   getHintedEdge = getHintedEdge;
+  fixClusterOverlap = fixClusterOverlap;
 
   splitCluster = splitCluster;
   restoreOriginClusterNode = restoreOriginClusterNode;

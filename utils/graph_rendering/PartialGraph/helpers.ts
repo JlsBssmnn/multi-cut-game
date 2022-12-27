@@ -6,7 +6,12 @@ import {
   PartialClusterNode,
   PartialSubgraph,
 } from "../../../types/graph";
-import { clusterDiameter, clusterOffset } from "../../calculations/geometry";
+import {
+  clusterDiameter,
+  clusterOffset,
+  vectorLength,
+} from "../../calculations/geometry";
+import { clusterRepositioningSpacing } from "../../constants";
 import { GraphDimensions, scaleLayout } from "../../graph_layout/scaleGraph";
 import { getSubgraph } from "./createPartialGraph";
 import PartialGraph, { GraphState } from "./PartialGraph";
@@ -465,4 +470,40 @@ export function getHintedEdge(
   }
 
   return null;
+}
+
+/**
+ * Checks if the given cluster intersects with any other cluster. If so, it tries
+ * to move the other cluster away s.t. they don't overlap anymore.
+ */
+export function fixClusterOverlap(
+  this: PartialGraph,
+  clusterNode: PartialClusterNode
+): void {
+  const radius = clusterNode.size / 2;
+  const clusterNodePosition = {
+    x: clusterNode.x + radius,
+    y: clusterNode.y + radius,
+  };
+  const space = this.nodeSize * clusterRepositioningSpacing;
+
+  this.nodes.forEach((otherCluster) => {
+    if (otherCluster === clusterNode) return;
+
+    const otherRadius = otherCluster.size / 2;
+    const diff = {
+      x: otherCluster.x + otherRadius - clusterNodePosition.x,
+      y: otherCluster.y + otherRadius - clusterNodePosition.y,
+    };
+
+    const diffLength = vectorLength(diff);
+    const distanceToMove = radius + otherRadius + space - diffLength;
+
+    if (distanceToMove <= 0) return;
+
+    const scaleFactor = distanceToMove / diffLength;
+
+    otherCluster.x += diff.x * scaleFactor;
+    otherCluster.y += diff.y * scaleFactor;
+  });
 }

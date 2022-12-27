@@ -19,4 +19,8 @@ export const graphMargin = 40;
 // how much percent of the nodeSize is gonna be the distance between the nodes
 export const gridLayoutSpacing = 1;
 
+// How much percent of the nodeSize to use as space between cluster nodes when they
+// overlap and are repositioned
+export const clusterRepositioningSpacing = 1;
+
 export const hintDuration = 3000;

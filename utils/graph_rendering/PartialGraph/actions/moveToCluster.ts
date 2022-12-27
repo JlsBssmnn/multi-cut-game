@@ -136,4 +136,5 @@ export function commitMoveToCluster(this: PartialGraph) {
   }
 
   this.updateClusterNode(this.dragEvent.clusterNode);
+  this.fixClusterOverlap(this.dragEvent.clusterNode);
 }

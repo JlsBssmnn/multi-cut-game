@@ -1,6 +1,6 @@
 import { Level } from "./levelTypes";
 
-const keyword = "complete [large]";
+const keyword = "complete [medium]";
 
 const graph = {
   nodes: [

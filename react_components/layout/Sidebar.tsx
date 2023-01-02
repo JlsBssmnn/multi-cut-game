@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 import InputIcon from "@mui/icons-material/Input";
+import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
 
 const levelCount = 8;
@@ -43,6 +44,20 @@ export default function Sidebar({ drawerOpen, setDrawerOpen }: SidebarProps) {
         onClick={() => setDrawerOpen(false)}
       >
         <List>
+          <ListItem disablePadding>
+            <Link href={`/`}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <HomeIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Start Page"}
+                  primaryTypographyProps={{ fontSize: "1.2rem" }}
+                />
+              </ListItemButton>
+            </Link>
+          </ListItem>
+          <Divider />
           <ListSubheader sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
             Main Levels
           </ListSubheader>

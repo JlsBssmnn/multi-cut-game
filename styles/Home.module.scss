@@ -1,0 +1,57 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: max(500px, 80%);
+  margin: auto;
+}
+
+.text {
+  text-align: center;
+}
+
+.mainHeading {
+  @extend .text;
+  font-size: 4rem;
+  text-decoration: underline;
+}
+
+.heading {
+  @extend .text;
+  font-size: 3rem;
+}
+
+.title {
+  font-size: 4rem;
+}
+
+.description {
+  text-align: justify;
+  margin: 0 1rem;
+  line-height: 1.5;
+  font-size: 1.5rem;
+}
+
+.bulletPointHeading {
+  font-style: italic;
+  font-weight: 500;
+}
+
+.bulletPointList {
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.listItem {
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.animation {
+  border: 1px solid black;
+}

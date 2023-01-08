@@ -505,10 +505,16 @@ export function fixClusterOverlap(
       y: otherCluster.y + otherRadius - clusterNodePosition.y,
     };
 
-    const diffLength = vectorLength(diff);
+    let diffLength = vectorLength(diff);
     const distanceToMove = radius + otherRadius + space - diffLength;
 
     if (distanceToMove <= 0) return;
+
+    if (diff.x === 0 && diff.y === 0) {
+      diff.x = 1;
+      diff.y = 1;
+      diffLength = vectorLength(diff);
+    }
 
     const scaleFactor = distanceToMove / diffLength;
 

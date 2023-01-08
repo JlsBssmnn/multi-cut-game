@@ -190,6 +190,11 @@ export default function InteractiveGraphV2({
         y: event.nativeEvent.offsetY,
       };
       dispatch({ type: "moveNode", payload: { pointer: pointerPosition } });
+    } else if (
+      (event.target as HTMLElement).id === "drag-area" &&
+      partialGraph.dragEvent != null
+    ) {
+      pointerUp();
     }
   }
 
@@ -200,14 +205,6 @@ export default function InteractiveGraphV2({
     partialGraph?.sendAction();
     dispatch({ type: "update" });
     emitGraphChange({ ...partialGraph!.logicalGraph });
-  }
-
-  function pointerOut(e: PointerEvent<HTMLDivElement>) {
-    // undo last action if event comes from mouse, on mobile
-    // this event is also triggered on pointer up
-    if (e.pointerType === "mouse" && e.buttons === 1) {
-      undoLastAction();
-    }
   }
 
   function undoLastAction() {
@@ -234,7 +231,6 @@ export default function InteractiveGraphV2({
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
-      onPointerOut={pointerOut}
     >
       <GraphVisualization
         graph={partialGraph}

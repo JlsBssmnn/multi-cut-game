@@ -360,6 +360,7 @@ export function undoAction(this: PartialGraph) {
   this.logicalGraph = lastState.logicalGraph;
   this.dragEvent = null;
   this.temporaryCluster = null;
+  this.temporarySplitClusters.splice(0);
 }
 
 /**

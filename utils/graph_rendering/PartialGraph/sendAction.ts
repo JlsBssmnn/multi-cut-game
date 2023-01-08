@@ -12,15 +12,12 @@ export function sendAction(this: PartialGraph) {
 
   const action = this.dragEvent.action;
   if (action.name !== "reposition" && !action.valid) {
-    const lastState = this.lastStates.pop();
-    if (!lastState)
+    if (this.lastStates.length === 0) {
       throw new Error(
         "There was an invalid action, but the last valid state wasn't stored!"
       );
-    this.nodes = lastState.nodes;
-    this.edges = lastState.edges;
-    this.dragEvent = null;
-    this.temporaryCluster = null;
+    }
+    this.undoAction();
     return;
   }
 

@@ -12,6 +12,8 @@ export const graphTheme = new PartialGraphTheme(
   6 // edgeThickness
 );
 
+export const levelCount = 8;
+
 export const appBarHeight = 64;
 export const nodeSize = 25;
 export const graphMargin = 40;

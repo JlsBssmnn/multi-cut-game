@@ -14,8 +14,7 @@ import EngineeringIcon from "@mui/icons-material/Engineering";
 import InputIcon from "@mui/icons-material/Input";
 import HomeIcon from "@mui/icons-material/Home";
 import Link from "next/link";
-
-const levelCount = 8;
+import { levelCount } from "../../utils/constants";
 
 const keywords: string[] = [];
 async function initKeywords() {

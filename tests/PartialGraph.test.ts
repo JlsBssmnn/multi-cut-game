@@ -1,6 +1,7 @@
 import { PartialClusterNode } from "../types/graph";
+import { graphTheme } from "../utils/constants";
+import { LayoutAlgorithms } from "../utils/graph_layout/LayoutAlgorithms";
 import PartialGraph from "../utils/graph_rendering/PartialGraph/PartialGraph";
-import PartialGraphTheme from "../utils/graph_rendering/PartialGraphTheme";
 
 function createPartialGraph(
   ids: { id: number; nodeIDs: number[] }[]
@@ -33,16 +34,8 @@ function createPartialGraph(
       edges: [],
     },
     20,
-    new PartialGraphTheme(
-      [0, 0, 255],
-      [224, 235, 245],
-      [255, 255, 255],
-      [0, 0, 0],
-      [255, 255, 255],
-      [255, 255, 255],
-      [255, 255, 255],
-      0.5
-    )
+    graphTheme,
+		LayoutAlgorithms.force,
   );
 }
 
@@ -67,10 +60,10 @@ test("get nodes by id", () => {
 
   expect(graph1.getNode(0)).toEqual(graph1.nodes[0].subgraph.nodes[0]);
   expect(graph1.getNode(1)).toEqual(graph1.nodes[0].subgraph.nodes[1]);
-  expect(graph1.getNode(1, 0)).toEqual(graph1.nodes[0].subgraph.nodes[1]);
-  expect(graph1.getNode(2, 0)).toEqual(graph1.nodes[0].subgraph.nodes[2]);
+  expect(graph1.getNode(1, graph1.getClusterNode(0))).toEqual(graph1.nodes[0].subgraph.nodes[1]);
+  expect(graph1.getNode(2, graph1.getClusterNode(0))).toEqual(graph1.nodes[0].subgraph.nodes[2]);
 
-  expect(() => graph1.getNode(4, 0)).toThrowError();
+  expect(() => graph1.getNode(4, graph1.getClusterNode(0))).toThrowError();
   expect(graph1.getNode(4)).toEqual(graph1.nodes[1].subgraph.nodes[0]);
   expect(() => graph1.getNode(11)).toThrowError();
 });
